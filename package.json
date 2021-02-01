@@ -1,0 +1,27 @@
+{
+  "name": "jibot3",
+  "version": "1.0.0",
+  "description": "A Slack Bot",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joi/jibot3.git"
+  },
+  "keywords": [
+    "slack",
+    "chat",
+    "bot"
+  ],
+  "author": "jibot team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Joi/jibot3/issues"
+  },
+  "homepage": "https://github.com/Joi/jibot3#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0"
+  }
+}
