@@ -2,9 +2,10 @@
   "name": "jibot3",
   "version": "1.0.0",
   "description": "A Slack Bot",
-  "main": "app.js",
+  "main": "src/app.js",
   "scripts": {
-    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+    "start": "node src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
   },
   "homepage": "https://github.com/Joi/jibot3#readme",
   "dependencies": {
+    "@slack/bolt": "^3.1.1",
     "dotenv": "^8.2.0"
   }
 }
