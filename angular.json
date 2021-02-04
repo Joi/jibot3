@@ -128,8 +128,8 @@
         "server": {
           "builder": "@angular-devkit/build-angular:server",
           "options": {
-			"outputPath": "functions/dist/server",
-			"main": "server.ts",
+            "outputPath": "functions/dist/server",
+            "main": "server.ts",
             "tsConfig": "tsconfig.server.json",
             "externalDependencies": [
               "firebase",
