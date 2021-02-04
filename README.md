@@ -8,7 +8,7 @@ An overview of Slack app creation can be found at: https://api.slack.com/start/o
 1. ### Setup App-Level Token with scopes:
 	1. connections:write
 	1. authorizations:read
-1. ### Enable Sock Mode
+1. ### Enable Socket Mode
 1. ### Set up OAuth scopes
 	1. app_mentions:read
 	1. channels.history
