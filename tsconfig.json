@@ -7,7 +7,7 @@
 			"@env/*": ["environments/*"],
 			"@app/*": ["app/*"],
 		},
-		"outDir": "./dist/out-tsc",
+		"outDir": "./functions/dist/out-tsc",
 		"sourceMap": true,
 		"declaration": false,
 		"downlevelIteration": true,

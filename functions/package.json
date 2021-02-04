@@ -1,0 +1,43 @@
+{
+  "name": "functions",
+  "scripts": {
+    "lint": "eslint --ext .js,.ts .",
+    "build": "tsc",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "12"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "@angular/animations": "~11.1.1",
+    "@angular/common": "~11.1.1",
+    "@angular/compiler": "~11.1.1",
+    "@angular/core": "~11.1.1",
+    "@angular/forms": "~11.1.1",
+    "@angular/platform-browser": "~11.1.1",
+    "@angular/platform-browser-dynamic": "~11.1.1",
+    "@angular/platform-server": "^11.1.1",
+    "@angular/router": "~11.1.1",
+    "@nguniversal/express-engine": "^11.1.1",
+    "express": "^4.17.1",
+    "firebase-admin": "^9.4.2",
+    "firebase-functions": "^3.13.1",
+    "rxjs": "~6.6.3",
+    "zone.js": "^0.11.3"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.14.2",
+    "@typescript-eslint/parser": "^4.14.2",
+    "eslint": "^7.19.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.22.1",
+    "firebase-functions-test": "^0.2.3",
+    "typescript": "^4.0.5"
+  },
+  "private": true
+}
