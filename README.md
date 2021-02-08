@@ -24,17 +24,21 @@ jibot3 requires Slack app tokens to communicate. The steps to retrieve this info
 		<pre><code>
 		export const environment = {
 			production: false,
+			SLACK_CLIENT_ID: "[]",
 			SLACK_APP_TOKEN: "[]",
 			SLACK_BOT_TOKEN: "[]",
+			SLACK_CLIENT_SECRET: "[]",
 			SLACK_SIGNING_SECRET: "[]",
 		};
 		</code></pre>
-	* `environments.prod.ts`
+	* `environments.prod.ts` (you only need this file if you will be deploying to a live environment)
 		<pre><code>
 		export const environment = {
 			production: false,
+			SLACK_CLIENT_ID: "[]",
 			SLACK_APP_TOKEN: "[]",
 			SLACK_BOT_TOKEN: "[]",
+			SLACK_CLIENT_SECRET: "[]",
 			SLACK_SIGNING_SECRET: "[]",
 		};
 		</code></pre>
