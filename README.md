@@ -1,6 +1,6 @@
 # jibot3
 
-A Slack Bot which currently only introduces itself and speaks nonsense.
+A Slack Bot which currently only introduces itself and speaks nonsense when it sees the word "bot".
 
 ## Clone or download the source code
 
