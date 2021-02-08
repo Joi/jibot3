@@ -45,12 +45,14 @@ jibot3 requires Slack app tokens to communicate. The steps to retrieve this info
 
 ## Build run and serve app
 1. `npm run dev:ssr`
-2. Open the live development server (usually located at [http://localhost:4200](http://localhost:4200)). Ensure the app is installed in your slack workspace.  The steps to retrieve this information is outlined in proceeding steps.
-3. Add your jibot to slack channels (Channel details -> More -> Add apps) or interact via direct message.
+1. Open the live development server (usually located at [http://localhost:4200](http://localhost:4200)).
+1. Ensure the app is installed in your slack workspace.  The steps to retrieve this information is outlined in proceeding steps.
+1. Add your jibot to slack channels (Channel details -> More -> Add apps).
+1. Interact with your jibot in channels to which the bot belongs or via direct message.
 
 ## Create & Configure a Slack APP
 
-You can retrieve your create a Slack App or access your existing Slack apps at: [https://api.slack.com/apps](https://api.slack.com/apps). An overview of Slack app creation can be found at: [https://api.slack.com/start/overview#creating](https://api.slack.com/start/overview#creating).
+You can retrieve your create a Slack App or access your existing Slack apps at: [https://api.slack.com/apps](https://api.slack.com/apps). An overview of Slack app creation can be found at: [https://api.slack.com/start/overview#creating](https://api.slack.com/start/overview#creating). You may need to confer with a Slack Administrator to get this information.
 
 1. ### Setup App-Level Token with scopes:
 	* `connections:write`
