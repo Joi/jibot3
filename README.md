@@ -1,28 +1,67 @@
 # jibot3
-A Slack Bot
 
-## Create & Configure a Slack APP
-You can retrieve your create a Slack App or access your existing Slack apps at: https://api.slack.com/apps
-An overview of Slack app creation can be found at: https://api.slack.com/start/overview#creating.
+A Slack Bot which currently only introduces itself and speaks nonsense.
 
-1. ### Setup App-Level Token with scopes:
-	1. connections:write
-	1. authorizations:read
-1. ### Enable Socket Mode
-1. ### Set up OAuth scopes
-	1. app_mentions:read
-	1. channels.history
-	1. channels:read
-	1. chat.write
-	1. im:history
-	1. users:read
-1. ### Subscribe to Bot Event Subscriptions
-	1. app_mention
-	1. message.channels
-	1. message.im
+## Clone or download the source code
+
+* **GitHub Repo:** [https://github.com/Joi/jibot3](https://github.com/Joi/jibot3)
+* **GitHub CLI:** `gh repo clone Joi/jibot3`
+* **HTTP:** `git clone https://github.com/Joi/jibot3.git`
+* **SSH:** `git clone https://github.com/Joi/jibot3.git`
+
+## Install Dependencies
+
+1. `cd projectDirectory`
+1. `npm install`
 
 ## Add Environment Variables
-You can retrieve your create a Slack API or retrieve your existing Slack APP API tokens from: https://api.slack.com/apps.
-1. SLACK_APP_TOKEN
-1. SLACK_BOT_TOKEN
-1. SLACK_SIGNING_SECRET
+
+jibot3 requires Slack app tokens to communicate. The steps to retrieve this information is outlined in proceeding steps. These tokens are stored as environment variables. **Treat these tokens like passwords! Do not share them or check them into source code repos.**
+
+1. `mkdir ./src/environments/`
+1. Add and edit the following files:
+	* `environments.ts`
+		<pre><code>
+		export const environment = {
+			production: false,
+			SLACK_APP_TOKEN: "[]",
+			SLACK_BOT_TOKEN: "[]",
+			SLACK_SIGNING_SECRET: "[]",
+		};
+		</code></pre>
+	* `environments.prod.ts`
+		<pre><code>
+		export const environment = {
+			production: false,
+			SLACK_APP_TOKEN: "[]",
+			SLACK_BOT_TOKEN: "[]",
+			SLACK_SIGNING_SECRET: "[]",
+		};
+		</code></pre>
+
+## Build run and serve app
+1. `npm run dev:ssr`
+2. Open the live development server (usually located at [http://localhost:4200](http://localhost:4200)). Ensure the app is installed in your slack workspace.  The steps to retrieve this information is outlined in proceeding steps.
+3. Add your jibot to slack channels (Channel details -> More -> Add apps) or interact via direct message.
+
+## Create & Configure a Slack APP
+
+You can retrieve your create a Slack App or access your existing Slack apps at: [https://api.slack.com/apps](https://api.slack.com/apps). An overview of Slack app creation can be found at: [https://api.slack.com/start/overview#creating](https://api.slack.com/start/overview#creating).
+
+1. ### Setup App-Level Token with scopes:
+	* `connections:write`
+	* `authorizations:read`
+1. ### Enable Socket Mode
+1. ### Set up OAuth scopes
+	* `app_mentions:read`
+	* `channels:history`
+	* `channels:read`
+	* `chat.write`
+	* `im:history`
+	* `users:read`
+1. ### Subscribe to Bot Event Subscriptions
+	* `app_mention`
+	* `message.channels`
+	* `message.im`
+1. Install the app to your slack workspace. This is in the Basic Information area.
+1. jibot can now be added to Slack channels or interacted with via direct message.
