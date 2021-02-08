@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { ServerModule } from '@angular/platform-server';
 import { App, LogLevel  } from '@slack/bolt';
-
 import { environment } from '@env/environment';
 import { AppModule } from '@app/app.module';
 import { AppComponent } from '@app/app.component';
@@ -18,7 +17,7 @@ export class AppServerModule {
 	private handleError = (error) => console.log(error);
 	private rot13 = (str) => str.split('').map(char => String.fromCharCode(char.charCodeAt(0) + (char.toLowerCase() < 'n' ? 13 : -13))).join('');
 	private getById = (id, collection) => collection.find(o => o.id === id);
-	private interestingThings: string[] = ['members', 'conversations'];
+	private interestingThings: string[] = ['users', 'conversations'];
 	private app = new App({
 		socketMode:		true,
 		convoStore:		false,
@@ -32,7 +31,7 @@ export class AppServerModule {
 	private clientConfig: any = {
 		token: environment.SLACK_BOT_TOKEN
 	}
-	public members:any[] = null;
+	public users:any[] = null;
 	public conversations:any[] = null;
 	constructor() {
 		this.create().catch(this.handleError.bind(this));
@@ -44,13 +43,15 @@ export class AppServerModule {
 		if (status.ok) this.lookAround().then(this.listenToThings.bind(this));
 	}
 	private async lookAround() {
-		this.interestingThings.forEach(async thing => await this.lookAt(thing).then(result => this.remember(thing, result)))
+		this.interestingThings.forEach(async thing => await this.lookAt(thing).then(result => this.remember(thing, result)));
 	}
 	private async lookAt(something:string) {
-		return (this.app.client[something]?.list) ? await this.app.client[something].list(this.clientConfig) : null;
+		(this.app.client[something]?.list) ? await this.app.client[something].list(this.clientConfig) : null;
 	}
-	private async remember(something:string, data:any) {
-		return (this[something] && data[something]) ? this[something] = data[something] : null;
+	private remember(something:string, data:any) {
+		let collectionName:string = something;
+		if (something == 'users') collectionName = 'members';
+		this[something] = data[collectionName];
 	}
 	private listenToThings() {
 		this.app.message(/(bot).*/, this.speakNonsense.bind(this));
@@ -60,7 +61,7 @@ export class AppServerModule {
 		return await say(this.rot13(event.text));
 	}
 	private async introduceMyself({ event, say }) {
-		let user = this.getById(event.user, this.members);
+		let user = this.getById(event.user, this.users);
 		let userName = (user.real_name) ? user.real_name : user.name;
 		return await say(`Hello ${userName}. I am ready to learn.`);
 	}
