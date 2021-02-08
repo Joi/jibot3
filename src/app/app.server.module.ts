@@ -43,10 +43,12 @@ export class AppServerModule {
 		if (status.ok) this.lookAround().then(this.listenToThings.bind(this));
 	}
 	private async lookAround() {
-		this.interestingThings.forEach(async thing => await this.lookAt(thing).then(result => this.remember(thing, result)));
+		return this.interestingThings.forEach(async thing => await this.lookAt(thing).then(result => this.remember(thing, result)));
 	}
 	private async lookAt(something:string) {
-		(this.app.client[something]?.list) ? await this.app.client[something].list(this.clientConfig) : null;
+		if (this.app.client[something]?.list) {
+			return await this.app.client[something].list(this.clientConfig);
+		}
 	}
 	private remember(something:string, data:any) {
 		let collectionName:string = something;
@@ -61,8 +63,12 @@ export class AppServerModule {
 		return await say(this.rot13(event.text));
 	}
 	private async introduceMyself({ event, say }) {
-		let user = this.getById(event.user, this.users);
-		let userName = (user.real_name) ? user.real_name : user.name;
-		return await say(`Hello ${userName}. I am ready to learn.`);
+		if (this.users) {
+			let user = this.getById(event.user, this.users);
+			let userName = (user.real_name) ? user.real_name : user.name;
+			return await say(`Hello ${userName}. I am ready to learn.`);
+		} else {
+			return await say(`Hello ${event.user}. I am ready to learn.`);
+		}
 	}
 }
