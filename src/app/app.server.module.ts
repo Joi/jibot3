@@ -4,20 +4,27 @@ import { App, LogLevel  } from '@slack/bolt';
 import { environment } from '@env/environment';
 import { AppModule } from '@app/app.module';
 import { AppComponent } from '@app/app.component';
+import { LoggerService } from '@services/logger.service';
 
 @NgModule({
 	bootstrap: [AppComponent],
 	declarations: [],
 	imports: [
-		AppModule, ServerModule,
+		AppModule,
+		ServerModule,
 	],
 	providers:	[]
 })
 export class AppServerModule {
-	private handleError = (error) => console.log(error);
+	constructor(private loggerService: LoggerService) {
+		this.loggerService.log(`${this.constructor.name} starting...`);
+		this.create().catch(this.handleError.bind(this));
+	}
+	private handleError = (error) => this.loggerService.error(error);
 	private rot13 = (str) => str.split('').map(char => String.fromCharCode(char.charCodeAt(0) + (char.toLowerCase() < 'n' ? 13 : -13))).join('');
 	private getById = (id, collection) => collection.find(o => o.id === id);
 	private interestingThings: string[] = ['users', 'conversations'];
+
 	private app = new App({
 		socketMode:		true,
 		convoStore:		false,
@@ -33,14 +40,17 @@ export class AppServerModule {
 	}
 	public users:any[] = null;
 	public conversations:any[] = null;
-	constructor() {
-		this.create().catch(this.handleError.bind(this));
-	}
+
 	private async create() {
 		return await this.app.start({}).then(this.wakeup.bind(this));
 	}
 	private async wakeup(status) {
-		if (status.ok) this.lookAround().then(this.listenToThings.bind(this));
+		if (status.ok) {
+			this.loggerService.log(`Wakup complete...`)
+			this.lookAround().then(this.listenToThings.bind(this));
+		} else {
+			this.loggerService.error(status);
+		}
 	}
 	private async lookAround() {
 		return this.interestingThings.forEach(async thing => await this.lookAt(thing).then(result => this.remember(thing, result)));
