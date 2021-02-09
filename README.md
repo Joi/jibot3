@@ -7,7 +7,7 @@ A Slack Bot which currently only introduces itself and speaks nonsense when it s
 * **GitHub Repo:** [https://github.com/Joi/jibot3](https://github.com/Joi/jibot3)
 * **GitHub CLI:** `gh repo clone Joi/jibot3`
 * **HTTP:** `git clone https://github.com/Joi/jibot3.git`
-* **SSH:** `git clone https://github.com/Joi/jibot3.git`
+* **SSH:** `git clone git@github.com:Joi/jibot3.git`
 
 ## Install Dependencies
 
