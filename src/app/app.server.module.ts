@@ -4,7 +4,7 @@ import { App, LogLevel  } from '@slack/bolt';
 import { environment } from '@env/environment';
 import { AppModule } from '@app/app.module';
 import { AppComponent } from '@app/app.component';
-import { LoggerService } from '@app/services/logger.service';
+import { LoggerService } from '@services/logger.service';
 
 @NgModule({
 	bootstrap: [AppComponent],
