@@ -6,6 +6,7 @@
 	  "paths": {
 		  "@env/*": ["environments/*"],
 		  "@app/*": ["app/*"],
+		  "@services/*": ["app/services/*"],
 	  },
 	  "outDir": "./out-tsc/server",
 	  "target": "es2016",
