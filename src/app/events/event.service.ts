@@ -7,7 +7,7 @@ import * as Events  from './';
 export class EventService {
 	public events: BoltEvent[] = [];
 	constructor(
-		private appMention: Events.AppMention,
+		public appMention: Events.AppMention,
 	) {
 		for (let event of arguments) this.events.push(<BoltEvent>event);
 	}

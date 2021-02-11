@@ -50,27 +50,8 @@ export class BoltService {
 		}));
 	}
 	private get = async (objectName) => await this.app.client[objectName].list(this.clientConfig);
-
-	private getById = (id, collection) => { return collection.find(i => i.id === id)};
-	private initMessages() { }
+	private initMessages = () => this.messageService.messages.forEach(this.messageService.listen.bind(this));
 	private initEvents = () => this.eventService.events.forEach(this.eventService.listen.bind(this));
 
-	private eventThing() {
-		// Object.keys(Events).forEach(i => {
-		// 	let event = Events[i];
-		// 	if (typeof event == 'function') {
-		// 		event = <BoltEvent>event;
-		// 	} else {
-		// 		console.log(event);
-		// 	}
-		// })
-
-		//console.log(this.eventService);
-		// Object.keys(this.eventService).forEach(i => {
-		// 	let event:BoltEvent = this.eventService[i];
-		// 	console.log(event);
-
-		// 	//this.app.event(event.name, event.callback.bind(this));
-		// });
-	}
+	private getById = (id, collection) => { return collection.find(i => i.id === id)};
 }

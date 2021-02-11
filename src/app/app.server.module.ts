@@ -4,6 +4,7 @@ import { AppModule } from '@app/app.module';
 import { AppComponent } from '@app/app.component';
 import { BoltService } from '@services/bolt.service';
 import * as Events from '@app/events'
+import * as Messages from '@app/events/message';
 
 @NgModule({
 	bootstrap: [AppComponent],
@@ -14,6 +15,7 @@ import * as Events from '@app/events'
 	],
 	providers: [
 		Events.AppMention,
+		Messages.Bot,
 	]
 })
 export class AppServerModule {

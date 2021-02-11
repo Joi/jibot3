@@ -6,10 +6,14 @@ import * as  Messages from './';
 })
 export class MessageService {
 	public messages: BoltMessage[] = [];
-	constructor() {
-		Object.keys(Messages).forEach(i => this.messages.push(<BoltMessage>Messages[i]))
+	constructor(
+		public bot: Messages.Bot
+	) {
+		for (let message of arguments) this.messages.push(<BoltMessage>message);
 	}
 	public listen(message:BoltMessage) {
 		let bolt:any = this;
+		bolt.app.message(message.regex, message.callback.bind(this));
+
 	}
 }
