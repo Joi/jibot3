@@ -7,7 +7,7 @@ import * as  Messages from './';
 export class MessageService {
 	public messages: BoltMessage[] = [];
 	constructor(
-		public bot: Messages.Bot
+		public rot13: Messages.Rot13
 	) {
 		for (let message of arguments) this.messages.push(<BoltMessage>message);
 	}
