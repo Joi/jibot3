@@ -35,22 +35,19 @@ export class BoltService {
 		private conversationService: ConversationService,
 		private eventService: EventService,
 		private messageService: MessageService,
-		private apiService: ApiService,
 	) { }
 	public init = () => this.initialize;
 	private async initialize() {
 		return await this.connectToSlack()
 			.then(this.startAppServer)
-			.then(this.startServices.bind(this))
-			.finally(() => {
-				this.initEvents();
-				this.initMessages();
-				this.logger.log('Bolt initialized...');
-			}).catch(this.logger.error);
+			.then(this.getSlackObjects.bind(this))
+			.then(this.startListenerServices.bind(this))
+			.finally(this.boltIsInitizated.bind(this))
+			.catch(this.logger.error);
 	}
 	private connectToSlack = async ():Promise<App> => await (!this.app) ? this.app = this.app = new App(this.boltOptions) : this.app;
 	private startAppServer = async (app):Promise<Server> => await app.start({});
-	private startServices = async ():Promise<any> => {
+	private getSlackObjects = async ():Promise<any> => {
 		return await Promise.all(this.services.map(async (service) => {
 			let localName = service.collectionNames.collection;
 			let response = await this.get(service.collectionNames.request);
@@ -59,7 +56,7 @@ export class BoltService {
 		}));
 	}
 	private get = async (objectName):Promise<any> => await this.app.client[objectName].list(this.clientConfig);
-	private initMessages = ():void => this.messageService.messages.forEach(this.messageService.listen.bind(this));
-	private initEvents = ():void => this.eventService.events.forEach(this.eventService.listen.bind(this));
+	private startListenerServices = () =>this.services.forEach(service => this[service].listen.bind(this));
+	private boltIsInitizated = ():void => this.logger.log('Bolt initialized...');
 	private getById = (id, collection):any => { return collection.find(i => i.id === id)};
 }
