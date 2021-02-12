@@ -3,6 +3,7 @@ import { Server } from 'http';
 import { App, AppOptions, LogLevel } from '@slack/bolt';
 import { environment } from '@env/environment';
 
+import { ApiService } from '@services/api.service';
 import { LoggerService } from '@services/logger.service';
 import { MemberService } from '@app/components/members/member.service';
 import { ConversationService } from '@app/components/conversations/conversation.service';
@@ -34,6 +35,7 @@ export class BoltService {
 		private conversationService: ConversationService,
 		private eventService: EventService,
 		private messageService: MessageService,
+		private apiService: ApiService,
 	) {
 	}
 	public async init() {
@@ -45,6 +47,9 @@ export class BoltService {
 				this.initEvents();
 				this.initMessages();
 				this.logger.log('Bolt initialized...');
+				this.apiService
+						.getApi("https://data.montgomerycountymd.gov/resource/98cc-bc7d.json")
+						.subscribe(response => console.log(response));
 			})
 			.catch(err => console.warn(err));
 	}
