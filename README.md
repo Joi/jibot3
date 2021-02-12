@@ -19,29 +19,30 @@ A Slack Bot which currently only introduces itself and speaks nonsense when it s
 jibot3 requires Slack app tokens to communicate. The steps to retrieve this information is outlined in proceeding steps. These tokens are stored as environment variables. **Treat these tokens like passwords! Do not share them or check them into source code repos.**
 
 1. `mkdir ./src/environments/`
-1. Add and edit the following files:
-	* `environments.ts`
-		<pre><code>
+1. `touch ./src/environments/environments.ts`
+1. Then add content to the files as shown, adding in your slack app tokens as appropriate:
+	<pre><code>
 		export const environment = {
 			production: false,
-			SLACK_CLIENT_ID: "[]",
-			SLACK_APP_TOKEN: "[]",
-			SLACK_BOT_TOKEN: "[]",
-			SLACK_CLIENT_SECRET: "[]",
-			SLACK_SIGNING_SECRET: "[]",
+			SLACK_CLIENT_ID: "",
+			SLACK_APP_TOKEN: "",
+			SLACK_BOT_TOKEN: "",
+			SLACK_CLIENT_SECRET: "",
+			SLACK_SIGNING_SECRET: "",
 		};
-		</code></pre>
-	* `environments.prod.ts` (you only need this file if you will be deploying to a live environment)
-		<pre><code>
+	</code></pre>
+1. If you will be deploying to a production environment, you will also need another file:
+1. `touch ./src/environments/environments.prod.ts`
+	<pre><code>
 		export const environment = {
 			production: false,
-			SLACK_CLIENT_ID: "[]",
-			SLACK_APP_TOKEN: "[]",
-			SLACK_BOT_TOKEN: "[]",
-			SLACK_CLIENT_SECRET: "[]",
-			SLACK_SIGNING_SECRET: "[]",
+			SLACK_CLIENT_ID: "",
+			SLACK_APP_TOKEN: "",
+			SLACK_BOT_TOKEN: "",
+			SLACK_CLIENT_SECRET: "",
+			SLACK_SIGNING_SECRET: "",
 		};
-		</code></pre>
+	</code></pre>
 
 ## Build run and serve app
 1. `npm run dev:ssr`
