@@ -36,10 +36,9 @@ export class BoltService {
 		private eventService: EventService,
 		private messageService: MessageService,
 		private apiService: ApiService,
-	) {
-	}
-	public async init() {
-		this.logger.log('Initializing Bolt...');
+	) { }
+	public init = () => this.initialize;
+	private async initialize() {
 		return await this.connectToSlack()
 			.then(this.startAppServer)
 			.then(this.startServices.bind(this))
@@ -47,11 +46,7 @@ export class BoltService {
 				this.initEvents();
 				this.initMessages();
 				this.logger.log('Bolt initialized...');
-				this.apiService
-						.getApi("https://data.montgomerycountymd.gov/resource/98cc-bc7d.json")
-						.subscribe(response => console.log(response));
-			})
-			.catch(err => console.warn(err));
+			}).catch(this.logger.error);
 	}
 	private connectToSlack = async ():Promise<App> => await (!this.app) ? this.app = this.app = new App(this.boltOptions) : this.app;
 	private startAppServer = async (app):Promise<Server> => await app.start({});

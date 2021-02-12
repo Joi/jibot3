@@ -4,6 +4,8 @@ import { AppModule } from '@app/app.module';
 import { AppComponent } from './app.component';
 
 import { BoltService } from '@services/bolt.service';
+import { ApiService } from '@services/api.service';
+
 import * as Events from '@app/events'
 import * as Messages from '@app/events/message';
 @NgModule({
