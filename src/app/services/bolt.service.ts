@@ -2,6 +2,8 @@ import { Injectable} from '@angular/core';
 import { Server } from 'http';
 import { App, AppOptions, LogLevel } from '@slack/bolt';
 import { environment } from '@env/environment';
+
+import { LoggerService } from '@services/logger.service';
 import { MemberService } from '@app/components/members/member.service';
 import { ConversationService } from '@app/components/conversations/conversation.service';
 import { EventService } from '@app/events/event.service';
@@ -27,21 +29,28 @@ export class BoltService {
 	};
 	private services: any[] = [this.memberService, this.conversationService];
 	constructor(
+		private logger: LoggerService,
 		private memberService: MemberService,
 		private conversationService: ConversationService,
 		private eventService: EventService,
 		private messageService: MessageService,
-	) {	}
+	) {
+	}
 	public async init() {
+		this.logger.log('Initializing Bolt...');
 		return await this.connectToSlack()
-						.then(this.startAppServer)
-						.then(this.startServices.bind(this))
-						.finally(this.initEvents.bind(this))
-						.finally(this.initMessages.bind(this));
+			.then(this.startAppServer)
+			.then(this.startServices.bind(this))
+			.finally(() => {
+				this.initEvents();
+				this.initMessages();
+				this.logger.log('Bolt initialized...');
+			})
+			.catch(err => console.warn(err));
 	}
 	private connectToSlack = async ():Promise<App> => await (!this.app) ? this.app = this.app = new App(this.boltOptions) : this.app;
 	private startAppServer = async (app):Promise<Server> => await app.start({});
-	private startServices = async () => {
+	private startServices = async ():Promise<any> => {
 		return await Promise.all(this.services.map(async (service) => {
 			let localName = service.collectionNames.collection;
 			let response = await this.get(service.collectionNames.request);
@@ -49,9 +58,8 @@ export class BoltService {
 			return service;
 		}));
 	}
-	private get = async (objectName) => await this.app.client[objectName].list(this.clientConfig);
-	private initMessages = () => this.messageService.messages.forEach(this.messageService.listen.bind(this));
-	private initEvents = () => this.eventService.events.forEach(this.eventService.listen.bind(this));
-
-	private getById = (id, collection) => { return collection.find(i => i.id === id)};
+	private get = async (objectName):Promise<any> => await this.app.client[objectName].list(this.clientConfig);
+	private initMessages = ():void => this.messageService.messages.forEach(this.messageService.listen.bind(this));
+	private initEvents = ():void => this.eventService.events.forEach(this.eventService.listen.bind(this));
+	private getById = (id, collection):any => { return collection.find(i => i.id === id)};
 }
