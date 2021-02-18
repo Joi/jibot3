@@ -9,8 +9,6 @@ import { LoggerService } from './logger.service';
 export class ApiService {
 	public apis:  Object = {};
 	public books: any = {};
-
-	public subscriptions:Object = {};
 	public presets: any = {
 		text: {
 			headers: new HttpHeaders().set('Accept', 'text/plain'),
@@ -25,17 +23,17 @@ export class ApiService {
 		private logger: LoggerService,
 		private http: HttpClient,
 	) {	}
-	public init = () => this.initialize();
+	public init = this.initialize;
 	private async initialize() {
-		console.log(`Initializing ${this.constructor.name}...`);
+		this.logger.log(`Initializing ${this.constructor.name}...`);
 		// await this.getApis().pipe(tap(apis => {
 		// 	apis.forEach(api => (this.apis[api.name] = this.getApi(api.url, api.options)));
 		// })).subscribe();
 		this.getBooks()
 			.pipe(tap(books => {
 				books.forEach(book => {
-					this.books[book.name] = {};
-					this.logger.log(`Getting ${book.name}...`);
+					this.books[book.name] = { title: book.name };
+					this.logger.log(`Getting '${book.name}'...`);
 					this.books[book.name].get = this.getApi(book.url, book.options).pipe(map(this.trimGutenbergBookSpacing.bind(this)));
 				});
 			})).subscribe();
@@ -61,16 +59,16 @@ export class ApiService {
 		// @TODO: Replace this function with a looker upper
 		let books: Object[] = [
 			{
-				name: 'The Mysterious Island',
-				url: "https://www.gutenberg.org/files/1268/1268-0.txt",
+				name: '2 B R 0 2 B',
+				url: 'https://www.gutenberg.org/cache/epub/21279/pg21279.txt',
 				options: {
 					... this.presets.text,
 					... { observe: 'body' }
 				}
 			},
 			// {
-			// 	name: '2 B R 0 2 B',
-			// 	url: 'https://www.gutenberg.org/cache/epub/21279/pg21279.txt',
+			// 	name: 'The Mysterious Island',
+			// 	url: "https://www.gutenberg.org/files/1268/1268-0.txt",
 			// 	options: {
 			// 		... this.presets.text,
 			// 		... { observe: 'body' }
@@ -88,7 +86,7 @@ export class ApiService {
 		return of(books);
 	}
 	private trimGutenbergBookSpacing(gutenberg) {
-		this.logger.log(`Trimming whitespace from guternberg book...`);
+		this.logger.log(`Trimming whitespace from gutenberg book...`);
 		let contents;
 		let tab = `\\t`, space = '\\s', nonSpace = '\\S', newline = `[\\r\\n]`,
 			trailingSpace = `[${tab}]*${newline}+[${tab}]*`,
@@ -102,6 +100,6 @@ export class ApiService {
 		}
 		return gutenberg;
 	}
-	public getApi = (url:string, options?:any):Observable<any> => this.http.get(url, options).pipe(catchError(this.apiError));
+	public getApi = (url:string, options?:any) => this.http.get(url, options).pipe(catchError(this.apiError));
 	private apiError = (error: HttpErrorResponse) => { console.error(error); return throwError(error); };
 }

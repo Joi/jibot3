@@ -13,12 +13,6 @@ import * as Messages from './events/message';
 	],
 	providers: [
 		EventService,
-		// {
-		// 	provide: APP_INITIALIZER,
-		// 	useFactory: (boltService: BoltService) => () => boltService.init(),
-		// 	deps: [BoltService],
-		// 	multi: true
-		// },
 		Events.AppMention,
 		Messages.Rot13,
 	]

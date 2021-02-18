@@ -16,12 +16,6 @@ import { BoltService } from './modules/slack/bolt.service';
 	],
 	providers: [
 		SlackModule,
-		// {
-		// 	provide: APP_INITIALIZER,
-		// 	useFactory: (apiService: ApiService) => () => apiService.init(),
-		// 	deps: [ApiService],
-		// 	multi: true
-		// },
 		{
 			provide: APP_INITIALIZER,
 			useFactory: (jibotService: JibotService) => () => jibotService.init(),

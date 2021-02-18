@@ -22,7 +22,7 @@ export class BoltService {
 		appToken:		environment.SLACK_APP_TOKEN,
 		signingSecret:	environment.SLACK_SIGNING_SECRET,
 	};
-	private app: App;
+	public app: App;
 	private clientConfig = {
 		token: environment.SLACK_BOT_TOKEN
 	};
@@ -42,31 +42,26 @@ export class BoltService {
 		public conversationService: ConversationService,
 	) {	}
 	public init = () => this.initialize();
-	private async initialize() {
+	public async initialize() {
+		this.logger.log(`Initializing ${this.constructor.name}...`);
 		await this.connectToSlack()
 			.then(this.startAppServer)
 			.then(this.getSlackObjects.bind(this))
-			.finally(this.startEventListeners.bind(this))
-			.finally(this.boltIsInitizated.bind(this))
-			.catch(this.logger.error);
-		return this.app;
+			.then(this.startEventListeners.bind(this))
+			.finally(() => this.logger.log(`${this.constructor.name} initialized...`));
+		return;
 	}
 	private connectToSlack = async ():Promise<App> => await (!this.app) ? this.app = this.app = new App(this.boltOptions) : this.app;
 	private startAppServer = async (app):Promise<any> => await app.start({});
-	private  async getSlackObjects():Promise<any> {
-		return await Promise.all(this.objectServices.map(async (service) => {
+	private  getSlackObjects():void {
+		this.objectServices.forEach(async service => {
 			let localName = service.collectionNames.local;
 			let response = await this.get(service.collectionNames.request);
 			if (response.ok) this.collections[localName] = service[localName] = response[service.collectionNames.response];
-		}));
+		});
 	};
 	private startEventListeners():void {
 		this.listenerServices.forEach(service => service.events.forEach(service.listen.bind(this)));
-		return;
-	}
-	private boltIsInitizated():void {
-		this.logger.log(`${this.constructor.name} initialized...`);
-		return;
 	}
 	private async get(objectName):Promise<any> {
 		return await this.app.client[objectName].list(this.clientConfig);
