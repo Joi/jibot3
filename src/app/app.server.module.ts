@@ -4,8 +4,6 @@ import { AppModule } from '@app/app.module';
 import { AppComponent } from './app.component';
 import { SlackModule } from './modules/slack/slack.module';
 import { JibotService } from '@services/jibot.service';
-import { ApiService } from '@services/api.service';
-import { BoltService } from './modules/slack/bolt.service';
 @NgModule({
 	bootstrap: [AppComponent],
 	declarations: [],
