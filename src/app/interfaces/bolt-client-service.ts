@@ -1,7 +1,7 @@
 export interface BoltCollectionNames {
 	request:	string;
 	response:	string;
-	collection:	string;
+	local:		string;
 }
 export interface BoltClientService {
 	collectionNames: BoltCollectionNames;

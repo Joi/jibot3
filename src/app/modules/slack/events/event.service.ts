@@ -11,7 +11,7 @@ export class EventService {
 	) {
 		for (let event of arguments) this.events.push(<BoltEvent>event);
 	}
-	public listen(event:BoltEvent) {
+	public listen = (event:BoltEvent) => {
 		let bolt:any = this;
 		bolt.app.event(event.name, event.callback.bind(bolt));
 	}

@@ -8,6 +8,6 @@ export class ConversationService implements BoltClientService {
 	public collectionNames: BoltCollectionNames = {
 		request:	"conversations",
 		response:	"channels",
-		collection:	"conversations",
+		local:		"conversations",
 	};
 }

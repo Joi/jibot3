@@ -8,6 +8,6 @@ export class MemberService implements BoltClientService {
 	public collectionNames: BoltCollectionNames = {
 		request:	"users",
 		response:	"members",
-		collection:	"members"
+		local:		"members"
 	};
 }

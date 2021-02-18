@@ -2,28 +2,32 @@ import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { ServerModule } from '@angular/platform-server';
 import { AppModule } from '@app/app.module';
 import { AppComponent } from './app.component';
-
-import { BoltService } from '@services/bolt.service';
+import { SlackModule } from './modules/slack/slack.module';
+import { JibotService } from '@services/jibot.service';
 import { ApiService } from '@services/api.service';
-
-import * as Events from '@app/events'
-import * as Messages from '@app/events/message';
+import { BoltService } from './modules/slack/bolt.service';
 @NgModule({
 	bootstrap: [AppComponent],
 	declarations: [],
 	imports: [
 		AppModule,
 		ServerModule,
+		SlackModule,
 	],
 	providers: [
+		SlackModule,
+		// {
+		// 	provide: APP_INITIALIZER,
+		// 	useFactory: (apiService: ApiService) => () => apiService.init(),
+		// 	deps: [ApiService],
+		// 	multi: true
+		// },
 		{
 			provide: APP_INITIALIZER,
-			useFactory: (boltService: BoltService) => () => boltService.init(),
-			deps: [BoltService],
+			useFactory: (jibotService: JibotService) => () => jibotService.init(),
+			deps: [JibotService],
 			multi: true
-		},
-		Events.AppMention,
-		Messages.Rot13,
+		}
 	]
 })
 export class AppServerModule { }

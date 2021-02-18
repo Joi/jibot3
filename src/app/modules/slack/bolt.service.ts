@@ -1,19 +1,17 @@
-import { Injectable} from '@angular/core';
-import { Server } from 'http';
-import { App, AppOptions, LogLevel } from '@slack/bolt';
+import { Injectable } from '@angular/core';
 import { environment } from '@env/environment';
-
-import { ApiService } from '@services/api.service';
+import { App, AppOptions, LogLevel } from '@slack/bolt';
 import { LoggerService } from '@services/logger.service';
+import { EventService } from './events/event.service';
+import { MessageService } from './events/message/message.service';
 import { MemberService } from '@app/components/members/member.service';
 import { ConversationService } from '@app/components/conversations/conversation.service';
-import { EventService } from '@app/events/event.service';
-import { MessageService } from '@app/events/message/message.service';
+
 @Injectable({
-	providedIn: 'root'
+  providedIn: 'root'
 })
 export class BoltService {
-	public collections:object = {};
+	public collections:Object = {};
 	private boltOptions: AppOptions = {
 		socketMode:		true,
 		convoStore:		false,
@@ -28,35 +26,42 @@ export class BoltService {
 	private clientConfig = {
 		token: environment.SLACK_BOT_TOKEN
 	};
-	private services: any[] = [this.memberService, this.conversationService];
-	constructor(
+	private services: any[] = [
+		this.memberService,
+		this.conversationService
+	];
+	private events: any[] = [
+		this.eventService,
+		this.messageService
+	];
+  	constructor(
 		private logger: LoggerService,
-		private memberService: MemberService,
-		private conversationService: ConversationService,
 		private eventService: EventService,
 		private messageService: MessageService,
+		public memberService: MemberService,
+		public conversationService: ConversationService,
 	) { }
-	public init = () => this.initialize;
+	public init = () => this.initialize();
 	private async initialize() {
-		return await this.connectToSlack()
+		await this.connectToSlack()
 			.then(this.startAppServer)
 			.then(this.getSlackObjects.bind(this))
-			.then(this.startListenerServices.bind(this))
+			.finally(this.startEventListeners.bind(this))
 			.finally(this.boltIsInitizated.bind(this))
 			.catch(this.logger.error);
+		return this.app;
 	}
 	private connectToSlack = async ():Promise<App> => await (!this.app) ? this.app = this.app = new App(this.boltOptions) : this.app;
-	private startAppServer = async (app):Promise<Server> => await app.start({});
+	private startAppServer = async (app):Promise<any> => await app.start({});
 	private getSlackObjects = async ():Promise<any> => {
 		return await Promise.all(this.services.map(async (service) => {
-			let localName = service.collectionNames.collection;
+			let localName = service.collectionNames.local;
 			let response = await this.get(service.collectionNames.request);
 			if (response.ok) this.collections[localName] = service[localName] = response[service.collectionNames.response];
-			return service;
 		}));
-	}
+	};
+	private startEventListeners = () => this.events.forEach(event => event.listen.bind(this));
+	private boltIsInitizated = ():void => this.logger.log(`${this.constructor.name} initialized...`);
 	private get = async (objectName):Promise<any> => await this.app.client[objectName].list(this.clientConfig);
-	private startListenerServices = () =>this.services.forEach(service => this[service].listen.bind(this));
-	private boltIsInitizated = ():void => this.logger.log('Bolt initialized...');
-	private getById = (id, collection):any => { return collection.find(i => i.id === id)};
+	public getById = (id, collection) => { return collection.find(i => i.id === id)};
 }

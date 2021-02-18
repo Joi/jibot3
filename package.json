@@ -42,6 +42,7 @@
 		"@nguniversal/express-engine": "^11.1.1",
 		"@slack/bolt": "^3.1.1",
 		"bufferutil": "^4.0.3",
+		"compromise": "^13.9.2",
 		"express": "^4.17.1",
 		"rxjs": "~6.6.3",
 		"ts-loader": "^8.0.14",
