@@ -23,13 +23,13 @@ export class JibotService {
 	public init = this.initialize;
 	private async initialize() {
 		this.logger.log(`Initializing ${this.constructor.name}...`);
-		return await this.apiService.init()
+		await this.apiService.init()
 			.then(this.boltService.init)
 			.then(app => (this.boltApp = app))
 			.then(this.favoriteBook.bind(this))
-			.finally(() => {
-				this.logger.log(`${this.constructor.name} initialized...`);
-			});
+			.finally(() => this.logger.log(`${this.constructor.name} initialized...`))
+			.catch(this.logger.error);
+		return;
 	}
 	private favoriteBook() {
 		this.logger.log(`Loading favorite book routine...`);
@@ -80,5 +80,6 @@ export class JibotService {
 				}
 			});
 		});
+		console.log(keywords);
 	}
 }

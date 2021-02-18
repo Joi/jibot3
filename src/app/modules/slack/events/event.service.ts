@@ -9,9 +9,9 @@ export class EventService {
 	constructor(
 		public appMention: Events.AppMention,
 	) {
-		for (let event of arguments) this.events.push(<BoltEvent>event);
+		for (let arg of arguments) this.events.push(<BoltEvent>arg);
 	}
-	public listen = (event:BoltEvent) => {
+	public listen(event:BoltEvent) {
 		let bolt:any = this;
 		bolt.app.event(event.name, event.callback.bind(bolt));
 	}

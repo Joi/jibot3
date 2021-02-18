@@ -5,15 +5,14 @@ import * as  Messages from './';
   	providedIn: 'root'
 })
 export class MessageService {
-	public messages: BoltMessage[] = [];
+	public events: BoltMessage[] = [];
 	constructor(
 		public rot13: Messages.Rot13
 	) {
-		for (let message of arguments) this.messages.push(<BoltMessage>message);
+		for (let arg of arguments) this.events.push(<BoltMessage>arg);
 	}
 	public listen(message:BoltMessage) {
 		let bolt:any = this;
 		bolt.app.message(message.regex, message.callback.bind(this));
-
 	}
 }

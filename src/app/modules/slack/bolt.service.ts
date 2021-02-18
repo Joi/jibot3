@@ -26,11 +26,11 @@ export class BoltService {
 	private clientConfig = {
 		token: environment.SLACK_BOT_TOKEN
 	};
-	private services: any[] = [
+	private objectServices: any[] = [
 		this.memberService,
 		this.conversationService
 	];
-	private events: any[] = [
+	private listenerServices: any[] = [
 		this.eventService,
 		this.messageService
 	];
@@ -40,7 +40,7 @@ export class BoltService {
 		private messageService: MessageService,
 		public memberService: MemberService,
 		public conversationService: ConversationService,
-	) { }
+	) {	}
 	public init = () => this.initialize();
 	private async initialize() {
 		await this.connectToSlack()
@@ -53,15 +53,25 @@ export class BoltService {
 	}
 	private connectToSlack = async ():Promise<App> => await (!this.app) ? this.app = this.app = new App(this.boltOptions) : this.app;
 	private startAppServer = async (app):Promise<any> => await app.start({});
-	private getSlackObjects = async ():Promise<any> => {
-		return await Promise.all(this.services.map(async (service) => {
+	private  async getSlackObjects():Promise<any> {
+		return await Promise.all(this.objectServices.map(async (service) => {
 			let localName = service.collectionNames.local;
 			let response = await this.get(service.collectionNames.request);
 			if (response.ok) this.collections[localName] = service[localName] = response[service.collectionNames.response];
 		}));
 	};
-	private startEventListeners = () => this.events.forEach(event => event.listen.bind(this));
-	private boltIsInitizated = ():void => this.logger.log(`${this.constructor.name} initialized...`);
-	private get = async (objectName):Promise<any> => await this.app.client[objectName].list(this.clientConfig);
-	public getById = (id, collection) => { return collection.find(i => i.id === id)};
+	private startEventListeners():void {
+		this.listenerServices.forEach(service => service.events.forEach(service.listen.bind(this)));
+		return;
+	}
+	private boltIsInitizated():void {
+		this.logger.log(`${this.constructor.name} initialized...`);
+		return;
+	}
+	private async get(objectName):Promise<any> {
+		return await this.app.client[objectName].list(this.clientConfig);
+	}
+	public getById(id, collection):any {
+		return collection.find(i => i.id === id);
+	}
 }

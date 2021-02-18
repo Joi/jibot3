@@ -57,7 +57,38 @@ export class ApiService {
 		];
 		return of(apis);
 	}
+	private getBooks(): Observable<any[]> {
+		// @TODO: Replace this function with a looker upper
+		let books: Object[] = [
+			{
+				name: 'The Mysterious Island',
+				url: "https://www.gutenberg.org/files/1268/1268-0.txt",
+				options: {
+					... this.presets.text,
+					... { observe: 'body' }
+				}
+			},
+			// {
+			// 	name: '2 B R 0 2 B',
+			// 	url: 'https://www.gutenberg.org/cache/epub/21279/pg21279.txt',
+			// 	options: {
+			// 		... this.presets.text,
+			// 		... { observe: 'body' }
+			// 	}
+			// },
+			// {
+			// 	name: 'The Time Machine',
+			// 	url: 'https://www.gutenberg.org/files/35/35-0.txt',
+			// 	options: {
+			// 		... this.presets.text,
+			// 		... { observe: 'body' }
+			// 	}
+			// }
+		];
+		return of(books);
+	}
 	private trimGutenbergBookSpacing(gutenberg) {
+		this.logger.log(`Trimming whitespace from guternberg book...`);
 		let contents;
 		let tab = `\\t`, space = '\\s', nonSpace = '\\S', newline = `[\\r\\n]`,
 			trailingSpace = `[${tab}]*${newline}+[${tab}]*`,
@@ -70,36 +101,6 @@ export class ApiService {
 			return contents[0].replace(eightyCharLineRegex, '$1 $2');
 		}
 		return gutenberg;
-	}
-	private getBooks(): Observable<any[]> {
-		// @TODO: Replace this function with a looker upper
-		let books: Object[] = [
-			// {
-			// 	name: 'The Mysterious Island',
-			// 	url: "https://www.gutenberg.org/files/1268/1268-0.txt",
-			// 	options: {
-			// 		... this.presets.text,
-			// 		... { observe: 'body' }
-			// 	}
-			// },
-			{
-				name: '2 B R 0 2 B',
-				url: 'https://www.gutenberg.org/cache/epub/21279/pg21279.txt',
-				options: {
-					... this.presets.text,
-					... { observe: 'body' }
-				}
-			},
-			// {
-			// 	name: 'The Time Machine',
-			// 	url: 'https://www.gutenberg.org/files/35/35-0.txt',
-			// 	options: {
-			// 		... this.presets.text,
-			// 		... { observe: 'body' }
-			// 	}
-			// }
-		];
-		return of(books);
 	}
 	public getApi = (url:string, options?:any):Observable<any> => this.http.get(url, options).pipe(catchError(this.apiError));
 	private apiError = (error: HttpErrorResponse) => { console.error(error); return throwError(error); };
