@@ -4,9 +4,11 @@ import { AppModule } from '@app/app.module';
 import { AppComponent } from './app.component';
 import { SlackModule } from './modules/slack/slack.module';
 import { JibotService } from '@services/jibot.service';
+import { ApiService } from '@services/api.service';
 @NgModule({
 	bootstrap: [AppComponent],
-	declarations: [],
+	declarations: [	],
+	exports: [ ],
 	imports: [
 		AppModule,
 		ServerModule,
@@ -14,6 +16,12 @@ import { JibotService } from '@services/jibot.service';
 	],
 	providers: [
 		SlackModule,
+		{
+			provide: APP_INITIALIZER,
+			useFactory: (apiService: ApiService) => () => apiService.init(),
+			deps: [ApiService],
+			multi: true
+		},
 		{
 			provide: APP_INITIALIZER,
 			useFactory: (jibotService: JibotService) => () => jibotService.init(),

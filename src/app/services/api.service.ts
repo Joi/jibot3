@@ -58,14 +58,6 @@ export class ApiService {
 	private getBooks(): Observable<any[]> {
 		// @TODO: Replace this function with a looker upper
 		let books: Object[] = [
-			{
-				name: '2 B R 0 2 B',
-				url: 'https://www.gutenberg.org/cache/epub/21279/pg21279.txt',
-				options: {
-					... this.presets.text,
-					... { observe: 'body' }
-				}
-			},
 			// {
 			// 	name: 'The Mysterious Island',
 			// 	url: "https://www.gutenberg.org/files/1268/1268-0.txt",
@@ -74,6 +66,14 @@ export class ApiService {
 			// 		... { observe: 'body' }
 			// 	}
 			// },
+			{
+				name: '2 B R 0 2 B',
+				url: 'https://www.gutenberg.org/cache/epub/21279/pg21279.txt',
+				options: {
+					... this.presets.text,
+					... { observe: 'body' }
+				}
+			},
 			// {
 			// 	name: 'The Time Machine',
 			// 	url: 'https://www.gutenberg.org/files/35/35-0.txt',
@@ -87,18 +87,15 @@ export class ApiService {
 	}
 	private trimGutenbergBookSpacing(gutenberg) {
 		this.logger.log(`Trimming whitespace from gutenberg book...`);
-		let contents;
 		let tab = `\\t`, space = '\\s', nonSpace = '\\S', newline = `[\\r\\n]`,
 			trailingSpace = `[${tab}]*${newline}+[${tab}]*`,
 			splats = '[\\*]{3}';
-		let startRegex = `${newline}${splats} START .*${splats}${trailingSpace}`,
-			endRegex = startRegex.replace("START", "END"),
-			contentRegex = new RegExp(`${startRegex}(.[${space}${nonSpace}]*)${endRegex}`, 'g'),
+		let startRegex = `(${newline}${splats} START .*${splats}${trailingSpace})`,
+			endRegex = `${newline}End of the Project Gutenberg EBook of .+${newline}`,
+			contentRegex = new RegExp(`(${startRegex}(.[${space}${nonSpace}]*)${endRegex})`, 'g'),
 			eightyCharLineRegex = new RegExp(`(${nonSpace}).${newline}{1}(${nonSpace})`, 'gs');
-		if (contents = gutenberg.match(contentRegex)) {
-			return contents[0].replace(eightyCharLineRegex, '$1 $2');
-		}
-		return gutenberg;
+		let contents = contentRegex.exec(gutenberg);
+		return (contents) ? contents[3].replace(eightyCharLineRegex, '') : gutenberg;
 	}
 	public getApi = (url:string, options?:any) => this.http.get(url, options).pipe(catchError(this.apiError));
 	private apiError = (error: HttpErrorResponse) => { console.error(error); return throwError(error); };
