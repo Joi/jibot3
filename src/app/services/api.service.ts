@@ -86,7 +86,7 @@ export class ApiService {
 		return of(books);
 	}
 	private trimGutenbergBookSpacing(gutenberg) {
-		this.logger.log(`Trimming whitespace from gutenberg book...`);
+		this.logger.log(`Trimming gutenberg book...`);
 		let tab = `\\t`, space = '\\s', nonSpace = '\\S', newline = `[\\r\\n]`,
 			trailingSpace = `[${tab}]*${newline}+[${tab}]*`,
 			splats = '[\\*]{3}';
@@ -95,7 +95,8 @@ export class ApiService {
 			contentRegex = new RegExp(`(${startRegex}(.[${space}${nonSpace}]*)${endRegex})`, 'g'),
 			eightyCharLineRegex = new RegExp(`(${nonSpace}).${newline}{1}(${nonSpace})`, 'gs');
 		let contents = contentRegex.exec(gutenberg);
-		return (contents) ? contents[3].replace(eightyCharLineRegex, '') : gutenberg;
+		//.replace(eightyCharLineRegex, '')
+		return (contents) ? contents[3] : gutenberg;
 	}
 	public getApi = (url:string, options?:any) => this.http.get(url, options).pipe(catchError(this.apiError));
 	private apiError = (error: HttpErrorResponse) => { console.error(error); return throwError(error); };
