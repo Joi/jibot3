@@ -6,22 +6,10 @@
 		"paths": {
 			"@env/*": ["environments/*"],
 			"@app/*": ["app/*"],
-      "@services/*": [
-        "app/services/*"
-      ],
-      "google-cloud": [
-        "dist/google-cloud/google-cloud",
-        "dist/google-cloud"
-      ],
-      "google-cloud-language": [
-        "dist/google-cloud-language/google-cloud-language",
-        "dist/google-cloud-language"
-      ],
-      "libraries": [
-        "dist/libraries/libraries",
-        "dist/libraries"
-      ],
-		},
+			"@services/*": [
+				"app/services/*"
+			],
+      	},
 		"outDir": "./dist/out-tsc",
 		"sourceMap": true,
 		"declaration": false,
