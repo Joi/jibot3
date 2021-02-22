@@ -58,22 +58,22 @@ export class ApiService {
 	private getBooks(): Observable<any[]> {
 		// @TODO: Replace this function with a looker upper
 		let books: Object[] = [
-			// {
-			// 	name: 'The Mysterious Island',
-			// 	url: "https://www.gutenberg.org/files/1268/1268-0.txt",
-			// 	options: {
-			// 		... this.presets.text,
-			// 		... { observe: 'body' }
-			// 	}
-			// },
 			{
-				name: '2 B R 0 2 B',
-				url: 'https://www.gutenberg.org/cache/epub/21279/pg21279.txt',
+				name: 'The Mysterious Island',
+				url: "https://www.gutenberg.org/files/1268/1268-0.txt",
 				options: {
 					... this.presets.text,
 					... { observe: 'body' }
 				}
 			},
+			// {
+			// 	name: '2 B R 0 2 B',
+			// 	url: 'https://www.gutenberg.org/cache/epub/21279/pg21279.txt',
+			// 	options: {
+			// 		... this.presets.text,
+			// 		... { observe: 'body' }
+			// 	}
+			// },
 			// {
 			// 	name: 'The Time Machine',
 			// 	url: 'https://www.gutenberg.org/files/35/35-0.txt',
