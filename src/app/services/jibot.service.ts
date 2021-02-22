@@ -47,7 +47,7 @@ export class JibotService {
 
 	private readBook(book) {
 		this.logger.log(`Reading '${book.title}'...`);
-		let nouns = ['places'];
+		let nouns = ['people', 'places', 'organizations'];
 		let keywords = [];
 		book.doc = nlp.default(book.contents).normalize({
 			abbreviations: true,

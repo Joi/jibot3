@@ -6,9 +6,8 @@
 		"paths": {
 			"@env/*": ["environments/*"],
 			"@app/*": ["app/*"],
-			"@services/*": [
-				"app/services/*"
-			],
+			"@services/*": [ "app/services/*"],
+			"@modules/*": [ "app/modules/*"],
       	},
 		"outDir": "./dist/out-tsc",
 		"sourceMap": true,

@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { environment } from '@env/environment';
 import { App, AppOptions, LogLevel } from '@slack/bolt';
 import { LoggerService } from '@services/logger.service';
+
 import { EventService } from './events/event.service';
-import { MessageService } from './events/message/message.service';
-import { MemberService } from '@app/components/members/member.service';
-import { ConversationService } from '@app/components/conversations/conversation.service';
+import { MessageService } from './messages/message.service';
+import { MemberService } from './members/member.service';
+import { ConversationService } from './conversations/conversation.service';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +27,13 @@ export class BoltService {
 	private clientConfig = {
 		token: environment.SLACK_BOT_TOKEN
 	};
+	constructor(
+		private logger: LoggerService,
+		private eventService: EventService,
+		private messageService: MessageService,
+		public memberService: MemberService,
+		public conversationService: ConversationService,
+	) {	}
 	private objectServices: any[] = [
 		this.memberService,
 		this.conversationService
@@ -34,13 +42,7 @@ export class BoltService {
 		this.eventService,
 		this.messageService
 	];
-  	constructor(
-		private logger: LoggerService,
-		private eventService: EventService,
-		private messageService: MessageService,
-		public memberService: MemberService,
-		public conversationService: ConversationService,
-	) {	}
+
 	public init = () => this.initialize();
 	public async initialize() {
 		this.logger.log(`Initializing ${this.constructor.name}...`);

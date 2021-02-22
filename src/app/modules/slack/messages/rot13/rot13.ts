@@ -1,7 +1,7 @@
 import { Injectable} from '@angular/core';
-import { BoltMessage } from '@app/interfaces/bolt-message';
+import * as Bolt from '@modules/slack/bolt.interface';
 @Injectable()
-export class Rot13 implements BoltMessage {
+export class Rot13 implements Bolt.Message {
 	public name =	'rot13';
 	public regex =	/(bot).*/;
 	public async callback({event, say}) {
