@@ -47,26 +47,30 @@ export class JibotService {
 
 	private readBook(book) {
 		this.logger.log(`Reading '${book.title}'...`);
-		let nouns = ['people', 'places', 'organizations'];
 		let keywords = [];
-		book.doc = nlp.default(book.contents).normalize({
-			abbreviations: true,
-			acronyms: true,
-			honorifics: true,
-			hyphenated:	true,
+		let normalizeOptions = {
 			punctuation: true,
 			quotations: true,
 			whitespace:true,
 			possessives:true,
-		});
+		}
+		book.doc = nlp.default(book.contents).normalize(normalizeOptions);
+		// .normalize({
+		// 	// abbreviations: true,
+		// 	// acronyms: true,
+		// 	// honorifics: true,
+		// 	// hyphenated:	true,
+		// 	// punctuation: true,
+		// 	// quotations: true,
+		// 	// whitespace:true,
+		// 	// possessives:true,
+		// });
 		// @TODO: We are going to want a nlp service or module
 		// @TODO We are going to want to use CG natural language API for heavier thinking than this
+		let nouns = ['people', 'places'];
 		nouns.forEach(noun => {
 			this.logger.log(`Saving ${noun}...`);
-			book[noun] = book.doc[noun]().unique().normalize({
-				punctuation: false,
-				whitespace:true,
-			}).sort('freq');
+			book[noun] = book.doc[noun]().unique().normalize(normalizeOptions);
 			book[noun].json().forEach(thing => {
 				let hint:any = {
 					text:	thing.text.replace(/[^\w\s]$/g, ''),
@@ -85,7 +89,7 @@ export class JibotService {
 				let textRegex, regex;
 				try {
 					textRegex = hint.text.replace(/([.\*])/,'\$1');
-					regex = new RegExp(`.*(${textRegex}).*`, 'i');
+					regex = new RegExp(`\\b(${textRegex})\\b`, 'i');
 					if (!keywords[hint.text]) {
 						keywords[hint.text] = thing.terms;
 						this.boltService.app.message(regex, hintCallback.bind(this));
