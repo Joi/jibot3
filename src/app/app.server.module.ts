@@ -5,9 +5,6 @@ import { AppComponent } from './app.component';
 import { SlackModule } from './modules/slack/slack.module';
 import { JibotService } from '@services/jibot.service';
 import { ApiService } from '@services/api.service';
-
-import { LanguageServiceClient } from '@google-cloud/language';
-
 @NgModule({
 	bootstrap: [AppComponent],
 	declarations: [	],
@@ -18,10 +15,6 @@ import { LanguageServiceClient } from '@google-cloud/language';
 		SlackModule,
 	],
 	providers: [
-		{
-			provide: LanguageServiceClient,
-			useFactory: () => new LanguageServiceClient({ fallback: true }),
-		},
 		SlackModule,
 		{
 			provide: APP_INITIALIZER,
