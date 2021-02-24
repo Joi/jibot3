@@ -33,9 +33,7 @@
 			  "styles": [
 				"src/styles.scss"
 			  ],
-			  "scripts": [
-				  "dist/nlpjs/bundles/nlpjs.umd.min.js.map"
-			  ]
+			  "scripts": [  ]
 			},
 			"configurations": {
 			  "production": {
@@ -208,6 +206,46 @@
 						"tsConfig": [
 							"projects/nlpjs/tsconfig.lib.json",
 							"projects/nlpjs/tsconfig.spec.json"
+						],
+						"exclude": [
+							"**/node_modules/**"
+						]
+					}
+				}
+			}
+		},
+		"sqlite3": {
+			"projectType": "library",
+			"root": "projects/sqlite3",
+			"sourceRoot": "projects/sqlite3/src",
+			"prefix": "lib",
+			"architect": {
+				"build": {
+					"builder": "@angular-devkit/build-angular:ng-packagr",
+					"options": {
+						"tsConfig": "projects/sqlite3/tsconfig.lib.json",
+						"project": "projects/sqlite3/ng-package.json"
+					},
+					"configurations": {
+						"production": {
+							"tsConfig": "projects/sqlite3/tsconfig.lib.prod.json"
+						}
+					}
+				},
+				"test": {
+					"builder": "@angular-devkit/build-angular:karma",
+					"options": {
+						"main": "projects/sqlite3/src/test.ts",
+						"tsConfig": "projects/sqlite3/tsconfig.spec.json",
+						"karmaConfig": "projects/sqlite3/karma.conf.js"
+					}
+				},
+				"lint": {
+					"builder": "@angular-devkit/build-angular:tslint",
+					"options": {
+						"tsConfig": [
+							"projects/sqlite3/tsconfig.lib.json",
+							"projects/sqlite3/tsconfig.spec.json"
 						],
 						"exclude": [
 							"**/node_modules/**"

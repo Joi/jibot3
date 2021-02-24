@@ -14,6 +14,10 @@
         "dist/nlpjs/nlpjs",
         "dist/nlpjs"
       ],
+      "sqlite3": [
+        "dist/sqlite3/sqlite3",
+        "dist/sqlite3"
+      ],
       	},
 		"outDir": "./dist/out-tsc",
 		"sourceMap": true,

@@ -5,21 +5,6 @@ import * as express from 'express';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { AppServerModule } from './src/main.server';
-
-import * as nlpjs from 'nlpjs';
-import nlp from 'compromise';
-//
-
-//const sqlite3 = require("sqlite3").verbose();
-//import { open } from 'sqlite';
-// (async () => {
-//     const db = await open({
-// 		filename: '/tmp/database.db',
-// 		driver: sqlite3.Database
-//     });
-// 	console.log(db);
-// })();
-
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
 	// const db_file = join(process.cwd(), "data", "jibot.db");

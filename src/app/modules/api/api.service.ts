@@ -29,17 +29,7 @@ export class ApiService {
 		await this.getApis()
 			.pipe(
 				tap(apis => apis.forEach(api => (this.apis[api.name] = this.get(api.url, api.options))))
-			).subscribe(
-				response => {
-					Object.keys(this.apis).forEach(i => {
-						let api = this.apis[i];
-						api.subscribe(
-							console.log, this.logger.error
-						)
-					});
-				},
-				this.logger.error
-			);
+			).subscribe();
 		return;
 	}
 	private getApis(): Observable<any[]> {
@@ -58,7 +48,6 @@ export class ApiService {
 		];
 		return of(apis);
 	}
-
 	public get = (url:string, options?:any) => this.http.get(url, options).pipe(catchError(this.apiError));
 	private apiError = (error: HttpErrorResponse) => { console.error(error); return throwError(error); };
 }
