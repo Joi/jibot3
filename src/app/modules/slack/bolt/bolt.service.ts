@@ -30,7 +30,7 @@ export class BoltService {
 		this.messageService
 	]
 	public objects:Object = {};
-	public init = async (options?:AppOptions) => {
+	public async init(options?:AppOptions) {
 		this.setOptions(options)
 			.then(this.create.bind(this))
 			.then(this.start.bind(this))

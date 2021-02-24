@@ -18,10 +18,8 @@ export class BookService {
 	public books: any = {};
 	private apiOptions:any = {
 		...this.api.presets.text,
-		params: new HttpParams().set('$$app_token', environment.GUTENBERG_TOKEN)
 	};
 	public init() {
-		this.apiOptions.headers.set('$$app_token', environment.GUTENBERG_TOKEN);
 		this.getBooks().then(books => {
 			books.forEach(book => {
 				this.logger.log(`Getting '${book.name}'...`);
@@ -37,7 +35,6 @@ export class BookService {
 				)
 			})
 		})
-
 	}
 	private read(book) {
 		this.logger.log(`Reading '${book.name}'...`);
@@ -54,6 +51,10 @@ export class BookService {
 			// {
 			// 	name: 'The Mysterious Island',
 			// 	url: "https://www.gutenberg.org/files/1268/1268-0.txt",
+			// }
+			// {
+			// 	name: 'The Time Machine',
+			// 	url: 'https://www.gutenberg.org/files/35/35-0.txt',
 			// }
 		]
 		// @TODO: replace this with a getter

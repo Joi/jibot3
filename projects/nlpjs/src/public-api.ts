@@ -1,4 +1,6 @@
+import { NlpjsModule } from "./lib/nlpjs.module";
+
 /*
  * Public API Surface of nlpjs
  */
-export * from './lib/nlpjs.module';
+export { NlpjsModule } from './lib/nlpjs.module';

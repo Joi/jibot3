@@ -18,4 +18,4 @@ import { BookService } from  './book.service';
 		},
 	]
 })
-export class BooksModule { }
+export class BookModule { }

@@ -33,7 +33,9 @@
 			  "styles": [
 				"src/styles.scss"
 			  ],
-			  "scripts": [  ]
+			  "scripts": [
+				  "dist/nlpjs/bundles/nlpjs.umd.min.js.map"
+			  ]
 			},
 			"configurations": {
 			  "production": {

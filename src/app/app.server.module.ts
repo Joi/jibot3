@@ -3,8 +3,7 @@ import { ServerModule } from '@angular/platform-server';
 import { AppModule } from '@app/app.module';
 import { AppComponent } from './app.component';
 import { LoggerService } from '@services/logger.service';
-
-import * as nlphs from 'nlpjs';
+//import { NlpjsModule } from 'nlpjs';
 import {
 	ApiModule,
 	SlackModule
@@ -20,7 +19,13 @@ import {
 		AppModule,
 		ServerModule,
 	],
-	providers: []
+	providers: [
+		ApiModule,
+		//NlpjsModule,
+	]
 })
 export class AppServerModule {
+	// constructor() {
+	// 	console.log(nlpjs);
+	// }
 }
