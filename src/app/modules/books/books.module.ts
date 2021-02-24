@@ -1,18 +1,21 @@
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ApiService } from './api.service';
+//import { ApiService } from '@app/modules/api/api.service';
+import { BookService } from  './book.service';
+
 @NgModule({
 	declarations: [],
+	exports: [],
 	imports: [
 		CommonModule
 	],
 	providers: [
 		{
 			provide:APP_INITIALIZER,
-			deps: [ApiService],
+			deps: [BookService],
 			multi: true,
-			useFactory: (api: ApiService) => () => api.init(),
+			useFactory: (books:BookService) => () => books.init()
 		},
 	]
 })
-export class ApiModule { }
+export class BooksModule { }

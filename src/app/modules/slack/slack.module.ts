@@ -1,13 +1,20 @@
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { environment } from '@env/environment';
+
+import { BooksModule } from '@modules/books/books.module';
 import { BoltService } from './bolt/bolt.service';
+
+//import { ApiService } from '@modules/api/api.service';
+
 import { AppOptions } from '@slack/bolt';
 import * as Events from './events';
 import * as Messages from './messages';
+
+//import { ApiService } from '../api/api.service';
 @NgModule({
 	declarations: [ ],
-	exports: [ ],
+	exports: [BooksModule],
 	imports: [CommonModule],
 	providers: [
 		{

@@ -173,7 +173,47 @@
 			}
 		  }
 		}
-	  }
+	  },
+		"nlpjs": {
+			"projectType": "library",
+			"root": "projects/nlpjs",
+			"sourceRoot": "projects/nlpjs/src",
+			"prefix": "lib",
+			"architect": {
+				"build": {
+					"builder": "@angular-devkit/build-angular:ng-packagr",
+					"options": {
+						"tsConfig": "projects/nlpjs/tsconfig.lib.json",
+						"project": "projects/nlpjs/ng-package.json"
+					},
+					"configurations": {
+						"production": {
+							"tsConfig": "projects/nlpjs/tsconfig.lib.prod.json"
+						}
+					}
+				},
+				"test": {
+					"builder": "@angular-devkit/build-angular:karma",
+					"options": {
+						"main": "projects/nlpjs/src/test.ts",
+						"tsConfig": "projects/nlpjs/tsconfig.spec.json",
+						"karmaConfig": "projects/nlpjs/karma.conf.js"
+					}
+				},
+				"lint": {
+					"builder": "@angular-devkit/build-angular:tslint",
+					"options": {
+						"tsConfig": [
+							"projects/nlpjs/tsconfig.lib.json",
+							"projects/nlpjs/tsconfig.spec.json"
+						],
+						"exclude": [
+							"**/node_modules/**"
+						]
+					}
+				}
+			}
+		}
 	},
 	"defaultProject": "jibot3"
   }

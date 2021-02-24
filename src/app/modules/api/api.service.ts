@@ -17,44 +17,44 @@ export class ApiService {
 		text: {
 			headers: new HttpHeaders().set('Accept', 'text/plain'),
 			responseType: 'text',
+			observe: 'body'
 		},
 		json: {
 			headers: new HttpHeaders().set('Accept', 'Application/json'),
 			responseType: 'json',
 		}
 	}
-	public init = this.initialize;
-	private async initialize() {
+	public async init () {
 		this.logger.log(`Initializing ${this.constructor.name}...`);
 		// await this.getApis().pipe(tap(apis => {
 		// 	apis.forEach(api => (this.apis[api.name] = this.getApi(api.url, api.options)));
 		// })).subscribe();
-		this.getBooks()
-			.pipe(tap(books => {
-				books.forEach(book => {
-					this.books[book.name] = { title: book.name };
-					this.logger.log(`Getting '${book.name}'...`);
-					this.books[book.name].get = this.getApi(book.url, book.options).pipe(map(this.trimGutenbergBookSpacing.bind(this)));
-				});
-			})).subscribe();
-		return;
+		// this.getBooks()
+		// 	.pipe(tap(books => {
+		// 		books.forEach(book => {
+		// 			this.books[book.name] = { title: book.name };
+		// 			this.logger.log(`Getting '${book.name}'...`);
+		// 			this.books[book.name].get = this.getApi(book.url, book.options).pipe(map(this.trimGutenbergBookSpacing.bind(this)));
+		// 		});
+		// 	})).subscribe();
+		// return;
 	}
-	private getApis(): Observable<any[]> {
-		// @TODO: Replace this function with a looker upper
-		let apis: Object[] = [
-			{
-				name: 'Montgomery County Maryland Adoptable Animals',
-				url: "https://data.montgomerycountymd.gov/resource/e54u-qx42.json",
-				options: {
-					... this.presets.json,
-					... {
-						params: new HttpParams().set('$$app_token', 'PmYY236OzmufmnCoMwT7Pgpkb')
-					}
-				}
-			}
-		];
-		return of(apis);
-	}
+	// private getApis(): Observable<any[]> {
+	// 	// @TODO: Replace this function with a looker upper
+	// 	let apis: Object[] = [
+	// 		{
+	// 			name: 'Montgomery County Maryland Adoptable Animals',
+	// 			url: "https://data.montgomerycountymd.gov/resource/e54u-qx42.json",
+	// 			options: {
+	// 				... this.presets.json,
+	// 				... {
+	// 					params: new HttpParams().set('$$app_token', 'PmYY236OzmufmnCoMwT7Pgpkb')
+	// 				}
+	// 			}
+	// 		}
+	// 	];
+	// 	return of(apis);
+	// }
 	private getBooks(): Observable<any[]> {
 		// @TODO: Replace this function with a looker upper
 		let books: Object[] = [
@@ -85,19 +85,7 @@ export class ApiService {
 		];
 		return of(books);
 	}
-	private trimGutenbergBookSpacing(gutenberg) {
-		this.logger.log(`Trimming gutenberg book...`);
-		let tab = `\\t`, space = '\\s', nonSpace = '\\S', newline = `[\\r\\n]`,
-			trailingSpace = `[${tab}]*${newline}+[${tab}]*`,
-			splats = '[\\*]{3}';
-		let startRegex = `(${newline}${splats} START .*${splats}${trailingSpace})`,
-			endRegex = `${newline}End of the Project Gutenberg EBook of .+${newline}`,
-			contentRegex = new RegExp(`(${startRegex}(.[${space}${nonSpace}]*)${endRegex})`, 'g'),
-			eightyCharLineRegex = new RegExp(`(${nonSpace}).${newline}{1}(${nonSpace})`, 'gs');
-		let contents = contentRegex.exec(gutenberg);
-		//.replace(eightyCharLineRegex, '')
-		return (contents) ? contents[3] : gutenberg;
-	}
-	public getApi = (url:string, options?:any) => this.http.get(url, options).pipe(catchError(this.apiError));
+
+	public get = (url:string, options?:any) => this.http.get(url, options).pipe(catchError(this.apiError));
 	private apiError = (error: HttpErrorResponse) => { console.error(error); return throwError(error); };
 }

@@ -18,7 +18,7 @@ export class BoltService {
 		private messageService: MessageService,
 	) { }
 
-	private app:App;
+	public app:App;
 	private appOptions: AppOptions = {
 		logLevel:		LogLevel.ERROR,
 		socketMode:		true,

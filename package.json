@@ -12,6 +12,7 @@
     "dev:ssr": "ng run jibot3:serve-ssr",
     "serve:ssr": "node dist/jibot3/server/main.js",
     "build:ssr": "ng build --prod && ng run jibot3:server:production",
+    "build:nlpjs": "ng build nlpjs",
     "prerender": "ng run jibot3:prerender"
   },
   "repository": {
@@ -47,6 +48,7 @@
     "bufferutil": "^4.0.3",
     "compromise": "^13.9.3",
     "express": "^4.17.1",
+    "nlpjs": "file:dist/nlpjs",
     "rxjs": "~6.6.3",
     "sqlite3": "^5.0.2",
     "ts-loader": "^8.0.14",
@@ -73,6 +75,7 @@
     "karma-coverage-istanbul-reporter": "~3.0.2",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "^1.5.0",
+    "ng-packagr": "^11.0.0",
     "protractor": "~7.0.0",
     "ts-node": "~7.0.0",
     "tslint": "~6.1.0",

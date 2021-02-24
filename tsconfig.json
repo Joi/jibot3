@@ -7,7 +7,13 @@
 			"@env/*": ["environments/*"],
 			"@app/*": ["app/*"],
 			"@services/*": [ "app/services/*"],
-			"@modules/*": [ "app/modules/*"],
+      "@modules/*": [
+        "app/modules/*"
+      ],
+      "nlpjs": [
+        "dist/nlpjs/nlpjs",
+        "dist/nlpjs"
+      ],
       	},
 		"outDir": "./dist/out-tsc",
 		"sourceMap": true,
