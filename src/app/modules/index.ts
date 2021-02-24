@@ -1,4 +1,2 @@
-import * as SlackModule from './slack/slack.module';
-export {
-	SlackModule
-};
+export { ApiModule } from './api/api.module';
+export { SlackModule } from './slack/slack.module';

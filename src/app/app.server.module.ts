@@ -1,36 +1,41 @@
-import { NgModule, APP_INITIALIZER } from '@angular/core';
+import { NgModule, APP_INITIALIZER, InjectionToken } from '@angular/core';
 import { ServerModule } from '@angular/platform-server';
 import { AppModule } from '@app/app.module';
 import { AppComponent } from './app.component';
-import { SlackModule } from './modules/slack/slack.module';
-import { JibotService } from '@services/jibot.service';
-import { ApiService } from '@services/api.service';
 
+import { LoggerService } from '@services/logger.service';
+import {
+	//ApiModule,
+	SlackModule
+} from './modules';
+
+const Logger = new InjectionToken('logger');
+const factory = () => new LoggerService().init()
 @NgModule({
 	bootstrap: [AppComponent],
-	declarations: [	],
-	exports: [ ],
+	declarations: [ ],
+	exports: [
+		SlackModule,
+		//ApiModule
+	],
 	imports: [
 		AppModule,
 		ServerModule,
-		SlackModule,
 	],
 	providers: [
-		SlackModule,
 		{
 			provide: APP_INITIALIZER,
-			useFactory: (apiService: ApiService) => () => apiService.init(),
-			deps: [ApiService],
-			multi: true
+			deps: [LoggerService],
+			useFactory: (logger:LoggerService) => () => logger.init(),
+			multi: true,
 		},
-		{
-			provide: APP_INITIALIZER,
-			useFactory: (jibotService: JibotService) => () => jibotService.init(),
-			deps: [JibotService],
-			multi: true
-		}
+		// { provide: Location, useValue: 'https://angular.io/#someLocation' },
+		// {
+		// 	provide: Hash,
+		// 	useFactory: (location: string) => location.split('#')[1],
+		// 	deps: [Location]
+		// }
 	]
 })
 export class AppServerModule {
-	constructor() {	}
 }

@@ -1,12 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
-import { LoggerService } from './logger.service';
+import { LoggerService } from '@services/logger.service';
 @Injectable({
 	providedIn: 'root'
 })
 export class ApiService {
+	constructor(
+		private logger: LoggerService,
+		private http: HttpClient,
+	) {	}
 	public apis:  Object = {};
 	public books: any = {};
 	public presets: any = {
@@ -19,10 +23,6 @@ export class ApiService {
 			responseType: 'json',
 		}
 	}
-	constructor(
-		private logger: LoggerService,
-		private http: HttpClient,
-	) {	}
 	public init = this.initialize;
 	private async initialize() {
 		this.logger.log(`Initializing ${this.constructor.name}...`);

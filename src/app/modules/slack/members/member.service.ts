@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import * as Bolt from '@modules/slack/bolt.interface';
+import * as Bolt from '../bolt/bolt.interface';
 @Injectable({
   providedIn: 'root'
 })

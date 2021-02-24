@@ -1,8 +1,7 @@
 import { Injectable} from '@angular/core';
-import * as Bolt from '@modules/slack/bolt.interface';
+import * as Bolt from '../../bolt/bolt.interface';
 @Injectable()
 export class AppMention implements Bolt.Event {
-	constructor() { }
 	public name: string = "app_mention";
 	public async callback({event, say}) {
 		let bolt:any = this;
