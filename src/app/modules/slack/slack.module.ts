@@ -12,8 +12,8 @@ import * as Messages from './messages';
 @NgModule({
 	declarations: [ ],
 	exports: [
-		ApiModule,
-		BookModule
+		// ApiModule,
+		// BookModule
 	],
 	imports: [CommonModule],
 	providers: [
