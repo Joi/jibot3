@@ -6,19 +6,9 @@
 		"paths": {
 			"@env/*": ["environments/*"],
 			"@app/*": ["app/*"],
-			"@services/*": [ "app/services/*"],
-      "@modules/*": [
-        "app/modules/*"
-      ],
-      "nlpjs": [
-        "dist/nlpjs/nlpjs",
-        "dist/nlpjs"
-      ],
-      "sqlite3": [
-        "dist/sqlite3/sqlite3",
-        "dist/sqlite3"
-      ],
-      	},
+			"@services/*": ["app/services/*"],
+			"@modules/*": ["app/modules/*"],
+	  	},
 		"outDir": "./dist/out-tsc",
 		"sourceMap": true,
 		"declaration": false,
