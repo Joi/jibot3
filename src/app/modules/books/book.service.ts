@@ -42,14 +42,14 @@ export class BookService {
 		// 	name: '2 B R 0 2 B',
 		// 	url: 'https://www.gutenberg.org/cache/epub/21279/pg21279.txt',
 		// },
-		// {
-		// 	name: 'The Mysterious Island',
-		// 	url: "https://www.gutenberg.org/files/1268/1268-0.txt",
-		// },
 		{
-			name: 'The Time Machine',
-			url: 'https://www.gutenberg.org/files/35/35-0.txt',
-		}
+			name: 'The Mysterious Island',
+			url: "https://www.gutenberg.org/files/1268/1268-0.txt",
+		},
+		// {
+		// 	name: 'The Time Machine',
+		// 	url: 'https://www.gutenberg.org/files/35/35-0.txt',
+		// }
 	];
 	private read(book) {
 		this.logger.log(`Reading '${book.name}'...`);
@@ -61,7 +61,7 @@ export class BookService {
 		}
 		let keywords = [];
 		book.doc = nlp.default(book.content).normalize(normalizeOptions);
-		['places'].forEach(noun => {
+		['people', 'places', 'organizations'].forEach(noun => {
 			this.logger.log(`Saving ${noun}...`);
 			book[noun] = book.doc[noun]().unique().normalize(normalizeOptions);
 			book[noun].json().forEach(thing => {
