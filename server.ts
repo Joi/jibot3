@@ -5,31 +5,16 @@ import * as express from 'express';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { AppServerModule } from './src/main.server';
+
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
-	// const db_file = join(process.cwd(), "data", "jibot.db");
-	// const db = new sqlite3.Database(db_file, err => {
-	// 	if (err) {
-	// 		return console.error(err.message);
-	// 	}
-	// 	console.log("Successful connection to the database 'apptest.db'");
-	// });
-	//
-	// const db = new sqlite3.Database(db_file, err => {
-	// 	if (err) {
-	// 	  return console.error(err.message);
-	// 	}
-	// 	console.log("Successful connection to the database 'apptest.db'");
-	//   });
 	const server = express();
 	const distFolder = join(process.cwd(), 'dist/jibot3/browser');
 	const indexHtml = existsSync(join(distFolder, 'index.original.html')) ? 'index.original.html' : 'index';
-
 	// Our Universal express-engine (found @ https://github.com/angular/universal/tree/master/modules/express-engine)
 	server.engine('html', ngExpressEngine({
 		bootstrap: AppServerModule,
 	}));
-
 	server.set('view engine', 'html');
 	server.set('views', distFolder);
 
@@ -49,13 +34,12 @@ export function app(): express.Express {
 }
 
 function run(): void {
-  const port = process.env.PORT || 4000;
-
-  // Start up the Node server
-  const server = app();
-  server.listen(port, () => {
-    console.log(`Node Express server listening on http://localhost:${port}`);
-  });
+	const port = process.env.PORT || 4000;
+	// Start up the Node server
+	const server = app();
+	server.listen(port, () => {
+		console.log(`Node Express server listening on http://localhost:${port}`);
+	});
 }
 
 // Webpack will replace 'require' with '__webpack_require__'
