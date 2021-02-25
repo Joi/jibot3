@@ -1,13 +1,16 @@
 {
-  "name": "jibot-sqlite3",
-  "version": "0.0.1",
-  "peerDependencies": {
-    "@angular/common": "^11.2.1",
-    "@angular/core": "^11.2.1",
-	"@mapbox/node-pre-gyp": "^1.0.0",
-    "sqlite3": "^5.0.2"
-  },
-  "dependencies": {
-    "tslib": "^2.0.0"
-  }
+	"name": "jibot-sqlite3",
+	"version": "0.0.1",
+	"types": "jibot-sqlite3.d.ts",
+	"peerDependencies": {},
+	"dependencies": {
+		"@mapbox/node-pre-gyp": "^1.0.0",
+		"@types/sqlite3": "^3.1.7",
+		"sqlite": "^4.0.19",
+		"sqlite3": "^5.0.2",
+		"tslib": "^2.0.0"
+	},
+	"devDependencies": {
+
+	}
 }
