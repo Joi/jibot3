@@ -26,6 +26,11 @@
 			"dom"
 		]
 	},
+	"externals": {
+		"aws-sdk": "aws-sdk",
+		"sqlite3": "commonjs sqlite3",
+		"node-gyp": "commonjs node-gyp"
+	},
 	"angularCompilerOptions": {
 		"fullTemplateTypeCheck": true,
 		"strictInjectionParameters": true

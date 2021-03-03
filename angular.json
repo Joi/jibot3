@@ -1,47 +1,48 @@
 {
 	"$schema": "./node_modules/@angular/cli/lib/config/schema.json",
 	"cli": {
-	  "analytics": false
+	"analytics": false
 	},
 	"version": 1,
 	"newProjectRoot": "projects",
 	"projects": {
-	  "jibot3": {
+	"jibot3": {
 		"projectType": "application",
 		"schematics": {
-		  "@schematics/angular:component": {
+		"@schematics/angular:component": {
 			"style": "scss"
-		  }
+		}
 		},
 		"root": "",
 		"sourceRoot": "src",
 		"prefix": "app",
 		"architect": {
-		  "build": {
+		"build": {
 			"builder": "@angular-devkit/build-angular:browser",
 			"options": {
-			  "outputPath": "dist/jibot3/browser",
-			  "index": "src/index.html",
-			  "main": "src/main.ts",
-			  "polyfills": "src/polyfills.ts",
-			  "tsConfig": "tsconfig.app.json",
-			  "aot": true,
-			  "assets": [
-				"src/favicon.ico",
-				"src/assets"
-			  ],
-			  "styles": [
-				"src/styles.scss"
-			  ],
-			  "scripts": [  ]
+				"allowedCommonJsDependencies": ["typeorm", "sqlite3"],
+				"outputPath": "dist/jibot3/browser",
+				"index": "src/index.html",
+				"main": "src/main.ts",
+				"polyfills": "src/polyfills.ts",
+				"tsConfig": "tsconfig.app.json",
+				"aot": true,
+				"assets": [
+					"src/favicon.ico",
+					"src/assets"
+				],
+				"styles": [
+					"src/styles.scss"
+				],
+				"scripts": [ ]
 			},
 			"configurations": {
-			  "production": {
+			"production": {
 				"fileReplacements": [
-				  {
+				{
 					"replace": "src/environments/environment.ts",
 					"with": "src/environments/environment.prod.ts"
-				  }
+				}
 				],
 				"optimization": true,
 				"outputHashing": "all",
@@ -51,127 +52,128 @@
 				"vendorChunk": false,
 				"buildOptimizer": true,
 				"budgets": [
-				  {
+				{
 					"type": "initial",
 					"maximumWarning": "2mb",
 					"maximumError": "5mb"
-				  },
-				  {
+				},
+				{
 					"type": "anyComponentStyle",
 					"maximumWarning": "6kb",
 					"maximumError": "10kb"
-				  }
+				}
 				]
-			  }
 			}
-		  },
-		  "serve": {
+			}
+		},
+		"serve": {
 			"builder": "@angular-devkit/build-angular:dev-server",
 			"options": {
-			  "browserTarget": "jibot3:build"
+
+			"browserTarget": "jibot3:build"
 			},
 			"configurations": {
-			  "production": {
+			"production": {
 				"browserTarget": "jibot3:build:production"
-			  }
 			}
-		  },
-		  "extract-i18n": {
+			}
+		},
+		"extract-i18n": {
 			"builder": "@angular-devkit/build-angular:extract-i18n",
 			"options": {
-			  "browserTarget": "jibot3:build"
+			"browserTarget": "jibot3:build"
 			}
-		  },
-		  "test": {
+		},
+		"test": {
 			"builder": "@angular-devkit/build-angular:karma",
 			"options": {
-			  "main": "src/test.ts",
-			  "polyfills": "src/polyfills.ts",
-			  "tsConfig": "tsconfig.spec.json",
-			  "karmaConfig": "karma.conf.js",
-			  "assets": [
+			"main": "src/test.ts",
+			"polyfills": "src/polyfills.ts",
+			"tsConfig": "tsconfig.spec.json",
+			"karmaConfig": "karma.conf.js",
+			"assets": [
 				"src/favicon.ico",
 				"src/assets"
-			  ],
-			  "styles": [
+			],
+			"styles": [
 				"src/styles.scss"
-			  ],
-			  "scripts": []
+			],
+			"scripts": []
 			}
-		  },
-		  "lint": {
+		},
+		"lint": {
 			"builder": "@angular-devkit/build-angular:tslint",
 			"options": {
-			  "tsConfig": [
+			"tsConfig": [
 				"tsconfig.app.json",
 				"tsconfig.spec.json",
 				"e2e/tsconfig.json",
 				"tsconfig.server.json"
-			  ],
-			  "exclude": [
+			],
+			"exclude": [
 				"**/node_modules/**"
-			  ]
+			]
 			}
-		  },
-		  "e2e": {
+		},
+		"e2e": {
 			"builder": "@angular-devkit/build-angular:protractor",
 			"options": {
-			  "protractorConfig": "e2e/protractor.conf.js",
-			  "devServerTarget": "jibot3:serve"
+			"protractorConfig": "e2e/protractor.conf.js",
+			"devServerTarget": "jibot3:serve"
 			},
 			"configurations": {
-			  "production": {
+			"production": {
 				"devServerTarget": "jibot3:serve:production"
-			  }
 			}
-		  },
-		  "server": {
+			}
+		},
+		"server": {
 			"builder": "@angular-devkit/build-angular:server",
 			"options": {
-			  "outputPath": "dist/jibot3/server",
-			  "main": "server.ts",
-			  "tsConfig": "tsconfig.server.json"
+			"outputPath": "dist/jibot3/server",
+			"main": "server.ts",
+			"tsConfig": "tsconfig.server.json"
 			},
 			"configurations": {
-			  "production": {
+			"production": {
 				"outputHashing": "media",
 				"fileReplacements": [
-				  {
+				{
 					"replace": "src/environments/environment.ts",
 					"with": "src/environments/environment.prod.ts"
-				  }
+				}
 				],
 				"sourceMap": false,
 				"optimization": true
-			  }
 			}
-		  },
-		  "serve-ssr": {
+			}
+		},
+		"serve-ssr": {
 			"builder": "@nguniversal/builders:ssr-dev-server",
 			"options": {
-			  "browserTarget": "jibot3:build",
-			  "serverTarget": "jibot3:server"
+			"browserTarget": "jibot3:build",
+			"serverTarget": "jibot3:server"
 			},
 			"configurations": {
-			  "production": {
+			"production": {
 				"browserTarget": "jibot3:build:production",
 				"serverTarget": "jibot3:server:production"
-			  }
 			}
-		  },
-		  "prerender": {
+			}
+		},
+		"prerender": {
 			"builder": "@nguniversal/builders:prerender",
 			"options": {
-			  "browserTarget": "jibot3:build:production",
-			  "serverTarget": "jibot3:server:production",
-			  "routes": [  ]
+			"browserTarget": "jibot3:build:production",
+			"serverTarget": "jibot3:server:production",
+			"routes": [  ]
 			},
 			"configurations": {
-			  "production": {}
+			"production": {}
 			}
-		  }
 		}
-	  }
+		}
+	}
 	},
 	"defaultProject": "jibot3"
-  }
+}

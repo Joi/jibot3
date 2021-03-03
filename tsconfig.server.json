@@ -3,11 +3,15 @@
 	"extends": "./tsconfig.app.json",
 	"compilerOptions": {
 		"baseUrl": "./src",
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
 		"outDir": "./out-tsc/server",
+		"resolveJsonModule": true,
 		"target": "es2016",
-		"types": [
-			"node"
-		]
+		"types": ["node"]
+	},
+	"resolve": {
+		"extensions": [".mjs", ".json", ".ts"]
 	},
 	"files": [
 		"src/main.server.ts",
