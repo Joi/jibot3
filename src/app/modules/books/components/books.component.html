@@ -1,0 +1,14 @@
+<ng-container *ngIf="books">
+	<mat-card *ngFor="let book of books">
+		<mat-card-title>{{book.title}}</mat-card-title>
+		<mat-card-content>
+			<dl>
+				<dt>url</dt>
+				<dd>{{book.url}}</dd>
+			</dl>
+		</mat-card-content>
+		<mat-card-actions>
+			<mat-icon>delete</mat-icon>
+		</mat-card-actions>
+	</mat-card>
+</ng-container>

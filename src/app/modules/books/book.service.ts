@@ -20,12 +20,7 @@ export class BookService {
 		});
 	}
 	private create = (book:Book) => this.request('post', this.apiRoute, book)
-	//public read = (book?:Book) => this.request('get', (book) ? `${this.apiRoute}/${book.id}` : this.apiRoute);
+	public read = (book?:Book) => this.request('get', (book) ? `${this.apiRoute}${book.id}` : this.apiRoute);
 	private update = (book:Book) => this.request('post', `${this.apiRoute}${book.id}`, book);
 	private destroy = (book:Book) => this.request('delete', `${this.apiRoute}${book.id}`);
-
-	public read = (book?:Book) => {
-
-		return this.request('get', (book) ? `${this.apiRoute}${book.id}` : this.apiRoute);
-	}
 }

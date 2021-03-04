@@ -19,20 +19,10 @@ export function app(): express.Express {
 	// Example Express Rest API endpoints
 	// server.get('/api/**', (req, res) => { });
 	// Serve static files from /browser
-	server.get('/api/**', (req, res) => {
-		//
-		console.log("THIS IS API CALLLLL");
-		// DO SOMETHING AND RETURN A USEFUL VIEWSFUL
-		let pretendData = [{
-			id: 123,
-			name: "The Mysterious Island",
-			url: "https://www.gutenberg.org/files/1268/1268-0.txt"
-		}];
-		res.json({"message":"Ok"})
-		res.render(indexHtml, { req, providers: [{ provide: new InjectionToken('BOOKS'), useValue: pretendData }] });
-	});
-
-
+	// server.get('/api/**', (req, res) => {
+	// 	res.json({"message":"Ok"})
+	// 	res.render(indexHtml, { req, providers: [{ provide: new InjectionToken('BOOKS'), useValue: pretendData }] });
+	// });
 	server.get('*.*', express.static(distFolder, {
 		maxAge: '1y'
 	}));

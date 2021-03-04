@@ -3,11 +3,7 @@ import { ServerModule } from '@angular/platform-server';
 import { AppModule } from '@app/app.module';
 import { AppComponent } from './app.component';
 
-import {
-	ApiModule,
-	SlackModule
-} from './modules';
-
+import { ApiModule, SlackModule, BookModule, } from './modules';
 
 @NgModule({
 	bootstrap: [AppComponent],
