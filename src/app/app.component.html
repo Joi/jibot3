@@ -1,14 +1,12 @@
-<div id="page" class="h-100 d-flex flex-column" style="border:1px purple solid;">
-	<header><app-header></app-header></header>
-	<mat-sidenav-container class="flex-fill">
-		<mat-sidenav #sidenav mode="push" position="start" [fixedInViewport]="true">
-			<app-nav></app-nav>
-		</mat-sidenav>
-		<mat-sidenav-content>
-			<main class="container-fluid">
-				<router-outlet></router-outlet>
-			</main>
-		</mat-sidenav-content>
-	</mat-sidenav-container>
-	<footer><app-footer></app-footer></footer>
-</div>
+<mat-sidenav-container class="h-100">
+	<mat-sidenav #sidenav mode="push" position="start" [fixedInViewport]="true">
+		<app-nav></app-nav>
+	</mat-sidenav>
+	<mat-sidenav-content class="h-100 d-flex flex-column">
+		<header><app-header></app-header></header>
+		<main class="container-fluid flex-fill">
+			<router-outlet></router-outlet>
+		</main>
+		<footer><app-footer></app-footer></footer>
+	</mat-sidenav-content>
+</mat-sidenav-container>

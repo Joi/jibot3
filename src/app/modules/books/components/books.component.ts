@@ -1,9 +1,8 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import {MatDialog} from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { Book } from '@app/modules/books/book';
 import { BookService } from '@modules/books/book.service';
 import { BehaviorSubject } from 'rxjs';
-import { first } from 'rxjs/operators';
 import { EditBookComponent } from './edit-book/edit-book.component';
 @Component({
   selector: 'app-books',

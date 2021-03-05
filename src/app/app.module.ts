@@ -10,6 +10,7 @@ import { MaterialModule } from './modules/material.module';
 import { NavComponent } from './components/nav/nav.component';
 import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
+import { OptionsComponent } from './components/options/options.component';
 
 @NgModule({
 	declarations: [
@@ -17,6 +18,7 @@ import { FooterComponent } from './components/footer/footer.component';
 		NavComponent,
 		HeaderComponent,
 		FooterComponent,
+		OptionsComponent,
 	],
 	exports: [MaterialModule],
 	imports: [

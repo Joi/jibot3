@@ -1,6 +1,6 @@
-<form *ngIf="form" #thing="ngForm" [formGroup]="form" novalidate class="d-flex flex-column">
+<form *ngIf="formGroup" #form="ngForm" [formGroup]="formGroup" novalidate class="d-flex flex-column">
 	<mat-form-field>
-		<mat-label>Book Title</mat-label>
+		<mat-label>Title</mat-label>
 		<input matInput type="text" formControlName="title"  placeholder="Enter the book title">
 	</mat-form-field>
 	<mat-form-field>
@@ -9,11 +9,11 @@
 	</mat-form-field>
 	<div class="d-flex flex-row bd-highlight mb-2">
 		<div class="flex-fill">
-			<button *ngIf="thing?.dirty" mat-flat-button type="button" color="primary" (click)="update(form.value)">
+			<button *ngIf="form?.dirty" mat-flat-button type="button" color="primary" (click)="update(form.value)">
 				<mat-icon>save</mat-icon>
 			</button>
 		</div>
-		<button mat-flat-button color="warn" type="button" (click)="delete(book)">
+		<button *ngIf="action == 'edit'"mat-flat-button color="warn" type="button" (click)="delete(book)">
 			<mat-icon>delete</mat-icon>
 		</button>
 	</div>

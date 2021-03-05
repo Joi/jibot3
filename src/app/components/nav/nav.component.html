@@ -1,6 +1,10 @@
-<mat-list role="list">
-	<mat-list-item role="listitem">
-		Book
-		<!-- <a routerLink="/books" routerLinkActive="active">Books</a> -->
+<mat-nav-list>
+	<mat-list-item [routerLinkActive]="['active']" [routerLink]="['/options']">
+		<mat-icon matListIcon>adjust</mat-icon>
+		<span matLine>Options</span>
 	</mat-list-item>
-  </mat-list>
+	<mat-list-item [routerLinkActive]="['active']" [routerLink]="['/books']">
+		<mat-icon matListIcon>adjust</mat-icon>
+		<span matLine>Books</span>
+	</mat-list-item>
+</mat-nav-list>

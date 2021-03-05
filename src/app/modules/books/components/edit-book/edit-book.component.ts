@@ -14,7 +14,7 @@ export class EditBookComponent implements OnInit {
 	@Output() onDelete = new EventEmitter();
 
 	public action: string = "edit";
-    public form: FormGroup;
+    public formGroup: FormGroup;
 	constructor(
 		private formBuilder: FormBuilder,
 		private bookService: BookService
@@ -24,7 +24,7 @@ export class EditBookComponent implements OnInit {
 			this.book = new Book();
 			this.action = "add";
 		}
-		this.form = this.formBuilder.group(this.book);
+		this.formGroup = this.formBuilder.group(this.book);
 	}
 	public update = (book:Book) => {
 		this.bookService.update(book).subscribe(
