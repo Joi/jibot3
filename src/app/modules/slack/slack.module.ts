@@ -1,7 +1,6 @@
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { environment } from '@env/environment';
-import { ApiModule } from '@modules/api/api.module';
 import { BoltService } from './bolt/bolt.service';
 import { AppOptions } from '@slack/bolt';
 import * as Events from './events';
@@ -10,7 +9,6 @@ import * as Messages from './messages';
 @NgModule({
 	// declarations: [ ],
 	// exports: [
-	// 	//ApiModule,
 	// ],
 	// imports: [CommonModule],
 	// providers: [

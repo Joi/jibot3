@@ -1,14 +1,13 @@
-import { EntitySubscriberInterface, EventSubscriber } from "typeorm";
-import { TransactionCommitEvent } from "typeorm/subscriber/event/TransactionCommitEvent";
-
+import { EntitySubscriberInterface, EventSubscriber, UpdateEvent } from "typeorm";
+import { BookController } from "../controllers/book.controller";
 @EventSubscriber()
-export class PostSubscriber implements EntitySubscriberInterface<any> {
-    // afterLoad(entity: any) {
-    //     console.log(entity);
-    //     console.log(`${entity.constructor.name}: ${entity.id} `);
-    // }
+export class BookSubscriber implements EntitySubscriberInterface<any> {
+	// constructor(private bookController: BookController) {}
+	// afterUpdate(event: UpdateEvent<any>) {
 
-    afterTransactionCommit(event: TransactionCommitEvent) {
-        console.log(`AFTER TRANSACTION COMMITTED: `, event);
-    }
+	// 	console.log(event);
+	// }
+    // afterTransactionCommit(event: TransactionCommitEvent) {
+    //     console.log(`AFTER TRANSACTION COMMITTED: `, event);
+    // }
 }

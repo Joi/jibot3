@@ -9,8 +9,7 @@ export const database = createConnection().then(async connection => {
     const app = express();
     app.use(bodyParser.json()).use(cors());
     Routes.forEach(route => {
-        // app.get(route).then(req)
-		(app as any)[route.method](route.route, (req: Request, res: Response, next: any) => {
+        (app as any)[route.method](route.route, (req: Request, res: Response, next: any) => {
             const result = (new (route.controller as any)())[route.action](req, res, next);
             if (result instanceof Promise) {
                 result.then(r => r !== null && r !== undefined ? res.send(r) : undefined);

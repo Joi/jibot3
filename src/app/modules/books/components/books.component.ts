@@ -1,7 +1,8 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {MatDialog} from '@angular/material/dialog';
 import { Book } from '@app/modules/books/book';
 import { BookService } from '@modules/books/book.service';
-import { BehaviorSubject, Observable, Subscriber } from 'rxjs';
+import { EditBookComponent } from './edit-book/edit-book.component';
 @Component({
   selector: 'app-books',
   templateUrl: './books.component.html',
@@ -12,20 +13,19 @@ export class BooksComponent implements OnInit, OnDestroy {
     private subscriber;
 	constructor(
 		private bookService: BookService,
+		public matDialog: MatDialog
 	) { }
+
+
+	public openDialog() {
+		let dialog = this.matDialog.open(EditBookComponent);
+	}
+	public handleChange = (books) => this.books.next(books);
+
     ngOnInit(): void {
-        this.subscriber = this.books.subscribe(console.log);
+        this.subscriber = this.books.subscribe();
     }
 	ngOnDestroy(): void {
         this.subscriber.unsubscribe();
-    }
-    public delete = (book:Book) => {
-        this.bookService.delete(book).subscribe(
-            (r) => {
-                console.log(r);
-                console.log("DELETED");
-            },
-            console.error
-        );
     }
 }

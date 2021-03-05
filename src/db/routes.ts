@@ -11,9 +11,9 @@ export const Routes = [{
     action: "one"
 }, {
     method: "post",
-    route: "/books",
+    route: "/books/:id",
     controller: BookController,
-    action: "save"
+    action: "save",
 }, {
     method: "delete",
     route: "/books/:id",

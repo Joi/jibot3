@@ -1,17 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { routes } from '@app/app-routing.module';
+import { Component, HostBinding, OnInit } from '@angular/core';
+//import { routes } from '@app/app-routing.module';
 @Component({
     selector: 'app-nav',
     templateUrl: './nav.component.html',
-    styleUrls: ['./nav.component.scss']
+    styleUrls: ['./nav.component.scss'],
 })
 export class NavComponent implements OnInit {
-    constructor() { 
-        console.log(routes);
-    }
-
-    ngOnInit(): void {
-        
-    }
+	constructor() {  }
+    ngOnInit(): void {}
 
 }

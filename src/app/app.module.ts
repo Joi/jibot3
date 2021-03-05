@@ -6,13 +6,17 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { BookModule } from './modules';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MaterialModule } from './modules/material/material.module';
+import { MaterialModule } from './modules/material.module';
 import { NavComponent } from './components/nav/nav.component';
+import { HeaderComponent } from './components/header/header.component';
+import { FooterComponent } from './components/footer/footer.component';
 
 @NgModule({
 	declarations: [
 		AppComponent,
 		NavComponent,
+		HeaderComponent,
+		FooterComponent,
 	],
 	exports: [MaterialModule],
 	imports: [

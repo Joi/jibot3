@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { Book } from '../../book';
+import { BookService } from '../../book.service';
 
 @Component({
   selector: 'app-edit-book',
@@ -6,10 +9,39 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./edit-book.component.scss']
 })
 export class EditBookComponent implements OnInit {
+	@Input() book: Book;
+	@Output() onChange = new EventEmitter();
+	@Output() onDelete = new EventEmitter();
 
-  constructor() { }
-
-  ngOnInit(): void {
-  }
-
+	public action: string = "edit";
+    public form: FormGroup;
+	constructor(
+		private formBuilder: FormBuilder,
+		private bookService: BookService
+	) { }
+	ngOnInit(): void {
+		if (!this.book) {
+			this.book = new Book();
+			this.action = "add";
+		}
+		this.form = this.formBuilder.group(this.book);
+	}
+	public update = (book:Book) => {
+		this.bookService.update(book).subscribe(
+            (books) => {
+				this.book = book;
+				this.onChange.emit(books);
+			},
+            console.error
+        );
+    }
+	public delete = (book:Book) => {
+        // this.bookService.delete(book).subscribe(
+        //     (r) => {
+        //         console.log(r);
+        //         console.log("DELETED");
+        //     },
+        //     console.error
+        // );
+    }
 }

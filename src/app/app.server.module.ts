@@ -2,25 +2,22 @@ import { NgModule } from '@angular/core';
 import { ServerModule } from '@angular/platform-server';
 import { AppModule } from '@app/app.module';
 import { AppComponent } from './app.component';
-import { ApiModule, SlackModule, BookModule, } from './modules';
+import { SlackModule, BookModule, } from './modules';
 
 @NgModule({
 	bootstrap: [AppComponent],
 	declarations: [ ],
 	exports: [
 		SlackModule,
-		ApiModule,
 	],
 	imports: [
 		AppModule,
 		ServerModule,
 	],
-	providers: [
-		ApiModule,
-	]
+	providers: []
 })
 export class AppServerModule {
 	constructor() {
-        
+
 	}
 }

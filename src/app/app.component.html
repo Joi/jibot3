@@ -1,12 +1,12 @@
+<header><app-header></app-header></header>
 <mat-sidenav-container>
-    <mat-sidenav mode="side" [fixedInViewport]="true">
+    <mat-sidenav #sidenav mode="push" position="start" [fixedInViewport]="true">
         <app-nav></app-nav>
     </mat-sidenav>
     <mat-sidenav-content>
-        <header><mat-toolbar>Header</mat-toolbar></header>
-        <main>
+        <main class="container-fluid">
             <router-outlet></router-outlet>
         </main>
-        <footer><mat-toolbar>Footer</mat-toolbar></footer>
     </mat-sidenav-content>
 </mat-sidenav-container>
+<footer><app-footer></app-footer></footer>
