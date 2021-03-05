@@ -1,5 +1,4 @@
-<form *ngIf="form" #thing="ngForm" [formGroup]="form" novalidate>
-	<pre><code><small>{{ book | json}}</small></code></pre>
+<form *ngIf="form" #thing="ngForm" [formGroup]="form" novalidate class="d-flex flex-column">
 	<mat-form-field>
 		<mat-label>Book Title</mat-label>
 		<input matInput type="text" formControlName="title"  placeholder="Enter the book title">
