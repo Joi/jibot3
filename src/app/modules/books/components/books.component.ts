@@ -1,24 +1,31 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Book } from '@app/modules/books/book';
 import { BookService } from '@modules/books/book.service';
-import { Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, Subscriber } from 'rxjs';
 @Component({
   selector: 'app-books',
   templateUrl: './books.component.html',
   styleUrls: ['./books.component.scss']
 })
 export class BooksComponent implements OnInit, OnDestroy {
-	private subscription;
-	public books: Book[];
+    public books = this.bookService.books;
+    private subscriber;
 	constructor(
 		private bookService: BookService,
-	) {
-		//this.bookService.read().then((s) => this.subscription = s);
-	}
-	ngOnInit(): void {
-		//this.subscription.subscribe((books:Book[]) => this.books = books);
-	}
+	) { }
+    ngOnInit(): void {
+        this.subscriber = this.books.subscribe(console.log);
+    }
 	ngOnDestroy(): void {
-		//this.subscription.uns
-	}
+        this.subscriber.unsubscribe();
+    }
+    public delete = (book:Book) => {
+        this.bookService.delete(book).subscribe(
+            (r) => {
+                console.log(r);
+                console.log("DELETED");
+            },
+            console.error
+        );
+    }
 }

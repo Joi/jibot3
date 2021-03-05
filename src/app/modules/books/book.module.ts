@@ -1,17 +1,27 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BookService } from  './book.service';
-import { BooksComponent } from './components';
+import { AddBookComponent, BooksComponent, EditBookComponent } from './components';
 import { MaterialModule } from '../material/material.module';
-
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 @NgModule({
 	declarations: [
-		BooksComponent
+		BooksComponent,
+        AddBookComponent,
+        EditBookComponent
 	],
-	exports: [],
+	exports: [
+        MaterialModule,
+        FormsModule,
+        ReactiveFormsModule,
+        RouterModule
+    ],
 	imports: [
 		CommonModule,
-		MaterialModule
+		MaterialModule,
+        RouterModule,
+        ReactiveFormsModule
 	],
 	providers: [
 		BookService

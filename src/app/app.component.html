@@ -1,9 +1,12 @@
-<header>
-	<h1>jibot3</h1>
-</header>
-<main>
-	<p><strong>Hello!</strong> I am ready to learn.</p>
-	<router-outlet></router-outlet>
-</main>
-<footer>
-</footer>
+<mat-sidenav-container>
+    <mat-sidenav mode="side" [fixedInViewport]="true">
+        <app-nav></app-nav>
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <header><mat-toolbar>Header</mat-toolbar></header>
+        <main>
+            <router-outlet></router-outlet>
+        </main>
+        <footer><mat-toolbar>Footer</mat-toolbar></footer>
+    </mat-sidenav-content>
+</mat-sidenav-container>

@@ -1,20 +1,23 @@
+/***************************************************************************************************
+ * Load `$localize` onto the global scope - used if i18n tags appear in Angular templates.
+ */
+import '@angular/localize/init';
 import 'zone.js/dist/zone-node';
 import { APP_BASE_HREF } from '@angular/common';
 import { ngExpressEngine } from '@nguniversal/express-engine';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { AppServerModule } from './src/main.server';
-import { InjectionToken } from '@angular/core';
 import * as express from 'express';
 export function app(): express.Express {
-	const server = express();
+    const server = express();
 	const distFolder = join(process.cwd(), 'dist/jibot3/browser');
 	const indexHtml = existsSync(join(distFolder, 'index.original.html')) ? 'index.original.html' : 'index';
 	// Our Universal express-engine (found @ https://github.com/angular/universal/tree/master/modules/express-engine)
 	server.engine('html', ngExpressEngine({
 		bootstrap: AppServerModule,
 	}));
-	server.set('view engine', 'html');
+    server.set('view engine', 'html');
 	server.set('views', distFolder);
 	// Example Express Rest API endpoints
 	// server.get('/api/**', (req, res) => { });

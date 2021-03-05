@@ -5,9 +5,14 @@ import { EditBookComponent } from '@modules/books/components/edit-book/edit-book
 import { BooksComponent } from '@modules/books/components/books.component';
 export const routes: Routes = [
 	{ path: '', pathMatch: 'full', redirectTo: 'books' },
-	{ path: 'add-book', component: AddBookComponent },
-	{ path: 'edit-book/:id', component: EditBookComponent },
-	{ path: 'books', component: BooksComponent }
+    { 
+        path: 'books', 
+        component: BooksComponent, 
+        children: [
+            { path: 'add', component: AddBookComponent },
+	        //{ path: '/:id', component: EditBookComponent },
+        ]
+    },
 ];
 @NgModule({
 	declarations: [],

@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { ServerModule } from '@angular/platform-server';
 import { AppModule } from '@app/app.module';
 import { AppComponent } from './app.component';
-
 import { ApiModule, SlackModule, BookModule, } from './modules';
 
 @NgModule({
@@ -22,6 +21,6 @@ import { ApiModule, SlackModule, BookModule, } from './modules';
 })
 export class AppServerModule {
 	constructor() {
-
+        
 	}
 }

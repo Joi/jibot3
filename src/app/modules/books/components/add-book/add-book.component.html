@@ -1,1 +1,10 @@
-<p>add-book works!</p>
+<form *ngIf="form" [formGroup]="form" novalidate>
+    <label>
+      <span>Title:</span>
+      <input type="text" formControlName="title">
+    </label>
+    <label>
+      <span>Url:</span>
+      <input type="text" formControlName="url">
+    </label>
+</form>

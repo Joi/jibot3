@@ -13,14 +13,3 @@
       "sourceMap": true
    }
 }
-
-// "ng": "ng",
-//     "start": "npm run serve:ssr",
-//     "build": "ng build",
-//     "test": "ng test",
-//     "lint": "ng lint",
-//     "e2e": "ng e2e",
-//     "dev:ssr": "ng run jibot3:serve-ssr",
-//     "serve:ssr": "node dist/jibot3/server/main.js",
-//     "build:ssr": "ng build --prod && ng run jibot3:server:production",
-//     "prerender": "ng run jibot3:prerender"

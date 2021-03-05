@@ -5,20 +5,21 @@ import * as bodyParser from "body-parser";
 import * as cors from 'cors';
 import { Request, Response } from "express";
 import { Routes } from "./routes";
-createConnection().then(async connection => {
-   	const app = express();
+export const database = createConnection().then(async connection => {
+    const app = express();
     app.use(bodyParser.json()).use(cors());
     Routes.forEach(route => {
-		(app as any)[route.method](route.route, (req: Request, res: Response, next: Function) => {
-            const result = (new (route.controller as any))[route.action](req, res, next);
+        // app.get(route).then(req)
+		(app as any)[route.method](route.route, (req: Request, res: Response, next: any) => {
+            const result = (new (route.controller as any)())[route.action](req, res, next);
             if (result instanceof Promise) {
-                result.then(result => result !== null && result !== undefined ? res.send(result) : undefined);
-
+                result.then(r => r !== null && r !== undefined ? res.send(r) : undefined);
             } else if (result !== null && result !== undefined) {
                 res.json(result);
             }
         });
     });
     app.listen(3000);
-    console.log("Jibot Database has started on port 3000. Open http://localhost:3000/users to see results");
+    console.log("Jibot Database has started on port 3000. Open http://localhost:3000/books to see results");
+    return app;
 }).catch(error => console.log(error));

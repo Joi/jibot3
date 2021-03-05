@@ -16,7 +16,6 @@
 		"typeorm": "0.2.31"
 	},
 	"scripts": {
-		"build": "tsc",
-		"start": "ts-node src/index.ts"
+		"start": "ts-node ."
 	}
 }

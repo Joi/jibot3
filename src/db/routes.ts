@@ -1,4 +1,4 @@
-import { BookController } from "./controller/BookController";
+import { BookController } from "./controllers/book.controller";
 export const Routes = [{
     method: "get",
     route: "/books",
