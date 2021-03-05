@@ -9,6 +9,6 @@ export class HeaderComponent implements OnInit {
 	constructor(
 		private sidenavService: SidenavService
 	) { }
-	ngOnInit(): void { }
+	ngOnInit(): void {	}
 	public toggleSidenav = () => this.sidenavService.toggle.next(true);
 }
