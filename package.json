@@ -5,9 +5,9 @@
   "scripts": {
     "ng": "ng",
     "start:db": "cd ./src/db && npm run start",
+    "dev:ssr": "ng run jibot3:serve-ssr",
     "build:ssr": "ng build --prod && ng run jibot3:server:production",
     "prod:ssr": "node dist/jibot3/server/main.js",
-    "dev:ssr": "ng run jibot3:serve-ssr",
     "prerender": "ng run jibot3:prerender",
     "test": "ng test",
     "lint": "ng lint",
@@ -49,6 +49,7 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "rxjs": "~6.6.3",
+    "sqlite3": "^5.0.2",
     "ts-loader": "^8.0.14",
     "tslib": "^2.0.0",
     "zone.js": "^0.10.3"
@@ -64,6 +65,7 @@
     "@types/jasmine": "~3.6.0",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^12.11.1",
+    "bufferutil": "^4.0.3",
     "codelyzer": "^6.0.0",
     "jasmine-core": "~3.6.0",
     "jasmine-spec-reporter": "~5.0.0",
@@ -75,6 +77,8 @@
     "protractor": "~7.0.0",
     "ts-node": "~7.0.0",
     "tslint": "~6.1.0",
-    "typescript": "~4.0.5"
+    "typeorm": "^0.2.31",
+    "typescript": "~4.0.5",
+    "utf-8-validate": "^5.0.4"
   }
 }

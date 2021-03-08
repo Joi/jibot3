@@ -20,10 +20,6 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "allowedCommonJsDependencies": [
-              "typeorm",
-              "sqlite3"
-            ],
             "outputPath": "dist/jibot3/browser",
             "index": "src/index.html",
             "main": "src/main.ts",

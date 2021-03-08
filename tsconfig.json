@@ -1,7 +1,6 @@
 {
 	"compileOnSave": false,
 	"compilerOptions": {
-		"allowSyntheticDefaultImports": true,
 		"baseUrl": "./src",
 		"paths": {
 			"@env/*": ["environments/*"],
@@ -11,25 +10,10 @@
 	  	},
 		"outDir": "./dist/out-tsc",
 		"sourceMap": true,
-		"declaration": false,
-		"downlevelIteration": true,
-		"experimentalDecorators": true,
-		"module": "es2020",
 		"moduleResolution": "node",
-		"importHelpers": true,
 		"target": "es2015",
-		"typeRoots": [
-		"node_modules/@types"
-		],
-		"lib": [
-			"es2019",
-			"dom"
-		]
-	},
-	"externals": {
-		"aws-sdk": "aws-sdk",
-		"sqlite3": "commonjs sqlite3",
-		"node-gyp": "commonjs node-gyp"
+		"typeRoots": ["node_modules/@types"],
+		"types": ["node"],
 	},
 	"angularCompilerOptions": {
 		"fullTemplateTypeCheck": true,
