@@ -1,8 +1,9 @@
 import {MigrationInterface, QueryRunner, Table} from "typeorm";
-export class CreateBookTable1614880942662 implements MigrationInterface {
-    public async up(queryRunner: QueryRunner): Promise<void> {
+
+export class CreateOptionsTable1615224455046 implements MigrationInterface {
+	public async up(queryRunner: QueryRunner): Promise<void> {
         return await queryRunner.createTable(new Table({
-            name: "books",
+            name: "options",
             columns: [
                 {
                     name: "id",
@@ -12,21 +13,20 @@ export class CreateBookTable1614880942662 implements MigrationInterface {
                     generationStrategy: 'increment'
                 },
                 {
-                    name: "title",
+                    name: "name",
                     type: "varchar",
                     isNullable: false,
                 },
                 {
-                    name: "url",
+                    name: "value",
                     type: "text",
                     isNullable: false
                 },
             ]
         }), true);
     }
-
     public async down(queryRunner: QueryRunner): Promise<void> {
-        return await queryRunner.dropTable("books");
+		return await queryRunner.dropTable("options");
     }
 
 }
