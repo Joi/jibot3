@@ -33,6 +33,4 @@ import { OptionsModule } from './modules/options/options.module';
 	providers: [],
 	bootstrap: [AppComponent]
 })
-export class AppModule {
-	constructor () {	}
-}
+export class AppModule {}
