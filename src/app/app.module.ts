@@ -4,13 +4,13 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { BookModule } from './modules';
+import { BookModule } from './modules/books/book.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './modules/material.module';
 import { NavComponent } from './components/nav/nav.component';
 import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
-import { OptionsComponent } from './components/options/options.component';
+import { OptionsModule } from './modules/options/options.module';
 
 @NgModule({
 	declarations: [
@@ -18,7 +18,6 @@ import { OptionsComponent } from './components/options/options.component';
 		NavComponent,
 		HeaderComponent,
 		FooterComponent,
-		OptionsComponent,
 	],
 	exports: [MaterialModule],
 	imports: [
@@ -29,6 +28,7 @@ import { OptionsComponent } from './components/options/options.component';
 		BrowserAnimationsModule,
 		MaterialModule,
 		BookModule,
+		OptionsModule
 	],
 	providers: [],
 	bootstrap: [AppComponent]

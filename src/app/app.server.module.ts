@@ -2,8 +2,7 @@ import { NgModule } from '@angular/core';
 import { ServerModule } from '@angular/platform-server';
 import { AppModule } from '@app/app.module';
 import { AppComponent } from './app.component';
-import { SlackModule, BookModule, } from './modules';
-
+import { SlackModule } from './modules/slack/slack.module';
 @NgModule({
 	bootstrap: [AppComponent],
 	declarations: [ ],
@@ -17,7 +16,5 @@ import { SlackModule, BookModule, } from './modules';
 	providers: []
 })
 export class AppServerModule {
-	constructor() {
-
-	}
+	constructor() { }
 }
