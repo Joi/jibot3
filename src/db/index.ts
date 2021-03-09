@@ -8,8 +8,7 @@ import { Routes } from "./routes";
 export const database = createConnection().then(async connection => {
     const app = express();
     app.use(bodyParser.json()).use(cors());
-	console.log(Routes);
-    Routes.forEach(route => {
+	Routes.forEach(route => {
 		(app as any)[route.method](route.route, (req: Request, res: Response, next: any) => {
             const result = (new (route.controller as any)())[route.action](req, res, next);
             if (result instanceof Promise) {

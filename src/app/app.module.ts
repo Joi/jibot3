@@ -13,6 +13,7 @@ import { FooterComponent } from './components/footer/footer.component';
 import { OptionsModule } from './modules/options/options.module';
 
 @NgModule({
+    bootstrap: [AppComponent],
 	declarations: [
 		AppComponent,
 		NavComponent,
@@ -31,6 +32,6 @@ import { OptionsModule } from './modules/options/options.module';
 		OptionsModule
 	],
 	providers: [],
-	bootstrap: [AppComponent]
+	
 })
 export class AppModule {}

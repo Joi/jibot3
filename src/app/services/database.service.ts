@@ -11,10 +11,13 @@ export class DatabaseService {
 		private http: HttpClient,
 		@Inject('entityName') private entityName: string
 	) {
-		console.log(this.entityName);
 		this.apiRoute = `${this.apiBase}/${this.entityName}`;
 	}
 	private request(method: string, url: string, data?: any):Observable<any> {
+        console.log(`DB: ${method.toUpperCase()} ${url}`);    
+        if (data) console.log(data);
+        else console.log('no data provided');
+
 		return this.http.request(method, url, {
 			body: data,
 			responseType: 'json',
@@ -23,6 +26,6 @@ export class DatabaseService {
 	}
 	public create	= (entity:any)	=> this.request('post', this.apiRoute, entity)
 	public read		= (entity?:any)	=> this.request('get', (entity) ? `${this.apiRoute}/${entity.id}` : this.apiRoute);
-	public update	= (entity:any)	=> this.request('post', `${this.apiRoute}/${entity.id}`, entity);
+	public update	= (entity:any)	=> this.request('put', `${this.apiRoute}/${entity.id}`, entity);
 	public delete	= (entity:any)	=> this.request('delete', `${this.apiRoute}/${entity.id}`);
 }

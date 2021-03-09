@@ -5,6 +5,7 @@ import { MaterialModule } from '@app/modules/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { BookService, BookServiceFactory } from './book.service';
+import { FetcherService } from '@services/fetcher.service';
 import { HttpClient } from '@angular/common/http';
 @NgModule({
 	declarations: [
@@ -24,10 +25,11 @@ import { HttpClient } from '@angular/common/http';
         ReactiveFormsModule
 	],
 	providers: [
+        FetcherService,
 		{
 			provide: BookService,
 			useFactory: BookServiceFactory,
-			deps: [HttpClient]
+			deps: [HttpClient, FetcherService]
 		}
 	]
 })

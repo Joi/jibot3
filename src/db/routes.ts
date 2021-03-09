@@ -5,7 +5,7 @@ Object.keys(Entities).forEach(entityName => {
 	// Import all the entities present, and loop through to set up the db routes
 	let route = "/" + entityName.toLowerCase();
 	let entityRoutes = [
-		{
+        {
 			method: "get",
 			route: `${route}`,
 			controller: Sqlite3Controller,
@@ -16,7 +16,12 @@ Object.keys(Entities).forEach(entityName => {
 			controller: Sqlite3Controller,
 			action: "one"
 		}, {
-			method: "post",
+            method: "post",
+			route: `${route}`,
+			controller: Sqlite3Controller,
+			action: "save",
+        }, {
+			method: "put",
 			route: `${route}/:id`,
 			controller: Sqlite3Controller,
 			action: "save",

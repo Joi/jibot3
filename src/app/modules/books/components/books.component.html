@@ -36,6 +36,10 @@
 				<th mat-header-cell *matHeaderCellDef> Url </th>
 				<td mat-cell *matCellDef="let book"><a href="{{ book.url }}">{{ book.url }}</a></td>
 			</ng-container>
+            <ng-container matColumnDef="content">
+				<th mat-header-cell *matHeaderCellDef> Content </th>
+				<td mat-cell *matCellDef="let book"><a href="{{ book.content }}">{{ book.content }}</a></td>
+			</ng-container>
 			<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
 			<tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 		</table>

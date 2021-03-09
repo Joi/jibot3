@@ -13,7 +13,7 @@ export class EditBookComponent implements OnInit {
 	@Output() onChange = new EventEmitter();
 	@Output() onDelete = new EventEmitter();
 
-	public action: string = "edit";
+	public action: string = "update";
     public formGroup: FormGroup;
 	constructor(
 		private formBuilder: FormBuilder,
@@ -22,18 +22,27 @@ export class EditBookComponent implements OnInit {
 	ngOnInit(): void {
 		if (!this.book) {
 			this.book = new Book();
-			this.action = "add";
+			this.action = "create";
 		}
 		this.formGroup = this.formBuilder.group(this.book);
 	}
+    public create = (book:Book) => {
+		this.bookService.create(book).subscribe(
+            (books) => {
+				this.book = book;
+				this.onChange.emit(books);
+			},
+            console.error
+        );
+    }
 	public update = (book:Book) => {
-		// this.bookService.update(book).subscribe(
-        //     (books) => {
-		// 		this.book = book;
-		// 		this.onChange.emit(books);
-		// 	},
-        //     console.error
-        // );
+        this.bookService.update(book).subscribe(
+            (books) => {
+                this.book = book;
+				this.onChange.emit(books);
+			},
+            (error) => console.error(error)
+        );
     }
 	public delete = (book:Book) => {
         // this.bookService.delete(book).subscribe(
