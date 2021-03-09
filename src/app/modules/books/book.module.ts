@@ -10,7 +10,7 @@ import { HttpClient } from '@angular/common/http';
 @NgModule({
 	declarations: [
 		BooksComponent,
-        EditBookComponent
+        EditBookComponent,
 	],
 	exports: [
         MaterialModule,

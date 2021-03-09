@@ -1,11 +1,11 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Book } from '@app/modules/books/book';
 import { EditBookComponent } from './edit-book/edit-book.component';
 import { BookService } from '../book.service';
-import { map } from 'rxjs/operators';
+import { DialogService } from '@app/services/dialog.service';
 
 @Component({
 	selector: 'app-books',
@@ -18,19 +18,27 @@ export class BooksComponent implements OnInit, OnDestroy {
 	public tableDataSource;
   	private subscriber;
     private subscribers = {};
+	private dialog;
 	constructor(
 		private bookService: BookService,
-		public matDialog: MatDialog
+		public matDialog: MatDialog,
+		private dialogService: DialogService,
+
 	) {
-		this.subscriber = this.bookService.read()
-            .subscribe((books:Book[]) => this.books.next(books));
 	}
 	public openDialog() {
-		let dialog = this.matDialog.open(EditBookComponent);
+		let dialog = this.matDialog.open(EditBookComponent, {
+			id: "new-book"
+		})
+		.afterClosed().subscribe(console.log);
+		return this.dialogService.add(dialog);
 	}
-	public handleChange = (books) => this.books.next(books);
+	public onBookChanged(books):void {
+		this.books.next(books);
+	};
     ngOnInit(): void {
-        this.subscriber = this.books.subscribe(books => this.tableDataSource = books);
+		this.subscriber = this.bookService.read().subscribe((books:Book[]) => this.books.next(books));
+		this.books.subscribe(books => this.tableDataSource = books);
     }
 	ngOnDestroy(): void {
         this.subscriber.unsubscribe();

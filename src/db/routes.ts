@@ -16,16 +16,16 @@ Object.keys(Entities).forEach(entityName => {
 			controller: Sqlite3Controller,
 			action: "one"
 		}, {
-            method: "post",
-			route: `${route}`,
-			controller: Sqlite3Controller,
-			action: "save",
-        }, {
 			method: "put",
 			route: `${route}/:id`,
 			controller: Sqlite3Controller,
 			action: "save",
 		}, {
+            method: "post",
+			route: `${route}`,
+			controller: Sqlite3Controller,
+			action: "save",
+        }, {
 			method: "delete",
 			route: `${route}/:id`,
 			controller: Sqlite3Controller,

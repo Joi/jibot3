@@ -9,16 +9,14 @@
 	</mat-form-field>
 	<div class="d-flex flex-row bd-highlight mb-2">
 		<div class="flex-fill">
-            <ng-container *ngIf="form?.dirty">
-                <button *ngIf="action ==='update'" mat-flat-button type="button" color="primary" (click)="update(form.value)">
-                    <mat-icon>save</mat-icon>
-                </button>
-                <button *ngIf="action ==='create'" mat-flat-button type="button" color="primary" (click)="create(form.value)">
-                    <mat-icon>add</mat-icon>
-                </button>
-            </ng-container>
+			<button *ngIf="action ==='update'" [disabled]="!form?.dirty" mat-flat-button type="button" color="primary" (click)="update(form.value)">
+				<mat-icon>save</mat-icon>
+			</button>
+			<button *ngIf="action ==='create'" [disabled]="!form?.dirty" mat-flat-button type="button" color="primary" (click)="create(form.value)">
+				<mat-icon>add</mat-icon>
+			</button>
 		</div>
-		<button *ngIf="action == 'update'"mat-flat-button color="warn" type="button" (click)="delete(book)">
+		<button *ngIf="action == 'update'" mat-flat-button color="warn" type="button" (click)="delete(book)">
 			<mat-icon>delete</mat-icon>
 		</button>
 	</div>

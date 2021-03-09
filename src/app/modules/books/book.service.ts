@@ -4,10 +4,14 @@ import { DatabaseService } from '@app/services/database.service';
 import { FetcherService } from '@services/fetcher.service';
 import * as nlp from 'compromise';
 import { tap } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
+import { Book } from './book';
 @Injectable({
   providedIn: 'root'
 })
 export class BookService extends DatabaseService {
+	public books: BehaviorSubject<Book[]>  = new BehaviorSubject(null);
+
     constructor(
         http: HttpClient,
         private fetcher: FetcherService
@@ -18,14 +22,6 @@ export class BookService extends DatabaseService {
         console.log(`Retrieving ${book.title} from ${book.url}...`);
         let params = { ...this.fetcher.presets.text };
         return this.fetcher.fetch(book.url, params)
-        // .pipe(
-        //     tap(content => {
-        //         book.content = content;
-        //         //console.log(typeof content);
-        //         //book.content = content;
-        //         this.update(book);
-        //     })
-        // )
     }
     public nlp(book) {
         let normalizeOptions = {

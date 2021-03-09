@@ -1,8 +1,8 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { DialogService } from '@app/services/dialog.service';
 import { Book } from '../../book';
 import { BookService } from '../../book.service';
-
 @Component({
   selector: 'app-edit-book',
   templateUrl: './edit-book.component.html',
@@ -10,15 +10,14 @@ import { BookService } from '../../book.service';
 })
 export class EditBookComponent implements OnInit {
 	@Input() book: Book;
-	@Output() onChange = new EventEmitter();
-	@Output() onDelete = new EventEmitter();
-
+	@Output() bookChanged:EventEmitter<Book[]> = new EventEmitter<Book[]>();
 	public action: string = "update";
     public formGroup: FormGroup;
 	constructor(
 		private formBuilder: FormBuilder,
-		private bookService: BookService
-	) { }
+		private bookService: BookService,
+		private dialogService: DialogService,
+	) {	}
 	ngOnInit(): void {
 		if (!this.book) {
 			this.book = new Book();
@@ -26,31 +25,24 @@ export class EditBookComponent implements OnInit {
 		}
 		this.formGroup = this.formBuilder.group(this.book);
 	}
-    public create = (book:Book) => {
+	public create(book:Book) {
 		this.bookService.create(book).subscribe(
             (books) => {
-				this.book = book;
-				this.onChange.emit(books);
+				this.dialogService.close('new-book', books);
 			},
             console.error
         );
     }
-	public update = (book:Book) => {
-        this.bookService.update(book).subscribe(
-            (books) => {
-                this.book = book;
-				this.onChange.emit(books);
-			},
-            (error) => console.error(error)
+	public update(book:Book) {
+		this.bookService.update(book).subscribe(
+            (books) => this.bookChanged.emit(books),
+            console.error
         );
     }
-	public delete = (book:Book) => {
-        // this.bookService.delete(book).subscribe(
-        //     (r) => {
-        //         console.log(r);
-        //         console.log("DELETED");
-        //     },
-        //     console.error
-        // );
+	public delete (book:Book) {
+		this.bookService.delete(book).subscribe(
+            (books) => this.bookChanged.emit(books),
+            console.error
+        );
     }
 }

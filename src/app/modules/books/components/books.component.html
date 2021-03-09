@@ -10,11 +10,11 @@
 			<mat-icon>view_module</mat-icon>
 			Library View
 		</ng-template>
-		<div class="d-flex">
+		<div class="d-flex flex-wrap">
 			<mat-card *ngFor="let book of books.value">
 				<mat-card-title>{{book.title}}</mat-card-title>
 				<mat-card-content>
-					<app-edit-book [book]="book" (onChange)="handleChange($event)"></app-edit-book>
+					<app-edit-book [book]="book" (bookChanged)="onBookChanged($event)"></app-edit-book>
 				</mat-card-content>
 			</mat-card>
 		</div>
