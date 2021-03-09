@@ -1,16 +1,18 @@
 {
 	"compileOnSave": false,
 	"compilerOptions": {
+        "allowSyntheticDefaultImports": true,
 		"baseUrl": "./src",
+        "experimentalDecorators": true,
+        "moduleResolution": "node",
+        "outDir": "./dist/out-tsc",
 		"paths": {
 			"@env/*": ["environments/*"],
 			"@app/*": ["app/*"],
 			"@services/*": ["app/services/*"],
 			"@modules/*": ["app/modules/*"],
 	  	},
-		"outDir": "./dist/out-tsc",
 		"sourceMap": true,
-		"moduleResolution": "node",
 		"target": "es2015",
 		"typeRoots": ["node_modules/@types"],
 		"types": ["node"],
