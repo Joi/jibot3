@@ -5,7 +5,6 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Book } from '@app/modules/books/book';
 import { EditBookComponent } from './edit-book/edit-book.component';
 import { BookService } from '../book.service';
-import { DialogService } from '@app/services/dialog.service';
 
 @Component({
 	selector: 'app-books',
@@ -22,16 +21,12 @@ export class BooksComponent implements OnInit, OnDestroy {
 	constructor(
 		private bookService: BookService,
 		public matDialog: MatDialog,
-		private dialogService: DialogService,
-
 	) {
 	}
 	public openDialog() {
-		let dialog = this.matDialog.open(EditBookComponent, {
-			id: "new-book"
-		})
-		.afterClosed().subscribe(console.log);
-		return this.dialogService.add(dialog);
+		this.matDialog.open(EditBookComponent)
+            .afterClosed()
+            .subscribe((books:Book[]) => this.books.next(books));
 	}
 	public onBookChanged(books):void {
 		this.books.next(books);

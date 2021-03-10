@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { DialogService } from '@app/services/dialog.service';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Book } from '../../book';
 import { BookService } from '../../book.service';
 @Component({
@@ -16,7 +16,7 @@ export class EditBookComponent implements OnInit {
 	constructor(
 		private formBuilder: FormBuilder,
 		private bookService: BookService,
-		private dialogService: DialogService,
+		public dialogRef: MatDialogRef<EditBookComponent>,
 	) {	}
 	ngOnInit(): void {
 		if (!this.book) {
@@ -28,7 +28,7 @@ export class EditBookComponent implements OnInit {
 	public create(book:Book) {
 		this.bookService.create(book).subscribe(
             (books) => {
-				this.dialogService.close('new-book', books);
+                this.dialogRef.close(books);
 			},
             console.error
         );
