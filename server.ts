@@ -15,7 +15,7 @@ export function app(): express.Express {
 	server.use(express.json({limit: '50mb'}));
 	server.use(express.urlencoded({limit: '50mb'}));
 	server.use(cors({
-		origin: 'http://localhost:4200',
+		origin: `http://localhost:${port}`,
 		credentials: true,
 	}));
 	const distFolder = join(process.cwd(), 'dist/jibot3/browser');
