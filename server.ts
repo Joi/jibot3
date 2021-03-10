@@ -6,14 +6,35 @@ import { existsSync } from 'fs';
 import { join } from 'path';
 import { AppServerModule } from './src/main.server';
 import express from 'express';
+import cors from 'cors';
+import request from 'request';
+const port = process.env.PORT || 4000;
+
 export function app(): express.Express {
 	const server = express();
+	server.use(express.json({limit: '50mb'}));
+	server.use(express.urlencoded({limit: '50mb'}));
+	server.use(cors({
+		origin: 'http://localhost:4200',
+		credentials: true,
+	}));
 	const distFolder = join(process.cwd(), 'dist/jibot3/browser');
 	const indexHtml = existsSync(join(distFolder, 'index.original.html')) ? 'index.original.html' : 'index';
 	server.engine('html', ngExpressEngine({
 		bootstrap: AppServerModule,
 	}));
-    server.set('view engine', 'html');
+	server.get('/gutenberg/**', (req, res) => {
+		let gutenbergUrl = req.path.replace("/gutenberg/", "");
+		request({ url: gutenbergUrl },
+			(error, response, body) => {
+				if (error || response.statusCode !== 200) {
+					return res.status(500).json({ type: 'error', message: error.message });
+				}
+				res.send(body);
+			}
+		)
+	});
+	server.set('view engine', 'html');
 	server.set('views', distFolder);
 	server.get('*.*', express.static(distFolder, {
 		maxAge: '1y'
@@ -24,7 +45,6 @@ export function app(): express.Express {
 	return server;
 }
 function run(): void {
-	const port = process.env.PORT || 4000;
 	const server = app();
 	server.listen(port, () => {
 		console.log(`Node Express server listening on http://localhost:${port}`);

@@ -1,6 +1,6 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
 @Injectable({
@@ -22,6 +22,8 @@ export class FetcherService {
 			responseType: 'json',
 		}
 	}
-    public fetch = (url:string, options?:any) => this.http.get(url, options).pipe(catchError(this.fetchError));
+    public fetch (url:string, options?:any):Observable<any> {
+		return this.http.get(url, options).pipe(catchError(this.fetchError));
+	}
     private fetchError = (error: HttpErrorResponse) => { return throwError(error); };
 }

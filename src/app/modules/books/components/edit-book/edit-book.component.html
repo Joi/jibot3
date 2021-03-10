@@ -1,4 +1,4 @@
-<form *ngIf="formGroup" #form="ngForm" [formGroup]="formGroup" novalidate class="d-flex flex-column">
+<form *ngIf="formGroup" #form="ngForm" [formGroup]="formGroup" action="POST" novalidate class="d-flex flex-column">
 	<mat-form-field>
 		<mat-label>Title</mat-label>
 		<input matInput type="text" formControlName="title"  placeholder="Enter the book title">
@@ -7,6 +7,9 @@
 		<mat-label>Url</mat-label>
 		<input matInput type="text" formControlName="url" placeholder="Enter the URL">
 	</mat-form-field>
+	<!-- <mat-form-field>
+		<textarea matInput formControlName="content"></textarea>
+	</mat-form-field> -->
 	<div class="d-flex flex-row bd-highlight mb-2">
 		<div class="flex-fill">
 			<button *ngIf="action ==='update'" [disabled]="!form?.dirty" mat-flat-button type="button" color="primary" (click)="update(form.value)">
