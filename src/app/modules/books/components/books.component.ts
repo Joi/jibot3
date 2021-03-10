@@ -5,6 +5,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Book } from '@app/modules/books/book';
 import { EditBookComponent } from './edit-book/edit-book.component';
 import { BookService } from '../book.service';
+import { map, tap } from 'rxjs/operators';
 
 @Component({
 	selector: 'app-books',
@@ -21,6 +22,21 @@ export class BooksComponent implements OnInit, OnDestroy {
 		private bookService: BookService,
 		public matDialog: MatDialog,
 	) {
+        this.subscriber = this.bookService.read()
+                .pipe(
+                    tap(books => books.forEach(book => {
+                        if (!book.content && book.url) {
+                            console.log(book.title);
+                        }
+                        // if (!book.content) {
+                        //     this.bookService.getContent(book).subscribe(
+                        //         (content) => console.log(`${book.title} content retrieved..`),
+                        //         (error) => console.error(error.message)
+                        //     );
+                        // }
+                    }))
+                )
+                .subscribe((books:Book[]) => this.books.next(books));
 	}
 	public openDialog() {
 		this.matDialog.open(EditBookComponent)
@@ -31,11 +47,10 @@ export class BooksComponent implements OnInit, OnDestroy {
 		this.books.next(books);
 	};
     ngOnInit(): void {
-		this.subscriber = this.bookService.read().subscribe((books:Book[]) => this.books.next(books));
 		this.books.subscribe(books => this.tableDataSource = books);
     }
 	ngOnDestroy(): void {
-        this.subscriber.unsubscribe();
+        if (this.subscriber?.unsubscribe) this.subscriber.unsubscribe();
         Object.keys(this.subscribers).forEach(id => this.subscribers[id].unsubscribe());
     }
 }

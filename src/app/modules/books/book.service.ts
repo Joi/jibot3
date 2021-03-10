@@ -10,18 +10,21 @@ import { Book } from './book';
   providedIn: 'root'
 })
 export class BookService extends DatabaseService {
-	public books: BehaviorSubject<Book[]>  = new BehaviorSubject(null);
-
-    constructor(
+	constructor(
         http: HttpClient,
         private fetcher: FetcherService
     ) {
-        super(http, "books");
+        super(http, "books");    
     }
     public getContent(book) {
         console.log(`Retrieving ${book.title} from ${book.url}...`);
         let params = { ...this.fetcher.presets.text };
-        return this.fetcher.fetch(book.url, params)
+        return this.fetcher.fetch(book.url, params).pipe(
+            tap(content => {
+                book.content = content;
+                this.update(book);
+            })
+        );
     }
     public nlp(book) {
         let normalizeOptions = {

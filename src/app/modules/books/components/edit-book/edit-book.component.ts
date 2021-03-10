@@ -28,6 +28,9 @@ export class EditBookComponent implements OnInit {
 	public create(book:Book) {
 		this.bookService.create(book).subscribe(
             (books) => {
+                // if (!book.content && book.url) {
+
+                // }
                 this.dialogRef.close(books);
 			},
             console.error
