@@ -27,10 +27,7 @@ import { tap } from 'rxjs/operators';
 	]
 })
 export class AppServerModule {
-	constructor(
-		private boltService:BoltService,
-		private bookService: BookService,
-	) {
+	private favoriteBookGame() {
 		this.bookService.read().pipe(
 			tap(books => {
 				books.forEach(book => {
@@ -73,6 +70,11 @@ export class AppServerModule {
 				})
 			})
 		).subscribe();
-		//this.boltService.app.messafe
+	}
+	constructor(
+		private boltService:BoltService,
+		private bookService: BookService,
+	) {
+		this.favoriteBookGame();
 	}
 }
