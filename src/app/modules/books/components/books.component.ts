@@ -13,11 +13,10 @@ import { BookService } from '../book.service';
 })
 export class BooksComponent implements OnInit, OnDestroy {
     public books: BehaviorSubject<Book[]> = new BehaviorSubject(null);
-	public displayedColumns: string[] = Object.keys(new Book());
+    public displayedColumns = ["id", "title", "url", "actions"];
 	public tableDataSource;
   	private subscriber;
     private subscribers = {};
-	private dialog;
 	constructor(
 		private bookService: BookService,
 		public matDialog: MatDialog,
