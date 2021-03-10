@@ -9,8 +9,10 @@
 		"paths": {
 			"@env/*": ["environments/*"],
 			"@app/*": ["app/*"],
-			"@services/*": ["app/services/*"],
+			"@components/*": ["app/components/*"],
+			"@pages/*": ["app/components/pages/*"],
 			"@modules/*": ["app/modules/*"],
+			"@services/*": ["app/services/*"],
 	  	},
 		"sourceMap": true,
 		"target": "es2015",

@@ -1,8 +1,8 @@
-import { Component, Input, Output, EventEmitter, OnInit, Inject, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Book } from '../../book';
-import { BookService } from '../../book.service';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialogRef } from '@angular/material/dialog';
+import { Book } from '@modules/server/books/book';
+import { BookService } from '@modules/server/books/book.service';
 @Component({
   selector: 'app-edit-book',
   templateUrl: './edit-book.component.html',
@@ -17,9 +17,7 @@ export class EditBookComponent implements OnInit {
 		private formBuilder: FormBuilder,
 		private bookService: BookService,
 		public dialogRef: MatDialogRef<EditBookComponent>,
-	) {
-
-	}
+	) {	}
 	ngOnInit(): void {
 		if (!this.book) {
 			this.book = new Book();
@@ -27,23 +25,14 @@ export class EditBookComponent implements OnInit {
 		}
 		this.formGroup = this.formBuilder.group(this.book);
 		this.formGroup.controls.url.setValidators(Validators.pattern('(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?'));
-		this.formGroup.controls.url.valueChanges.subscribe(url => {
-			if (this.formGroup.controls.url.valid) {
-				setTimeout(() => {
-					this.bookService.getContent(this.formGroup.value).subscribe(
-						content => this.formGroup.controls.content.setValue(content)
-					)
-				}, 1);
-			}
-		});
 	}
 	public create(book:Book) {
-		this.bookService.create(book).subscribe(
-			(books) => {
-				this.dialogRef.close(books)
-			},
-			console.error
-		);
+		this.bookService.getContent(book).subscribe(content => {
+			book.content = content;
+			this.bookService.create(book).subscribe(books => {
+				this.dialogRef.close(books);
+			})
+		});
     }
 	public update(book:Book) {
 		this.bookService.update(book).subscribe(

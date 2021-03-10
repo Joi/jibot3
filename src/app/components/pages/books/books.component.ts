@@ -1,12 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { Book } from '@app/modules/books/book';
+import { MatDialog } from '@angular/material/dialog';
+import { Book } from '@modules/server/books/book';
+import { BookService } from '@modules/server/books/book.service';
 import { EditBookComponent } from './edit-book/edit-book.component';
-import { BookService } from '../book.service';
-import { map, tap } from 'rxjs/operators';
-import { timeStamp } from 'node:console';
 
 @Component({
 	selector: 'app-books',
