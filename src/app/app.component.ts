@@ -14,11 +14,9 @@ export class AppComponent implements AfterViewInit {
 	constructor(
 		private router: Router,
 		private sidenavService: SidenavService
-	) {
-		this.router.events.subscribe(this.sidenav?.close);
-
-	}
+	) {	}
 	ngAfterViewInit() {
+		this.router.events.subscribe(() => this.sidenav.close());
 		this.sidenavService.toggle.subscribe((doIt:boolean) => (doIt) ? this.sidenav.opened = !this.sidenav.opened : null);
 	}
 }
