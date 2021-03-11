@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Option } from '@modules/server/options/option';
-import { OptionsService } from '@modules/server/options/options.service';
+import { Option } from '@modules/options/option';
+import { OptionsService } from '@modules/options/options.service';
 
 @Component({
   selector: 'app-options',

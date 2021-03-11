@@ -12,7 +12,7 @@ A Slack Bot which currently only introduces itself and speaks nonsense when it s
 ## Install Dependencies
 
 1. `cd projectDirectory`
-1. `npm install`
+1. `npm install:all`
 
 ## Add Environment Variables
 
@@ -44,7 +44,8 @@ jibot3 requires Slack app tokens to communicate. The steps to retrieve this info
 		};
 	</code></pre>
 
-## Build run and serve app
+## Build run and serve database and app
+1. `npm run start:db`
 1. `npm run dev:ssr`
 1. Open the live development server (usually located at [http://localhost:4200](http://localhost:4200)).
 1. Ensure the app is installed in your slack workspace.  The steps to retrieve this information is outlined in proceeding steps.

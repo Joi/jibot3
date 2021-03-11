@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { Book } from '@modules/server/books/book';
-import { BookService } from '@modules/server/books/book.service';
+import { Book } from '@modules/books/book';
+import { BookService } from '@modules/books/book.service';
 import { EditBookComponent } from './edit-book/edit-book.component';
 
 @Component({

@@ -4,6 +4,7 @@
   "description": "A Slack Bot",
   "scripts": {
     "ng": "ng",
+    "install:all": "npm install; cd src/db; npm install",
     "start:db": "cd ./src/db && npm run start",
     "dev:ssr": "ng run jibot3:serve-ssr",
     "build:ssr": "ng build --prod && ng run jibot3:server:production",
