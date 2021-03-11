@@ -1,8 +1,8 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
-import { Book } from '@modules/server/books/book';
-import { BookService } from '@modules/server/books/book.service';
+import { Book } from '@modules/books/book';
+import { BookService } from '@modules/books/book.service';
 @Component({
   selector: 'app-edit-book',
   templateUrl: './edit-book.component.html',
