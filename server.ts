@@ -56,7 +56,7 @@ export function app(): express.Express {
                     res.setHeader("content-type", "image/png");
                     res.setHeader("content-length", img.length);
                     res.send(img);
-                }); 
+                });
             }
         });
 	});

@@ -1,6 +1,11 @@
 # jibot3
 
-A Slack Bot which currently only introduces itself and speaks nonsense when it sees the word "bot".
+A Slack Bot which:
+1. introduces itself when @mentioned
+1. responds with a rot13's when it sees a slack users say the word "bot"
+1. watches channel messages which might pertain
+1. has an sqlite3 database for data persistence
+1. has an api backend which can generate word freqency distribution plots for text content within the database
 
 ## Clone or download the source code
 
@@ -10,9 +15,20 @@ A Slack Bot which currently only introduces itself and speaks nonsense when it s
 * **SSH:** `git clone git@github.com:Joi/jibot3.git`
 
 ## Install Dependencies
-
 1. `cd projectDirectory`
 1. `npm install:all`
+
+## EXCITING AND NEW! NLTK / Python / Oh My!
+The python folder virtual envirment setup is not yet complete, and there are some steps to be done manually.
+1. Installing python / pip (I am mac-based and use homebrew), see directions here: [https://docs.python-guide.org/starting/install3/osx/](https://docs.python-guide.org/starting/install3/osx/)
+1. The npm "install:all" script will install ntlk but there is a downloader that must be run. first, cd to the python directory:
+	* `cd src/python`
+1. then, you can either:
+	1. open an interactive python shell and run the following commands to open the downloader ui:
+		* `import nltk`
+		* `nltk.download()`
+	1. or install every via command line by running:
+		* `sudo python3 -m nltk.downloader -d /usr/local/share/nltk_data all`
 
 ## Add Environment Variables
 
