@@ -3,7 +3,6 @@ import requests
 import hashlib
 import sys
 import matplotlib.pyplot as plt
-from PIL import Image
 import sqlite3
 import os
 
