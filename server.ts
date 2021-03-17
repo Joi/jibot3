@@ -40,20 +40,27 @@ export function app(): express.Express {
 		)
 	});
 
-    server.get('/freqdist/**', (req, res) => {
-        const text = "I thought I saw a hippo in the sky. I'm sure I was wrong. The sun was shining too brightly for it to be true. I think the robots did it... In fact I am sure of it.";
-        const imagedir = "./src/python/";
-        PythonShell.run('./src/python/freqdist.py', {
-            pythonOptions: ['-u'],
-            args: [text]
+    server.get('/freqdist.png**', (req, res) => {
+        const imagedir = "./src/python/freqdist/images/";
+        const table = req.query.table as string;
+        const id = req.query.id as string;
+        const col = req.query.col as string
+        PythonShell.run('freqdist.py', {
+            pythonOptions: [],
+            scriptPath: "./src/python/freqdist",
+            args: ['plot', table, id, col]
         }, function(err:PythonShellError, filename:string[]) {
             if (err) console.error(err)
-            fs.readFile(`${imagedir}/${filename[0]}`, (err, img) => {
-                if (err) res.status(500).send(err);
-                res.setHeader("content-type", "image/png");
-                res.setHeader("content-length", img.length);
-                res.end(img);
-            }); 
+            if (filename) {
+                fs.readFile(filename[0], (err, img) => {
+                    if (err) res.status(500).send(err);
+                    res.setHeader("content-type", "image/png");
+                    res.setHeader("content-length", img.length);
+                    res.send(img);
+                }); 
+            } else {
+
+            }
         });
 	});
 	server.set('view engine', 'html');

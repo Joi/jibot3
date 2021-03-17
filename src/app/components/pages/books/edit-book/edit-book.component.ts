@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { Book } from '@modules/books/book';
 import { BookService } from '@modules/books/book.service';
 @Component({
@@ -17,6 +17,7 @@ export class EditBookComponent implements OnInit {
 		private formBuilder: FormBuilder,
 		private bookService: BookService,
 		public dialogRef: MatDialogRef<EditBookComponent>,
+        public matDialog: MatDialog,
 	) {	}
 	ngOnInit(): void {
 		if (!this.book) {
@@ -25,6 +26,9 @@ export class EditBookComponent implements OnInit {
 		}
 		this.formGroup = this.formBuilder.group(this.book);
 		this.formGroup.controls.url.setValidators(Validators.pattern('(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?'));
+	}
+    public openDialog(templateRef) {
+        let dialogRef = this.matDialog.open(templateRef);
 	}
 	public create(book:Book) {
 		this.bookService.getContent(book).subscribe(content => {

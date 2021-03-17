@@ -1,3 +1,6 @@
+<ng-template #freqdist>
+    <img *ngIf="book" class="d-block w-100" src="/freqdist.png?table=books&col=content&id={{book.id}}">
+</ng-template>
 <form *ngIf="formGroup" #form="ngForm" [formGroup]="formGroup" action="POST" novalidate class="d-flex flex-column">
 	<mat-form-field>
 		<mat-label>Title</mat-label>
@@ -10,9 +13,14 @@
 	<!-- <mat-form-field>
 		<textarea matInput formControlName="content"></textarea>
 	</mat-form-field> -->
-	<div class="d-flex flex-row bd-highlight mb-2">
-		<div class="flex-fill">
-			<button *ngIf="action ==='update'" [disabled]="!form?.dirty" mat-flat-button type="button" color="primary" (click)="update(form.value)">
+    <div class="d-flex flex-row bd-highlight mb-2">
+        <button  mat-flat-button type="button" color="primary" (click)="openDialog(freqdist)">
+            <mat-icon>insights</mat-icon> Word Frequency
+        </button>
+    </div>
+    <div class="d-flex flex-row bd-highlight mb-2">
+        <div class="flex-fill">
+            <button *ngIf="action ==='update'" [disabled]="!form?.dirty" mat-flat-button type="button" color="primary" (click)="update(form.value)">
 				<mat-icon>save</mat-icon>
 			</button>
 			<button *ngIf="action ==='create'" [disabled]="!form?.dirty" mat-flat-button type="button" color="primary" (click)="create(form.value)">
@@ -23,5 +31,4 @@
 			<mat-icon>delete</mat-icon>
 		</button>
 	</div>
-
 </form>

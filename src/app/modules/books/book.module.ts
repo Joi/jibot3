@@ -81,7 +81,7 @@ export class BookModule {
                             }
                         });
                     });
-                    console.log(Object.keys(keywords));
+                    // console.log(Object.keys(keywords));
                     if (updateBook) {
                         this.bookService.update(book).subscribe();
                     }
