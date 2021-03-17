@@ -26,7 +26,23 @@ export class CreateBookTable1615248471484 implements MigrationInterface {
                     name: "content",
                     type: "text",
                     isNullable: true
+                },
+                {
+                    name: "people",
+                    type: "text",
+                    isNullable: true
+                },
+                {
+                    name: "places",
+                    type: "text",
+                    isNullable: true
+                },
+                {
+                    name: "organizations",
+                    type: "text",
+                    isNullable: true
                 }
+
             ]
         }), true);
     }
@@ -34,5 +50,4 @@ export class CreateBookTable1615248471484 implements MigrationInterface {
     public async down(queryRunner: QueryRunner): Promise<void> {
 		return await queryRunner.dropTable("books");
     }
-
 }

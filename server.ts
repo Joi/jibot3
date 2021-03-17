@@ -4,10 +4,15 @@ import { APP_BASE_HREF } from '@angular/common';
 import { ngExpressEngine } from '@nguniversal/express-engine';
 import { existsSync } from 'fs';
 import { join } from 'path';
+import { PythonShell, PythonShellError } from 'python-shell';
+
 import { AppServerModule } from './src/main.server';
 import express from 'express';
 import cors from 'cors';
 import request from 'request';
+import fs from 'fs';
+
+
 const port = process.env.PORT || 4000;
 
 export function app(): express.Express {
@@ -33,6 +38,23 @@ export function app(): express.Express {
 				res.send(body);
 			}
 		)
+	});
+
+    server.get('/freqdist/**', (req, res) => {
+        const text = "I thought I saw a hippo in the sky. I'm sure I was wrong. The sun was shining too brightly for it to be true. I think the robots did it... In fact I am sure of it.";
+        const imagedir = "./src/python/";
+        PythonShell.run('./src/python/freqdist.py', {
+            pythonOptions: ['-u'],
+            args: [text]
+        }, function(err:PythonShellError, filename:string[]) {
+            if (err) console.error(err)
+            fs.readFile(`${imagedir}/${filename[0]}`, (err, img) => {
+                if (err) res.status(500).send(err);
+                res.setHeader("content-type", "image/png");
+                res.setHeader("content-length", img.length);
+                res.end(img);
+            }); 
+        });
 	});
 	server.set('view engine', 'html');
 	server.set('views', distFolder);

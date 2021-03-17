@@ -5,10 +5,7 @@ export class Books {
     @Column("varchar", { nullable: false}) title: string;
     @Column("varchar", { nullable: true}) url: string;
     @Column("varchar", { nullable: true}) content: string;
-    //@Column() topics: string;
-    // @Column() people: string;
-    // @Column() places: string;
-    // @Column() organizations: string;
-    // @Column() nouns: string;
-    // @Column() verbs: string;
+    @Column("varchar", { nullable: true}) people: string;
+    @Column("varchar", { nullable: true}) places: string;
+    @Column("varchar", { nullable: true}) organizations: string;
 }

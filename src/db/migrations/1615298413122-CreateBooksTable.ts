@@ -27,6 +27,22 @@ export class CreateBooksTable1615298413122 implements MigrationInterface {
                     type: "text",
                     isNullable: true,
                 },
+                ,
+                {
+                    name: "people",
+                    type: "text",
+                    isNullable: true
+                },
+                {
+                    name: "places",
+                    type: "text",
+                    isNullable: true
+                },
+                {
+                    name: "organizations",
+                    type: "text",
+                    isNullable: true
+                }
             ]
         }), true);
     }

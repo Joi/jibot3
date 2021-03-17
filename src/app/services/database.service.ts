@@ -15,10 +15,7 @@ export class DatabaseService {
 	}
 	private request(method: string, url: string, data?: any):Observable<any> {
         console.log(`DB: ${method.toUpperCase()} ${url}`);    
-        if (data) console.log(data);
-        else console.log('no data provided');
-
-		return this.http.request(method, url, {
+        return this.http.request(method, url, {
 			body: data,
 			responseType: 'json',
 			observe: 'body',
