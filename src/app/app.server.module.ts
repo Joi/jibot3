@@ -6,9 +6,6 @@ import { BoltService } from '@modules/slack/bolt/bolt.service';
 import { AppMention } from '@modules/slack/events';
 import { Rot13 } from '@modules/slack/messages';
 import { SlackModule } from '@modules/slack/slack.module';
-import { BookService } from '@modules/books/book.service';
-
-import { tap } from 'rxjs/operators';
 import { BookModule } from './modules/books/book.module';
 @NgModule({
 	bootstrap: [AppComponent],
