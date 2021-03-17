@@ -14,8 +14,7 @@ conn = sqlite3.connect("/Users/margaretnottingham/Projects/jibot3/src/db/databas
 def plot(table, id, col):
     cur = conn.cursor()
     cur.execute(f"SELECT {col} FROM {table} WHERE id={id}")
-    rows = cur.fetchall()
-    text = rows[0][0]
+    text = cur.fetchone()[0]
     words = []
     pwd = os.path.dirname(os.path.realpath(__file__))
     checksum = hashlib.md5(text.encode('utf-8')).hexdigest()
