@@ -3,7 +3,7 @@
 A Slack Bot which:
 1. introduces itself when @mentioned
 1. responds with a rot13's when it sees a slack users say the word "bot"
-1. watches channel messages which might pertain
+1. watches channel messages which might pertain to books in it's database
 1. has an sqlite3 database for data persistence
 1. has an api backend which can generate word freqency distribution plots for text content within the database
 
