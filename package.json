@@ -4,7 +4,8 @@
   "description": "A Slack Bot",
   "scripts": {
     "ng": "ng",
-    "install:all": "npm install; cd src/db; npm install",
+    "install:all": "npm run install:jibot & npm run install:db & npm run install:python",
+    
     "start:db": "cd ./src/db && npm run start",
     "dev:ssr": "ng run jibot3:serve-ssr",
     "build:ssr": "ng build --prod && ng run jibot3:server:production",
@@ -12,7 +13,12 @@
     "prerender": "ng run jibot3:prerender",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    
+    "install:db": "cd src/db && npm install",
+    "install:python": "cd src/python && pip3 install -r requirements.txt",
+    "install:jibot": "npm install"
+    
   },
   "repository": {
     "type": "git",
