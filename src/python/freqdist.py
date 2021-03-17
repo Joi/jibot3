@@ -3,7 +3,6 @@ import json
 import matplotlib.pyplot as plt
 import nltk
 import os
-import requests
 import sqlite3
 import sys
 
