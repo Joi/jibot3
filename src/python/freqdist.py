@@ -1,18 +1,22 @@
-import nltk
-import requests
 import hashlib
-import sys
+import json
 import matplotlib.pyplot as plt
-import sqlite3
+import nltk
 import os
+import requests
+import sqlite3
+import sys
 
 stopwords = nltk.corpus.stopwords.words('english')
 tokenizer = nltk.RegexpTokenizer(r"\w+")
-conn = sqlite3.connect("/Users/margaretnottingham/Projects/jibot3/src/db/database.sqlite")
 
-def plot(table, id, col):
+def plot(args):
+    dbpath = args.get("dbpath")
+    if (dbpath is None):
+        dbpath = "../db/database.sqlite"
+    conn = sqlite3.connect(dbpath)
     cur = conn.cursor()
-    cur.execute(f"SELECT {col} FROM {table} WHERE id={id}")
+    cur.execute("SELECT %s FROM %s WHERE id=%s" % (args["col"], args["table"], args["id"]))
     text = cur.fetchone()[0]
     words = []
     pwd = os.path.dirname(os.path.realpath(__file__))
@@ -32,13 +36,12 @@ def plot(table, id, col):
     sys.stdout.flush()
 
 def main():
-    if (len(sys.argv) == 5):
+    if (sys.argv and sys.argv[1]):
         command = sys.argv[1]
-        table = sys.argv[2]
-        id = sys.argv[3]
-        col = sys.argv[4]
-        eval(f"{command}('{table}', '{id}', '{col}')")
-        # freq_dist(table, id, col)
+    if (sys.argv and sys.argv[2]):
+        args = json.loads(sys.argv[2])
+    if (command and args):
+        eval(f"{command}(args)")
 
 if __name__ == '__main__':
     main()

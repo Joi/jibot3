@@ -5,18 +5,16 @@ import { ngExpressEngine } from '@nguniversal/express-engine';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { PythonShell, PythonShellError } from 'python-shell';
-
 import { AppServerModule } from './src/main.server';
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
 import request from 'request';
 import fs from 'fs';
-
-
 const port = process.env.PORT || 4000;
 
 export function app(): express.Express {
-	const server = express();
+    const server = express();
 	server.use(express.json({limit: '50mb'}));
 	server.use(express.urlencoded({limit: '50mb'}));
 	server.use(cors({
@@ -41,14 +39,15 @@ export function app(): express.Express {
 	});
 
     server.get('/freqdist.png**', (req, res) => {
-        const imagedir = "./src/python/freqdist/images/";
-        const table = req.query.table as string;
-        const id = req.query.id as string;
-        const col = req.query.col as string
+        let db = "./src/db/database.sqlite";
+        const args = JSON.stringify({
+            ...req.query,
+            dbpath: path.resolve(db)
+        });
         PythonShell.run('freqdist.py', {
             pythonOptions: [],
-            scriptPath: "./src/python/freqdist",
-            args: ['plot', table, id, col]
+            scriptPath: './src/python',
+            args: ['plot', args]
         }, function(err:PythonShellError, filename:string[]) {
             if (err) console.error(err)
             if (filename) {
@@ -58,8 +57,6 @@ export function app(): express.Express {
                     res.setHeader("content-length", img.length);
                     res.send(img);
                 }); 
-            } else {
-
             }
         });
 	});
