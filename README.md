@@ -16,7 +16,7 @@ A Slack Bot which:
 
 ## Install Dependencies
 1. `cd projectDirectory`
-1. `npm install:all`
+1. `npm run install:all`
 
 ## EXCITING AND NEW! NLTK / Python / Oh My!
 The python folder virtual envirment setup is not yet complete, and there are some steps to be done manually.
