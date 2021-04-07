@@ -12,6 +12,7 @@ import { HeaderComponent } from '@app/components/header/header.component';
 import { FooterComponent } from '@app/components/footer/footer.component';
 import { OptionsComponent } from '@pages/options/options.component';
 import { BooksComponent, EditBookComponent } from '@pages/books';
+
 @NgModule({
     bootstrap: [AppComponent],
 	declarations: [
