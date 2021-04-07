@@ -48,7 +48,6 @@
     "@ng-bootstrap/schematics": "^2.0.0-alpha.1",
     "@nguniversal/express-engine": "^10.1.0",
     "@slack/bolt": "^3.1.1",
-    "base64-img": "^1.0.4",
     "bootstrap": "^4.6.0",
     "compromise": "^13.10.0",
     "cors": "^2.8.5",
