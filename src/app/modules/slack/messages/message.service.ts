@@ -1,18 +1,18 @@
-import { Injectable } from '@angular/core';
-import * as Messages from './index'
-import * as Bolt from '../bolt/bolt.interface';
+import { Inject, Injectable } from '@angular/core';
+import * as Messages from './index';
+
 @Injectable({
   	providedIn: 'root'
 })
 export class MessageService {
 	constructor(
-		public rot13: Messages.Rot13
-	) {
-		for (let arg of arguments) this.events.push(<Bolt.Message>arg);
-	}
-	public events  = [];
+	) {	}
 	public listen(message) {
-		let bolt:any = this;
-		bolt.app.message(message.regex, message.callback.bind(this));
+		if (this.constructor.name.toLowerCase() === 'boltservice') {
+			let bolt:any = this;
+			bolt.app.value.message(message.regex, message.callback.bind(bolt));
+		} else {
+			console.error(`Did you initialize your message listener function wrong? (${this.constructor.name})`);
+		}
 	}
 }
