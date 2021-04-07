@@ -57,9 +57,8 @@ export class BookModule {
                                     noun: 	nlp.default(noun).nouns().toSingular().text()
                                 }
                                 let hintCallback = async ({ event, say }) => {
-                                    let user = this.boltService.getById(event.user, 'members');
                                     hint.message = [
-                                        `HI ${user.real_name}! You mentioned ${hint.text}!`,
+                                        `HI <@${event.user}>! You mentioned ${hint.text}!`,
                                         `I am reading a book related to this ${hint.noun}.`,
                                         `Can you guess what book I am reading?`,
                                     ];

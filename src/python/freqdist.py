@@ -28,6 +28,9 @@ def plot(args):
 		text = soup.get_text()
 		fp.close()
 
+	elif args.get("text"):
+		text = args.get("text")
+
 	words = []
 	pwd = os.path.dirname(os.path.realpath(__file__))
 	checksum = hashlib.md5(text.encode('utf-8')).hexdigest()
