@@ -25,7 +25,7 @@ import * as nlp from 'compromise';
 		}
 	]
 })
-export class BookModule { 
+export class BookModule {
     constructor(
         private boltService:BoltService,
 		private bookService: BookService,
@@ -38,7 +38,7 @@ export class BookModule {
 				books.forEach(book => {
 					let keywords = [];
 					let normalizeOptions = {punctuation: true, quotations: true, whitespace:true, possessives:true};
-					let doc; 
+					let doc;
                     let updateBook: boolean = false;
                     ['people', 'places', 'organizations'].forEach(noun => {
                         if (!book[noun]) {
@@ -71,7 +71,7 @@ export class BookModule {
                                     regex = new RegExp(`\\b(${textRegex})\\b`, 'i');
                                     if (!keywords[hint.text]) {
                                         keywords[hint.text] = thing.terms;
-                                        this.boltService.app.message(regex, hintCallback.bind(this));
+                                        this.boltService.app.value.message(regex, hintCallback.bind(this));
                                     } else {
                                         keywords[hint.text] = { ...keywords[hint.text], ...thing.terms };
                                     }
