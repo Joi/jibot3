@@ -7,6 +7,9 @@ A Slack Bot which:
 1. has an sqlite3 database for data persistence
 1. has an api backend which can generate word freqency distribution plots for text content within the database
 
+## Recent New Stuff:
+* New slack OAuth scope requirement:  `files.write`
+
 ## Clone or download the source code
 
 * **GitHub Repo:** [https://github.com/Joi/jibot3](https://github.com/Joi/jibot3)
@@ -81,6 +84,7 @@ You can retrieve your create a Slack App or access your existing Slack apps at: 
 	* `channels:history`
 	* `channels:read`
 	* `chat.write`
+	* `files.write`
 	* `im:history`
 	* `users:read`
 1. ### Subscribe to Bot Event Subscriptions
