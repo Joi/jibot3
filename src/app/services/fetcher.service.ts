@@ -7,9 +7,9 @@ import { catchError, map, tap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class FetcherService {
-    constructor(
+	constructor(
         private http: HttpClient,
-    ) { }
+    ) {	}
     public presets: any = {
 		text: {
 			headers: new HttpHeaders().set('Accept', 'text/plain'),
@@ -20,10 +20,20 @@ export class FetcherService {
 		json: {
 			headers: new HttpHeaders().set('Accept', 'Application/json'),
 			responseType: 'json',
+		},
+		png: {
+			responseType: 'arraybuffer',
+			headers: new HttpHeaders().set('Accept', 'Image/png'),
 		}
 	}
     public fetch (url:string, options?:any):Observable<any> {
-		return this.http.get(url, options).pipe(catchError(this.fetchError));
+		let request = this.http.get(url, options).pipe(catchError(this.fetchError));
+		// request.pipe(
+		// 	tap(thing => {
+		// 		console.log(thing)
+		// 	})
+		// )
+		return request;
 	}
     private fetchError = (error: HttpErrorResponse) => { return throwError(error); };
 }
