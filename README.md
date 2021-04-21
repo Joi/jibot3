@@ -1,4 +1,4 @@
-# crispy-octo-umbrella • A slack bot function compilerator
+# Jibot3 • A slack bot function compilerator
 The intent of this code is to create a "garage" where you can park code to be used in a useful way within a chat bot interface (currently slack) without needing to know very much about the chat bot interface.
 
 # Setup
