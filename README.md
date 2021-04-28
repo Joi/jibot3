@@ -1,18 +1,21 @@
 # Jibot3 • A slack bot
 The intent of this code is to create a "garage" where you can park code to be used in a useful way within a chat bot interface (currently slack) without needing to know very much about the chat bot interface.
 
-## New Notes:
+# New Notes:
 
-### Socket Mode vs. Non
+## [Socket Mode](https://app.slack.com/app-settings/T01LN1N5H60/A01LUFAPUFK/socket-mode) Considerations
 
-    Turning on Socket Mode will route your app’s interactions and events over a WebSockets connection instead sending these payloads to Request URLs, which are public HTTP endpoints.
+Socket Mode is convenient, but it restricts the capabilities pretty drastically, most notably as it relates to incoming webhooks from external services. A reproducible development environment which allows for a real request url is an important step in allowing external triggers and data to come into slack. There are various ways to create a live url to host this code, including: [regular-old-hosting](https://api.slack.com/docs/hosting), dynamic DNS services, and tunneling, each with pros and cons and ease of use considerations.
 
-Socket Mode is convenient, but it restricts the capabilities pretty drastically, most notably as it relates to incoming webhooks from external services. I am getting a development environment set up and quickly reproducible to allow for a real request url, so that we can implement webhooks. Webhooks are going to be key to getting "stuff" into slack from external sources.
+### A Quick Solution: Response URL using [`ngrok`](https://ngrok.com/) & [`pyngrok`](https://pypi.org/project/pyngrok/)
+ Code to support ngrok and pyngrok are in place to facilitate creating a live request URL, and will be used in place of socket mode to act as a fully functioning live request url.  If an environment variable called `NGROK_AUTH_TOKEN` is present, it will be used to establish a live http tunnel to be used as your apps Request Url. If you have a ngrok subdomain or custom domain, you can specify that via an environment variable called `NGROK_HOSTNAME.`
 
-More information about socket mode can be found here: https://app.slack.com/app-settings/T01LN1N5H60/A01LUFAPUFK/socket-mode
-
-### Slash commands and shortcuts
-Slash commands and shortcuts are similar in how they are presented within the slack UI, and also similar in that they require an endpoint, and therefore don't work as nicely when using Socket Mode. With the move towards a reproducible environment with a usable request url, we will be able to do more with less need to enter the slack configuration.
+ To configure the request url, go to https://api.slack.com/apps, select the appropriate app, then:
+ 1. In the **Settings** menu, click on **Socket Mode**, then disable socket mode
+ 1. In the **Features** Menu, click on **Event Subscriptions**, ensure events is endabled, then
+ 1. Enter the Request Url, followed by /slack/events, for example:
+ 	* my ngrok url is: `http://cozmobott.ngrok.io`
+	* My slack request url is: `http://cozmobott.ngrok.io/slack/events`
 
 # Setup
 The setup instructions presume that we have a slack robot setup already. The slack bot we have been using for the previous iteration of has permissions appropriate to this code. I will ammend these instructions with detailed information about slack bot setup and permissions once we determine where/how to move this code into existing jibot repo.
@@ -28,6 +31,7 @@ Replace [] values as shown below with the appropriate values from your slack bot
 	SLACK_SIGNING_SECRET=[...]
 	SLACK_BOT_TOKEN=[xoxb-...]
 	SLACK_APP_TOKEN=[xapp-...]
+	NGROK_AUTH_TOKEN=[OPTIONAL:your-ngrok-auth-token]
 
 ## Run the bot
 	python ./app.py
