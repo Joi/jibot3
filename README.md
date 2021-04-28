@@ -1,5 +1,15 @@
-# Jibot3 • A slack bot function compilerator
+# Jibot3 • A slack bot
 The intent of this code is to create a "garage" where you can park code to be used in a useful way within a chat bot interface (currently slack) without needing to know very much about the chat bot interface.
+
+## New Notes:
+
+### Socket Mode vs. Non
+
+    Turning on Socket Mode will route your app’s interactions and events over a WebSockets connection instead sending these payloads to Request URLs, which are public HTTP endpoints.
+
+Socket Mode is convenient, but it restricts the capabilities pretty drastically, most notably as it relates to incoming webhooks from external services. I am getting a development environment set up and quickly reproducible to allow for a real request url, so that we can implement webhooks. Webhooks are going to be key to getting "stuff" into slack from external sources.
+
+More information about socket mode can be found here: https://app.slack.com/app-settings/T01LN1N5H60/A01LUFAPUFK/socket-mode
 
 # Setup
 The setup instructions presume that we have a slack robot setup already. The slack bot we have been using for the previous iteration of has permissions appropriate to this code. I will ammend these instructions with detailed information about slack bot setup and permissions once we determine where/how to move this code into existing jibot repo.
@@ -31,10 +41,3 @@ To add a plugin, simply add a new python file within the relevant event type dir
 The intent of the **keyword** variable will depend from event to event. In a message event type, the keyword is a string or a regular expression which is used as a search expression to match messages in chat locations where the bot is. in a slash command, it would the a string like `'/hello_world'`
 
 The **callback_function** will be run upon finding a matching event. The callback functions are currently only passed 2 arguments -- a payload object and a say function which allows for basic responses. This could probably be kwargs, but I think it's worthwhile to discuss your thoughts on this (not specifically about kwargs, but rather on whether we should expand the params passed to include more or all of them... I think keeping it simple until we need more is a reasonable approach)
-
-## Notes:
-
-### Slash Commands do not work
-I am unsure of why the plugins/command/hello_world.py is not functional. I need to investigate that further. I was hoping that by making the functionality a step more generic that I would be sure I was handling the creation of listeners in a consistent way and the problem would become more apparent, but the symptoms have not changed (the slash commands do not appear within slack at all, there is no error generated). I have left the command folder in place because slash commands are pretty ubiquitious and expected bot functionality, the syntax should not need to change, and I'll be looking into why this isn't working next. It could likely pertain to timed ack() requirements...
-
-**NOPE! It's slack bot permissions!** Time to see what we can do to minimize the need to continually update app permissions that is not simply blindly enabling everything up front (if possible). That should probably be the next step...
