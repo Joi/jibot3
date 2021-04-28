@@ -3,6 +3,8 @@ import logging
 from logging import Logger
 from typing import Callable, Dict, Any, Optional
 
+# from pyngrok import ngrok
+
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from slack_bolt.context import BoltContext
@@ -15,7 +17,6 @@ from slack_sdk import WebClient
 
 class app:
 	def __init__(self):
-		print("INIT")
 		self.do_socket_mode = False
 		self.app_token = os.environ.get("SLACK_APP_TOKEN")
 		self.bot_token = os.environ.get("SLACK_BOT_TOKEN")
@@ -34,10 +35,12 @@ class app:
 		if self.do_socket_mode is True:
 			self.socket_mode.start()
 		else:
+			# ssh_tunnel = ngrok.connect(22, "tcp")
+			# http_tunnel = ngrok.connect()
 			self.bolt.start(port=int(os.environ.get("PORT", 3000)))
 
 	def global_listener(self, client, context, logger, payload, next):
-		# print(payload)
+		logger.info(payload)
 		next()
 
 	def event_listener(self, event_type, keyword, callback_function):

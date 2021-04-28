@@ -41,7 +41,7 @@ def init_slack():
 		callback_function = plugin.get('lib').callback_function
 		slack.event_listener(event_type,  keyword, callback_function)
 		print('\t' + plugin.get('path') + " (" + keyword + ")")
-	slack.start(socket_mode=True)
+	slack.start(socket_mode=False)
 
 def main():
 	init_plugins()
