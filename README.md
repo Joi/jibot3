@@ -11,6 +11,9 @@ Socket Mode is convenient, but it restricts the capabilities pretty drastically,
 
 More information about socket mode can be found here: https://app.slack.com/app-settings/T01LN1N5H60/A01LUFAPUFK/socket-mode
 
+### Slash commands and shortcuts
+Slash commands and shortcuts are similar in how they are presented within the slack UI, and also similar in that they require an endpoint, and therefore don't work as nicely when using Socket Mode. With the move towards a reproducible environment with a usable request url, we will be able to do more with less need to enter the slack configuration.
+
 # Setup
 The setup instructions presume that we have a slack robot setup already. The slack bot we have been using for the previous iteration of has permissions appropriate to this code. I will ammend these instructions with detailed information about slack bot setup and permissions once we determine where/how to move this code into existing jibot repo.
 
