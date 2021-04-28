@@ -14,4 +14,4 @@ This directory contains plugins which are intended to respond to slack slack sla
 The keyword in these files should correspond to the triggering slash command name.
 
 ## `callback_function`
-The callback_function will be called when a triggering command is found. Currently two arguments are being passed into the command callback function, an command object containing context for the command request, and a say() function which allows the robot to respond with text in slack to the trigging command. It is likely that we will update this to pass all available arguments (**kwargs) and allow the developer to use as they see fit.
+The callback_function will be called when a triggering command is found. These functions are called with a set of arguments, each of which can be used in any order. Please see the plugins directory README.md file for details about the callback function arguments.
