@@ -7,7 +7,7 @@ import lib.slack as bolt
 
 logging.basicConfig(level=logging.ERROR)
 plugins = []
-
+slack = None
 def init_plugins():
 	global plugins
 	app_dir = os.path.dirname(os.path.realpath(__file__))
@@ -31,6 +31,7 @@ def plugin_info_from_path(plugin_path):
 
 def init_slack():
 	global plugins
+	global slack
 	print("Initializing slack...")
 	slack = bolt.app()
 	print("Loading slack plugins...")
@@ -44,8 +45,13 @@ def init_slack():
 	slack.start(socket_mode=False)
 
 def main():
-	init_plugins()
-	init_slack()
+	global slack
+	try:
+		init_plugins()
+		init_slack()
+	except KeyboardInterrupt:
+		print("App closed with keyboard interrupt... Shutting down...")
+		slack.close()
 
 if __name__ == "__main__":
 	main()
