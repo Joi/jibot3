@@ -5,6 +5,7 @@ from typing import Callable, Dict, Any, Optional
 from pyngrok import ngrok
 
 from slack_bolt import App
+from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from slack_bolt.context import BoltContext
 from slack_bolt.context.ack import Ack
@@ -30,7 +31,10 @@ class app:
 		self.app_token = os.environ.get("SLACK_APP_TOKEN")
 		self.bot_token = os.environ.get("SLACK_BOT_TOKEN")
 		self.signing_secret = os.environ.get("SLACK_SIGNING_SECRET")
-		self.bolt = App(signing_secret = self.signing_secret, token = self.bot_token)
+		self.bolt = App(
+			signing_secret = self.signing_secret,
+			token = self.bot_token
+		)
 		self.socket_mode = SocketModeHandler(self.bolt, self.app_token)
 
 	def start(self, **kwargs):
@@ -53,7 +57,7 @@ class app:
 		logger.info(payload)
 		next()
 
-	def event_listener(self, event_type, keyword, callback_function):
+	def create_event_listener(self, event_type, keyword, callback_function):
 		self.event_type = event_type
 		self.keyword = keyword
 		self.callback_function = callback_function
