@@ -5,19 +5,12 @@ from typing import Callable, Dict, Any, Optional
 from pyngrok import ngrok
 
 from slack_bolt import App
-from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_bolt.adapter.socket_mode import SocketModeHandler
-from slack_bolt.context import BoltContext
-from slack_bolt.context.ack import Ack
-from slack_bolt.context.respond import Respond
-from slack_bolt.context.say import Say
-from slack_bolt.request import BoltRequest
-from slack_bolt.response import BoltResponse
-from slack_sdk import WebClient
 
 class app:
 	def __init__(self):
 		self.do_socket_mode = True
+		self.webhook = None
 		self.ngrok = False
 		self.ngrok_hostname = None
 		if os.environ.get('NGROK_AUTH_TOKEN'):
@@ -38,23 +31,24 @@ class app:
 		self.socket_mode = SocketModeHandler(self.bolt, self.app_token)
 
 	def start(self, **kwargs):
+		self.bolt.use(self.global_listener)
 		if kwargs.get("socket_mode"):
 			self.do_socket_mode = kwargs.get("socket_mode")
-		self.bolt.use(self.global_listener)
 		if self.do_socket_mode is True:
 			self.socket_mode.start()
 		else:
 			if (self.ngrok is True):
 				request_url_tunnel = ngrok.connect(self.port, "http", subdomain=self.ngrok_hostname)
-			print("Request Url is: " + request_url_tunnel.public_url)
+				print("Request Url is: " + request_url_tunnel.public_url)
 			self.bolt.start(port=self.port)
+
 
 	def close(self):
 		if (self.ngrok is True):
 			ngrok.kill()
 
 	def global_listener(self, client, context, logger, payload, next):
-		logger.info(payload)
+		print(payload)
 		next()
 
 	def create_event_listener(self, event_type, keyword, callback_function):
