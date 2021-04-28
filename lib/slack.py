@@ -17,10 +17,12 @@ class app:
 	def __init__(self):
 		print("INIT")
 		self.do_socket_mode = False
-		self.app_token = os.environ["SLACK_APP_TOKEN"],
+		self.app_token = os.environ.get("SLACK_APP_TOKEN")
+		self.bot_token = os.environ.get("SLACK_BOT_TOKEN")
+		self.signing_secret = os.environ.get("SLACK_SIGNING_SECRET")
 		self.bolt = App(
-			signing_secret = os.environ.get("SLACK_SIGNING_SECRET"),
-			token = os.environ.get("SLACK_BOT_TOKEN"),
+			signing_secret = self.signing_secret,
+			token = self.bot_token,
 			raise_error_for_unhandled_request = False,
 		)
 		self.socket_mode = SocketModeHandler(self.bolt, self.app_token)
