@@ -28,7 +28,7 @@ Replace [] values as shown below with the appropriate values from your slack bot
 I (pegnott) am using VS Code on  MacOS...  I set up a virtual environment, and adding environment variables to be loaded on activations. Here's how I did it:
 * Install the [Microsoft Python extension for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
 * `python -m venv [venv_directory]`
-* `touch venv/.env`
+* `touch [venv_directory]/.env`
 * edit venv.env file to include the variables as shown above.
 * update venv/bin/activate.  Around line 40, there is a line that looks like:
 
