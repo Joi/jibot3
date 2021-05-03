@@ -31,6 +31,7 @@ Replace [] values as shown below with the appropriate values from your slack bot
 	SLACK_BOT_TOKEN=[xoxb-...]
 	SLACK_APP_TOKEN=[xapp-...]
 	NGROK_AUTH_TOKEN=[OPTIONAL:your-ngrok-auth-token]
+	NGROK_HOSTNAME=[OPTIONAL:your-ngrok-static-hostname]
 
 I (pegnott) am using VS Code on  MacOS...  I set up a virtual environment, and adding environment variables to be loaded on activations. Here's how I did it:
 * Install the [Microsoft Python extension for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
