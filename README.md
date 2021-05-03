@@ -5,9 +5,7 @@ The intent of this code is to create a "garage" where you can park code to be us
 
 ### Socket Mode vs. Non
 
-    Turning on Socket Mode will route your app’s interactions and events over a WebSockets connection instead sending these payloads to Request URLs, which are public HTTP endpoints.
-
-Socket Mode is convenient, but it restricts the capabilities pretty drastically, most notably as it relates to incoming webhooks from external services. I am getting a development environment set up and quickly reproducible to allow for a real request url, so that we can implement webhooks. Webhooks are going to be key to getting "stuff" into slack from external sources.
+Turning on Socket Mode will route your app’s interactions and events over a WebSockets connection instead sending these payloads to Request URLs, which are public HTTP endpoints. Socket Mode is convenient, but it restricts the capabilities pretty drastically, most notably as it relates to incoming webhooks from external services. I am getting a development environment set up and quickly reproducible to allow for a real request url, so that we can implement webhooks. Webhooks are going to be key to getting "stuff" into slack from external sources.
 
 More information about socket mode can be found here: https://app.slack.com/app-settings/T01LN1N5H60/A01LUFAPUFK/socket-mode
 
@@ -16,8 +14,6 @@ Slash commands and shortcuts are similar in how they are presented within the sl
 
 # Setup
 The setup instructions presume that we have a slack robot setup already. The slack bot we have been using for the previous iteration of has permissions appropriate to this code. I will ammend these instructions with detailed information about slack bot setup and permissions once we determine where/how to move this code into existing jibot repo.
-
-To install and run, you'll need python, and environment variables. I am using a .venv folder for a virtual environtment, and a .env file to hold & load environment variables, but how you accomplish this can vary based on your chosed OS, IDE, and shell evironment.
 
 ## Packages
 	pip install slack-bolt
@@ -29,8 +25,32 @@ Replace [] values as shown below with the appropriate values from your slack bot
 	SLACK_BOT_TOKEN=[xoxb-...]
 	SLACK_APP_TOKEN=[xapp-...]
 
+I (pegnott) am using VS Code on  MacOS...  I set up a virtual environment, and adding environment variables to be loaded on activations. Here's how I did it:
+* Install the [Microsoft Python extension for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+* `python -m venv [venv_directory]`
+* `touch venv/.env`
+* edit venv.env file to include the variables as shown above.
+* update venv/bin/activate.  Around line 40, there is a line that looks like:
+
+		export VIRTUAL_ENV
+
+* Add the following below it:
+
+		set -a
+		source $VIRTUAL_ENV/.env
+		set +a
+
+* Activate the virtual environment:
+
+		source ./[venv_directory]/bin/activate
+
+* NOTE: The MS Python extension for VS Code will ask if you want to use this as a workspace -- doing so will mean that when you open a new terminal window, the virtual environment will be acticvated automatically, allowing you to skip this step next time.
+
 ## Run the bot
 	python ./app.py
+
+## Test the bot
+In a channel which includes the bot, or in a direct message to the bot, send a message which include the phrase "hello world" (without quotes). The bot will reply with a message that includes the filename that is running the code.
 
 ## Adding plugins
 
