@@ -4,9 +4,10 @@ import logging
 import os
 import re
 import lib.slack as bolt
+logging.basicConfig(level=logging.INFO)
 
-logging.basicConfig(level=logging.ERROR)
 plugins = []
+slack = None
 
 def init_plugins():
 	global plugins
@@ -31,21 +32,27 @@ def plugin_info_from_path(plugin_path):
 
 def init_slack():
 	global plugins
-	print("Initializing slack...")
+	global slack
+	logging.info("Initializing slack...")
 	slack = bolt.app()
-	print("Loading slack plugins...")
+	logging.info("Loading slack plugins...")
 	for plugin in plugins:
 		plugin_name = plugin.get('name')
 		event_type = plugin.get('type')
 		keyword = plugin.get('lib').keyword
 		callback_function = plugin.get('lib').callback_function
-		slack.event_listener(event_type,  keyword, callback_function)
-		print('\t' + plugin.get('path') + " (" + keyword + ")")
-	slack.start(socket_mode=True)
+		slack.create_event_listener(event_type,  keyword, callback_function)
+		logging.info('\t' + plugin.get('path') + " (" + keyword + ")")
+	slack.start(socket_mode=os.environ.get('JIBOT_DO_SOCKET_MODE', True))
 
 def main():
-	init_plugins()
-	init_slack()
+	global slack
+	try:
+		init_plugins()
+		init_slack()
+	except KeyboardInterrupt:
+		logging.info("App closed with keyboard interrupt... Shutting down...")
+		slack.close()
 
 if __name__ == "__main__":
 	main()
