@@ -2,6 +2,9 @@
 The intent of this code is to create a "garage" where you can park code to be used in a useful way within a chat bot interface (currently slack) without needing to know very much about the chat bot interface.
 
 # New Notes:
+**IMPORTANT:** The environment variable names have changed! The reason for this is, essentially, to namespace them. The bolt library will automatically do things with specifically named environment variables if they are present, which can include error-throwing scenarios.
+
+
 
 ## [Socket Mode](https://app.slack.com/app-settings/T01LN1N5H60/A01LUFAPUFK/socket-mode) Considerations
 
@@ -25,13 +28,15 @@ The setup instructions presume that we have a slack robot setup already. The sla
 	pip install slack-bolt
 
 ## Environment Variables
-Replace [] values as shown below with the appropriate values from your slack bot configuration and import as appropriate to your local development environment.
+Replace [] values as shown below with the appropriate values from your slack bot configuration and import as appropriate to your local development environment. **BOT_TOKEN and SIGNING_SECRET are required.** PORT defaults to 3000 for non-socket mode bolt apps. DO_SOCKET_MODE defaults to true. (NOTE from pegnott: We do not seem to have awareness from this side as to whether or not socket mode is enabled on the slack api end... we haven't probed very deeply, however it's pretty inline with scopes/permissions. It would be convenient if we could check that and set the value accordingly, and will looking again once webhooks are functional)
 
-	SLACK_SIGNING_SECRET=[...]
-	SLACK_BOT_TOKEN=[xoxb-...]
-	SLACK_APP_TOKEN=[xapp-...]
-	NGROK_AUTH_TOKEN=[OPTIONAL:your-ngrok-auth-token]
-	NGROK_HOSTNAME=[OPTIONAL:your-ngrok-static-hostname]
+	JIBOT_SLACK_BOT_TOKEN=[xoxb-...]
+	JIBOT_SLACK_SIGNING_SECRET=[...]
+	JIBOT_PORT=[3000]
+	JIBOT_NGROK_AUTH_TOKEN=[...]
+	JIBOT_NGROK_HOSTNAME=[...]
+	JIBOT_DO_SOCKET_MODE=[True]
+
 
 I (pegnott) am using VS Code on  MacOS...  I set up a virtual environment, and adding environment variables to be loaded on activations. Here's how I did it:
 * Install the [Microsoft Python extension for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
