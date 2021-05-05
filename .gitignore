@@ -6,6 +6,7 @@
 # Environments / Environment variables
 *.env
 venv/
+.vscode/
 
 # User-specific files
 *.rsuser
