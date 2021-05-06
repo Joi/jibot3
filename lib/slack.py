@@ -28,6 +28,7 @@ class app:
 	verification_token = os.environ.get("JIBOT_SLACK_VERIFICATION_TOKEN", None)
 	port = int(os.environ.get("JIBOT_PORT", 3000))
 	webhook_url: str = os.environ.get("JIBOT_SLACK_WEBHOOK_URL", None)
+	webhook:WebhookClient = WebhookClient(webhook_url) if webhook_url is not None else None
 
 	ngrok_token = os.environ.get("JIBOT_NGROK_AUTH_TOKEN", None)
 	ngrok_hostname = os.environ.get("JIBOT_NGROK_HOSTNAME", None)
@@ -39,33 +40,32 @@ class app:
 	channels = None
 	users = None
 
-	webhook:WebhookClient = WebhookClient(webhook_url) if webhook_url is not None else None
 	logging = logging
 	welcome_message:list = []
+
 	def log_to_slack(self, message, *args, **kwargs):
 		self.logging.info(message)
 		if self.webhook is not None:
 			self.webhook.send(text=message)
 
 	def __init__(self):
+		logging.info(self.webhook_url)
 		self.logging.debug(inspect.currentframe().f_code.co_name)
 		self.bolt = App(
-			name="jibot",
 			signing_secret = self.signing_secret,
 			token = self.bot_token,
-			raise_error_for_unhandled_request = False,
 			verification_token = self.verification_token
 		)
 		logging.Logger.slack = self.log_to_slack
 		self.logging = logging.getLogger(self.bolt.name.upper())
-		self.logging.slack("*Starting jibot...*")
-		self.load_plugins()
-		self.bolt.use(self.global_listener)
 		self.test_slack_client_connection()
 		self.who_is_bot()
 		self.get_slack_info()
-		self.logging.slack("\r".join(self.welcome_message))
+		self.bolt.use(self.global_listener)
+		self.load_plugins()
 		try:
+			self.welcome_message.append("*Starting bot listeners...*")
+			self.logging.slack("\r".join(self.welcome_message))
 			self.start()
 		except KeyboardInterrupt:
 			self.close()
@@ -99,7 +99,6 @@ class app:
 				}
 				plugin['lib'] = importlib.import_module(plugin.get('import_path'))
 				keyword = plugin.get('name')
-				log_message.append(f"{plugin.get('type')}, keyword: {keyword}")
 				try:
 					keyword = plugin.get('lib').keyword
 					log_message.append(f"This plugin has a keyword specified ('{keyword}'), this overrides using the plugin filename as the keyword.")
