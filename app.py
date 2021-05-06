@@ -10,7 +10,10 @@ logging.basicConfig(
 )
 
 def main():
-	bolt.app()
+	try:
+		bolt.app()
+	except KeyboardInterrupt:
+		bolt.app.close()
 
 if __name__ == "__main__":
 	main()
