@@ -1,7 +1,31 @@
 # Jibot3 • A slack bot
 The intent of this code is to create a "garage" where you can park code to be used in a useful way within a chat bot interface (currently slack) without needing to know very much about the chat bot interface.
 
-# New Notes:
+# * New Notes:
+**IMPORTANT:** The environment variable names have changed! The reason for this is, essentially, to namespace them. The bolt library will automatically do things with specifically named environment variables if they are present, which can include error-throwing scenarios.
+
+# Slack Bot Creation
+Here is a good introdocution and instructions for creating and configuring a slack bot: https://api.slack.com/bot-users.
+
+# Slack Bot Oauth / Event Listening / Webhooks, OH MY!
+The slack bot and web api client use of tokens and scopes. The tokens and scopes required will vary depending on your desired bot listeners and interactivity needs, however here is a basic guide to setting up tokens and scopes for use with jibot:
+
+* If you plan to use socket mode, you must have an App-Level token with `connections:write` scope
+	* https://api.slack.com/apps/ Settings -> Basic Information
+* **Bot Token Scopes:** When an error is thrown, the missing scope will be specified in an error log. Start with the following, and add as you need: (https://api.slack.com/apps/ Settings -> OAuth & Permissions)
+	* app_mentions:read (@bot_name_mentions)
+	* channels:read (can get basic info about channel(s))
+	* groups:read (can get basic info about private channel(s) to which the bot has been added)
+	* im:read (can get basic info about direct message(s) to which the bot has been added)
+	* team:read (can get basic info about the current team)
+	* users:read (can get basic info about users(s))
+	* chat:write (can write in channels/direct messages )
+* **User Token Scopes** User token scopes allow access to api data and methods on behalf of the user which authorized/installed the slack application. At the moment, this has not been implemented, although if a user token is present and it is valid, it is used to establish the identity details of that user, for logging purposes.
+* **Event Subscriptions:**
+	* app_mention
+	* message.channels
+* **Incoming Webhooks:**
+Incoming webhooks are handy for connecting external services into our slack. In many cases the format of the data being sent is not in a format that slack can use. If we are using ngrok and have a static ngrok hostname, we can create an endpoint to use as an interceptor for external services, so that the data may be examined and put into a format useful to to slack or otherwise stored or manipulated.
 
 ## [Socket Mode](https://app.slack.com/app-settings/T01LN1N5H60/A01LUFAPUFK/socket-mode) Considerations
 
@@ -20,21 +44,48 @@ Socket Mode is convenient, but it restricts the capabilities pretty drastically,
 # Setup
 The setup instructions presume that we have a slack robot setup already. The slack bot we have been using for the previous iteration of has permissions appropriate to this code. I will ammend these instructions with detailed information about slack bot setup and permissions once we determine where/how to move this code into existing jibot repo.
 
-To install and run, you'll need python, and environment variables. I am using a .venv folder for a virtual environtment, and a .env file to hold & load environment variables, but how you accomplish this can vary based on your chosed OS, IDE, and shell evironment.
-
 ## Packages
+	pip install pyngrok
 	pip install slack-bolt
 
 ## Environment Variables
-Replace [] values as shown below with the appropriate values from your slack bot configuration and import as appropriate to your local development environment.
+Replace [] values as shown below with the appropriate values from your slack bot configuration and import as appropriate to your local development environment. **BOT_TOKEN and SIGNING_SECRET are required. JIBOT_SLACK_APP_TOKEN is required to run in socket mode** PORT defaults to 3000 for non-socket mode bolt apps. DO_SOCKET_MODE defaults to true. (NOTE from pegnott: We do not seem to have awareness from this side as to whether or not socket mode is enabled on the slack api end... we haven't probed very deeply, however it's pretty inline with scopes/permissions. It would be convenient if we could check that and set the value accordingly, and will looking again once webhooks are functional)
 
-	SLACK_SIGNING_SECRET=[...]
-	SLACK_BOT_TOKEN=[xoxb-...]
-	SLACK_APP_TOKEN=[xapp-...]
-	NGROK_AUTH_TOKEN=[OPTIONAL:your-ngrok-auth-token]
+	JIBOT_SLACK_APP_TOKEN=[xapp-...]
+	JIBOT_SLACK_BOT_TOKEN=[xoxb-...]
+	JIBOT_SLACK_SIGNING_SECRET=[...]
+	JIBOT_PORT=[3000]
+	JIBOT_NGROK_AUTH_TOKEN=[...]
+	JIBOT_NGROK_HOSTNAME=[...]
+	JIBOT_DO_SOCKET_MODE=[True]
+
+
+I (pegnott) am using VS Code on  MacOS...  I set up a virtual environment, and adding environment variables to be loaded on activations. Here's how I did it:
+* Install the [Microsoft Python extension for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+* `python -m venv [venv_directory]`
+* `touch [venv_directory]/.env`
+* edit venv.env file to include the variables as shown above.
+* update venv/bin/activate.  Around line 40, there is a line that looks like:
+
+		export VIRTUAL_ENV
+
+* Add the following below it:
+
+		set -a
+		source $VIRTUAL_ENV/.env
+		set +a
+
+* Activate the virtual environment:
+
+		source ./[venv_directory]/bin/activate
+
+* NOTE: The MS Python extension for VS Code will ask if you want to use this as a workspace -- doing so will mean that when you open a new terminal window, the virtual environment will be acticvated automatically, allowing you to skip this step next time.
 
 ## Run the bot
 	python ./app.py
+
+## Test the bot
+In a channel which includes the bot, or in a direct message to the bot, send a message which include the phrase "hello world" (without quotes). The bot will reply with a message that includes the filename that is running the code.
 
 ## Adding plugins
 
