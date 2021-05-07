@@ -9,5 +9,10 @@ This directory contains plugins which are called as part of a slash command. Thi
 1. Optionally, enter a usage hint
 1. Optionally, specify whether channels, users, and links are sent to the app unescaped
 
+## Create an Environment Variable\:
+For instructions on one method for adding environment variables to your project, please see the top-level readme.
+
+	JIBOT_SLACK_SLASH_COMMAND=[slash_command_name]
+
 ## `callback_function`
-The callback_function will be called when a triggering command is found. These functions are called with a set of arguments, each of which can be used in any order. Please see the plugins directory README.md file for details about the callback function arguments.
+Each file must contain a function called `callback_function`. The callback_function will be called when a triggering command argument is found. These functions are called with a set of arguments, each of which can be used in any order. Please see the plugins directory README.md file for details about the callback function arguments.
