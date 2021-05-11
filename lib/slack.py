@@ -1,12 +1,18 @@
 import	ast
 import 	glob
+import 	http
 import	importlib
 import	inspect
 import	logging
 import	os
 import	re
-from 	logging import Logger
-from 	pyngrok import ngrok
+import	socket
+import	socketserver
+
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from logging import Logger
+from pyngrok import ngrok
+from threading import Thread
 
 from slack_bolt import App
 from slack_bolt.error import BoltError
@@ -15,10 +21,12 @@ from slack_bolt.authorization import  AuthorizeResult
 from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_sdk.errors import SlackApiError
 from slack_sdk.webhook import WebhookClient
+from slack_sdk.web import WebClient
 
-logging.addLevelName(logging.INFO + 3, 'SLACK')
-
+from lib.webhook import WebhookServerHandler
 class app:
+	app_dir = os.getcwd()
+	plugins_dir = app_dir + os.sep +  'plugins'
 	app_token:str = os.environ.get("JIBOT_SLACK_APP_TOKEN", None)
 	bot_token:str = os.environ.get("JIBOT_SLACK_BOT_TOKEN", None)
 	bot_slash_command:str = os.environ.get("JIBOT_SLACK_SLASH_COMMAND", None)
@@ -28,9 +36,10 @@ class app:
 	user_token:str = os.environ.get("JIBOT_SLACK_USER_TOKEN", None)
 	verification_token:str = os.environ.get("JIBOT_SLACK_VERIFICATION_TOKEN", None)
 	port = int(os.environ.get("JIBOT_PORT", 3000))
+	webhook_proxy_port = int(os.environ.get("JIBOT_WEBSOCKET_PORT", port +1))
+	webhook_proxy_server = None
 	webhook_url:str = os.environ.get("JIBOT_SLACK_WEBHOOK_URL", None)
-	webhook:WebhookClient = WebhookClient(webhook_url) if webhook_url is not None else None
-
+	webhook_client:WebhookClient = WebhookClient(webhook_url) if webhook_url is not None else None
 	ngrok_token:str = os.environ.get("JIBOT_NGROK_AUTH_TOKEN", None)
 	ngrok_hostname:str = os.environ.get("JIBOT_NGROK_HOSTNAME", None)
 	has_ngrok:bool = True if ngrok_token is not None else False
@@ -41,23 +50,17 @@ class app:
 	channels = None
 	users = None
 	command_plugins:dict = {}
-
 	app_welcome_message:list = []
 	bot_welcome_message:list = []
 	logging = logging
 
-	def log_to_slack(self, message, *args, **kwargs):
-		self.logging.info(message)
-		if self.webhook is not None:
-			self.webhook.send(text=message)
-
 	def __init__(self):
-		self.logging.debug(inspect.currentframe().f_code.co_name)
+		self.logging.info(inspect.currentframe().f_code.co_name)
 		self.bolt = App(
-			raise_error_for_unhandled_request=False,
+			raise_error_for_unhandled_request = False,
 			signing_secret = self.signing_secret,
 			token = self.bot_token,
-			verification_token = self.verification_token
+			verification_token = self.verification_token,
 		)
 		logging.Logger.slack = self.log_to_slack
 		self.logging = logging.getLogger(self.bolt.name.upper())
@@ -66,7 +69,7 @@ class app:
 		self.who_is_bot()
 		self.bot_says_hi()
 		self.load_plugins()
-		# self.bolt.use(self.global_listener)
+		self.bolt.use(self.global_listener)
 		try:
 			self.app_welcome_message.append("*Starting bot listeners...*")
 			self.logging.slack("\r".join(self.app_welcome_message))
@@ -74,21 +77,25 @@ class app:
 		except KeyboardInterrupt:
 			self.close()
 
+	def log_to_slack(self, message, *args, **kwargs):
+		self.logging.info(message)
+		if self.webhook_client is not None:
+			self.webhook_client.send(text=message)
+
 	def slack_api_error(self, error: SlackApiError):
 		error_name = error.response['error']
 		assert(error_name)
 		if error_name == 'missing_scope':
-			message = f"The bot is missing proper oauth scope!({missing_scope}). Scopes are added to your bot at https://api.slack.com/apps."
 			missing_scope = error.response['needed']
-			this.logging.error(message)
-			this.logging.slack(message)
-		logging.error(error.response)
+			message = f"The bot is missing proper oauth scope!({missing_scope}). Scopes are added to your bot at https://api.slack.com/apps."
+			self.logging.error(message)
+			self.logging.slack(message)
+		self.logging.error(error.response)
 
 	def load_plugins(self):
+		self.logging.info(inspect.currentframe().f_code.co_name)
 		self.app_welcome_message.append(f"Loading slack plugins...")
-		app_dir = os.getcwd()
-		plugins_dir = app_dir + os.sep +  'plugins'
-		plugin_files = glob.glob(plugins_dir + os.sep + "**" + os.sep + "[!__]*.py", recursive=True)
+		plugin_files = glob.glob(self.plugins_dir + os.sep + "**" + os.sep + "[!__]*.py", recursive=True)
 		path_regex = re.compile("^plugins\/(\w+)\/(.+)\.py$")
 		log_message:list = []
 		for plugin_path in plugin_files:
@@ -109,40 +116,63 @@ class app:
 				except AttributeError as e:
 					assert(e)
 				plugin['keyword'] = keyword
-				plugin['callback_function'] = plugin.get('lib').callback_function
-				handler_function:callable = getattr(self.bolt, plugin.get('type'))
-				if plugin.get('type') == 'command':
-					self.command_plugins[keyword] = plugin.get('callback_function')
-				else:
-					handler_function(plugin.get('keyword'))(plugin.get('callback_function'))
+				try:
+					plugin['callback_function'] = plugin.get('lib').callback_function
+				except:
+					self.logging.debug("Skipping plugin with no callback...")
+					assert('thing')
+				if plugin.get('callback_function') is not None:
+					handler_function:callable = getattr(self.bolt, plugin.get('type'))
+					if plugin.get('type') == 'command':
+						self.command_plugins[keyword] = plugin.get('callback_function')
+					else:
+						handler_function(plugin.get('keyword'))(plugin.get('callback_function'))
 		if self.bot_slash_command is not None:
 			log_message.append(f"Bot has a slash command (/{self.bot_slash_command}), setup command listener...")
 			self.bolt.command(f"/{self.bot_slash_command}")(self.command_listener)
 		self.app_welcome_message.append("\r\t".join(log_message))
 
 	def start(self):
-		self.logging.debug(inspect.currentframe().f_code.co_name)
+		self.logging.info(inspect.currentframe().f_code.co_name)
+		if (self.has_ngrok is True):
+			self.app_welcome_message.append("Detected ngrok, starting webhook tunnel...")
+			self.webhook_proxy_server = Thread(target=self.start_webhook_http_server)
+			self.webhook_proxy_server.start()
+			ngrok_tunnel = ngrok.connect(
+				self.webhook_proxy_port,
+				"http",
+				subdomain=self.ngrok_hostname,
+			)
+			ngrok_process = ngrok.get_ngrok_process()
+			self.app_welcome_message.append("Webhook proxy url is: " + ngrok_tunnel.public_url)
+
 		if self.do_socket_mode is True:
 			self.socket_mode = SocketModeHandler(self.bolt, self.app_token)
 			self.app_welcome_message.append("Starting bolt app in Socket mode....")
 			self.socket_mode.start()
-
 		else:
-			if (self.has_ngrok is True):
-				self.app_welcome_message.append("Detected ngrok... starting request url tunnel...")
-				request_url_tunnel = ngrok.connect(self.port, "http", subdomain=self.ngrok_hostname)
-				ngrok_process = ngrok.get_ngrok_process()
-				self.app_welcome_message.append("Request Url is: " + request_url_tunnel.public_url)
 			self.bolt.start(port=self.port)
 
+	def start_webhook_http_server(self):
+		self.logging.info(inspect.currentframe().f_code.co_name)
+		self.app_welcome_message.append("Setting up a simple http server to act as a webhook proxy...")
+		webhook_server_address = ('localhost', self.webhook_proxy_port)
+		webhook_server = HTTPServer(webhook_server_address, WebhookServerHandler)
+		try:
+			webhook_server.serve_forever()
+		except KeyboardInterrupt:
+			self.logging.slack("Closing webhook server proxy...")
+			webhook_server.server_close()
+
 	def close(self):
+		self.logging.info(inspect.currentframe().f_code.co_name)
 		self.logging.slack("*Shutting jibot down...*")
-		self.logging.debug(inspect.currentframe().f_code.co_name)
 		if (self.has_ngrok is True):
 			ngrok.kill()
+			self.webhook_proxy_server._stop()
 
 	def test_slack_client_connection(self):
-		self.logging.debug(inspect.currentframe().f_code.co_name)
+		self.logging.info(inspect.currentframe().f_code.co_name)
 		try:
 			self.api_connected = self.bolt.client.api_test().get("ok")
 			self.app_welcome_message.append("Slack web client connection established...")
@@ -151,17 +181,17 @@ class app:
 			self.slack_api_error(e)
 
 	def who_is_bot(self):
-		self.logging.debug(inspect.currentframe().f_code.co_name)
+		self.logging.info(inspect.currentframe().f_code.co_name)
 		try:
 			bot_auth = self.bolt.client.auth_test(token=self.bot_token)
 			self.bot_user = self.bolt.client.users_info(user=bot_auth.get("user_id")).get("user")
 			self.app_welcome_message.append(f"Starting jibot. Jibot is named '{self.bot_user.get('real_name')}.'")
-			self.logging.slack(self.bot_user)
+			self.logging.debug(self.bot_user)
 		except SlackApiError as e:
 			self.slack_api_error(e)
 
 	def bot_says_hi(self):
-		self.logging.debug(inspect.currentframe().f_code.co_name)
+		self.logging.info(inspect.currentframe().f_code.co_name)
 		if self.channels is not None:
 			bot_channels:list = []
 			for channel in self.channels:
@@ -180,7 +210,7 @@ class app:
 				self.logging.warning("The bot is NOT on any slack channels. Should we consider having the bot create a channel (if scopes allow)? You can also add bot to a channel via @mention_bot_name")
 
 	def get_slack_info(self):
-		self.logging.debug(inspect.currentframe().f_code.co_name)
+		self.logging.info(inspect.currentframe().f_code.co_name)
 		if self.bot_user is not None:
 			team_id = self.bot_user.get("team_id", None)
 			try:
@@ -202,7 +232,27 @@ class app:
 			ack()
 
 	def global_listener(self, ack, action, client, command, context, event, logger, message, next, options, payload, request, response, respond, say, shortcut, view):
-		logger.info(inspect.currentframe().f_code.co_name)
-		logger.debug(payload)
+		logger.debug(inspect.currentframe().f_code.co_name)
+		logger.info(payload)
 		next()
 	pass
+
+# class WebhookServerHandler(BaseHTTPRequestHandler):
+#     def _set_response(self):
+#         self.send_response(200)
+#         self.send_header('Content-type', 'text/html')
+#         self.end_headers()
+
+#     def do_GET(self):
+#         logging.info("GET request,\nPath: %s\nHeaders:\n%s\n", str(self.path), str(self.headers))
+#         self._set_response()
+#         self.wfile.write("GET request for {}".format(self.path).encode('utf-8'))
+
+#     def do_POST(self):
+#         content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
+#         post_data = self.rfile.read(content_length) # <--- Gets the data itself
+#         logging.info("POST request,\nPath: %s\nHeaders:\n%s\n\nBody:\n%s\n",
+#                 str(self.path), str(self.headers), post_data.decode('utf-8'))
+
+#         self._set_response()
+#         self.wfile.write("POST request for {}".format(self.path).encode('utf-8'))
