@@ -44,7 +44,6 @@ class app:
 	ngrok_hostname:str = os.environ.get("JIBOT_NGROK_HOSTNAME", None)
 	has_ngrok:bool = True if ngrok_token is not None else False
 	do_socket_mode:bool = ast.literal_eval(os.environ.get("JIBOT_DO_SOCKET_MODE", 'True'))
-
 	api_connected:bool = False
 	bot_user = None
 	channels = None
@@ -55,12 +54,10 @@ class app:
 	logging = logging
 
 	def __init__(self):
-		self.logging.info(inspect.currentframe().f_code.co_name)
+		self.logging.debug(inspect.currentframe().f_code.co_name)
 		self.bolt = App(
-			raise_error_for_unhandled_request = False,
 			signing_secret = self.signing_secret,
 			token = self.bot_token,
-			verification_token = self.verification_token,
 		)
 		logging.Logger.slack = self.log_to_slack
 		self.logging = logging.getLogger(self.bolt.name.upper())
@@ -93,7 +90,7 @@ class app:
 		self.logging.error(error.response)
 
 	def load_plugins(self):
-		self.logging.info(inspect.currentframe().f_code.co_name)
+		self.logging.debug(inspect.currentframe().f_code.co_name)
 		self.app_welcome_message.append(f"Loading slack plugins...")
 		plugin_files = glob.glob(self.plugins_dir + os.sep + "**" + os.sep + "[!__]*.py", recursive=True)
 		path_regex = re.compile("^plugins\/(\w+)\/(.+)\.py$")
@@ -133,11 +130,12 @@ class app:
 		self.app_welcome_message.append("\r\t".join(log_message))
 
 	def start(self):
-		self.logging.info(inspect.currentframe().f_code.co_name)
+		self.logging.debug(inspect.currentframe().f_code.co_name)
 		if (self.has_ngrok is True):
 			self.app_welcome_message.append("Detected ngrok, starting webhook tunnel...")
 			self.webhook_proxy_server = Thread(target=self.start_webhook_http_server)
 			self.webhook_proxy_server.start()
+			self.logging.info(self.webhook_proxy_port)
 			ngrok_tunnel = ngrok.connect(
 				self.webhook_proxy_port,
 				"http",
@@ -154,7 +152,7 @@ class app:
 			self.bolt.start(port=self.port)
 
 	def start_webhook_http_server(self):
-		self.logging.info(inspect.currentframe().f_code.co_name)
+		self.logging.debug(inspect.currentframe().f_code.co_name)
 		self.app_welcome_message.append("Setting up a simple http server to act as a webhook proxy...")
 		webhook_server_address = ('localhost', self.webhook_proxy_port)
 		webhook_server = HTTPServer(webhook_server_address, WebhookServerHandler)
@@ -165,14 +163,14 @@ class app:
 			webhook_server.server_close()
 
 	def close(self):
-		self.logging.info(inspect.currentframe().f_code.co_name)
+		self.logging.debug(inspect.currentframe().f_code.co_name)
 		self.logging.slack("*Shutting jibot down...*")
 		if (self.has_ngrok is True):
 			ngrok.kill()
 			self.webhook_proxy_server._stop()
 
 	def test_slack_client_connection(self):
-		self.logging.info(inspect.currentframe().f_code.co_name)
+		self.logging.debug(inspect.currentframe().f_code.co_name)
 		try:
 			self.api_connected = self.bolt.client.api_test().get("ok")
 			self.app_welcome_message.append("Slack web client connection established...")
@@ -181,7 +179,7 @@ class app:
 			self.slack_api_error(e)
 
 	def who_is_bot(self):
-		self.logging.info(inspect.currentframe().f_code.co_name)
+		self.logging.debug(inspect.currentframe().f_code.co_name)
 		try:
 			bot_auth = self.bolt.client.auth_test(token=self.bot_token)
 			self.bot_user = self.bolt.client.users_info(user=bot_auth.get("user_id")).get("user")
@@ -191,7 +189,7 @@ class app:
 			self.slack_api_error(e)
 
 	def bot_says_hi(self):
-		self.logging.info(inspect.currentframe().f_code.co_name)
+		self.logging.debug(inspect.currentframe().f_code.co_name)
 		if self.channels is not None:
 			bot_channels:list = []
 			for channel in self.channels:
@@ -210,7 +208,7 @@ class app:
 				self.logging.warning("The bot is NOT on any slack channels. Should we consider having the bot create a channel (if scopes allow)? You can also add bot to a channel via @mention_bot_name")
 
 	def get_slack_info(self):
-		self.logging.info(inspect.currentframe().f_code.co_name)
+		self.logging.debug(inspect.currentframe().f_code.co_name)
 		if self.bot_user is not None:
 			team_id = self.bot_user.get("team_id", None)
 			try:
@@ -236,23 +234,3 @@ class app:
 		logger.info(payload)
 		next()
 	pass
-
-# class WebhookServerHandler(BaseHTTPRequestHandler):
-#     def _set_response(self):
-#         self.send_response(200)
-#         self.send_header('Content-type', 'text/html')
-#         self.end_headers()
-
-#     def do_GET(self):
-#         logging.info("GET request,\nPath: %s\nHeaders:\n%s\n", str(self.path), str(self.headers))
-#         self._set_response()
-#         self.wfile.write("GET request for {}".format(self.path).encode('utf-8'))
-
-#     def do_POST(self):
-#         content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
-#         post_data = self.rfile.read(content_length) # <--- Gets the data itself
-#         logging.info("POST request,\nPath: %s\nHeaders:\n%s\n\nBody:\n%s\n",
-#                 str(self.path), str(self.headers), post_data.decode('utf-8'))
-
-#         self._set_response()
-#         self.wfile.write("POST request for {}".format(self.path).encode('utf-8'))

@@ -1,13 +1,20 @@
 # Jibot3 • A slack bot
 The intent of this code is to create a "garage" where you can park code to be used in a useful way within a chat bot interface (currently slack) without needing to know very much about the chat bot interface.
 
-# * New Notes:
-**IMPORTANT:** The environment variable names have changed! The reason for this is, essentially, to namespace them. The bolt library will automatically do things with specifically named environment variables if they are present, which can include error-throwing scenarios.
+# **IMPORTANT NEW CHANGES!**:
+**The environment variable names have changed!** Namespacing these variables allow us to store as much slack info we want in env vars, but to  select programatically which tokens to use when. Additionally, the bolt app loads any env vars which are present, which can cause error conditions, and this allows the app the sidestep that issue.
+
+	JIBOT_SLACK_APP_TOKEN=[xapp-...]
+	JIBOT_SLACK_BOT_TOKEN=[xoxb-...]
+	...
 
 # Slack Bot Creation
 Here is a good introdocution and instructions for creating and configuring a slack bot: https://api.slack.com/bot-users.
 
-# Slack Bot Oauth / Event Listening / Webhooks, OH MY!
+## Recommended: Using [Socket Mode](https://app.slack.com/app-settings/T01LN1N5H60/A01LUFAPUFK/socket-mode)
+Socket Mode is convenient, and is likely to work to serve jibot's needs for a while. Socket Mode allows for slack events to be "listened for" on your local computer without requiring a stable and internet-reachable dns name or IP address endpoint. Without socket mode, you'll need
+
+## Slack Bot Oauth / Event Listening
 The slack bot and web api client use of tokens and scopes. The tokens and scopes required will vary depending on your desired bot listeners and interactivity needs, however here is a basic guide to setting up tokens and scopes for use with jibot:
 
 * If you plan to use socket mode, you must have an App-Level token with `connections:write` scope
@@ -24,42 +31,34 @@ The slack bot and web api client use of tokens and scopes. The tokens and scopes
 * **Event Subscriptions:**
 	* app_mention
 	* message.channels
-* **Incoming Webhooks:**
-Incoming webhooks are handy for connecting external services into our slack. In many cases the format of the data being sent is not in a format that slack can use. If we are using ngrok and have a static ngrok hostname, we can create an endpoint to use as an interceptor for external services, so that the data may be examined and put into a format useful to to slack or otherwise stored or manipulated.
+* **Incoming [Webhooks](https://api.slack.com/messaging/webhooks):**
+WEBHOOKS ARE COMING! Please see the webhook readme files for details as they emerge.
 
-## [Socket Mode](https://app.slack.com/app-settings/T01LN1N5H60/A01LUFAPUFK/socket-mode) Considerations
-
-Socket Mode is convenient, but it restricts the capabilities pretty drastically, most notably as it relates to incoming webhooks from external services. A reproducible development environment which allows for a real request url is an important step in allowing external triggers and data to come into slack. There are various ways to create a live url to host this code, including: [regular-old-hosting](https://api.slack.com/docs/hosting), dynamic DNS services, and tunneling, each with pros and cons and ease of use considerations.
-
-### A Quick Solution: Response URL using [`ngrok`](https://ngrok.com/) & [`pyngrok`](https://pypi.org/project/pyngrok/)
- Code to support ngrok and pyngrok are in place to facilitate creating a live request URL, and will be used in place of socket mode to act as a fully functioning live request url.  If an environment variable called `NGROK_AUTH_TOKEN` is present, it will be used to establish a live http tunnel to be used as your apps Request Url. If you have a ngrok subdomain or custom domain, you can specify that via an environment variable called `NGROK_HOSTNAME.`
-
- To configure the request url, go to https://api.slack.com/apps, select the appropriate app, then:
- 1. In the **Settings** menu, click on **Socket Mode**, then disable socket mode
- 1. In the **Features** Menu, click on **Event Subscriptions**, ensure events is endabled, then
- 1. Enter the Request Url, followed by /slack/events, for example:
- 	* my ngrok url is: `http://cozmobott.ngrok.io`
-	* My slack request url is: `http://cozmobott.ngrok.io/slack/events`
-
-# Setup
+# Project Setup
 The setup instructions presume that we have a slack robot setup already. The slack bot we have been using for the previous iteration of has permissions appropriate to this code. I will ammend these instructions with detailed information about slack bot setup and permissions once we determine where/how to move this code into existing jibot repo.
 
 ## Packages
 	pip install pyngrok
 	pip install slack-bolt
+	pip install slack_sdk
 
 ## Environment Variables
-Replace [] values as shown below with the appropriate values from your slack bot configuration and import as appropriate to your local development environment. **BOT_TOKEN and SIGNING_SECRET are required. JIBOT_SLACK_APP_TOKEN is required to run in socket mode** PORT defaults to 3000 for non-socket mode bolt apps. DO_SOCKET_MODE defaults to true. (NOTE from pegnott: We do not seem to have awareness from this side as to whether or not socket mode is enabled on the slack api end... we haven't probed very deeply, however it's pretty inline with scopes/permissions. It would be convenient if we could check that and set the value accordingly, and will looking again once webhooks are functional)
+Replace [] values as shown below with the appropriate values from your slack bot configuration and import as appropriate to your local development environment. **BOT_TOKEN and SIGNING_SECRET are required. JIBOT_SLACK_APP_TOKEN is required to run in socket mode**
 
-	JIBOT_SLACK_APP_TOKEN=[xapp-...]
-	JIBOT_SLACK_BOT_TOKEN=[xoxb-...]
-	JIBOT_SLACK_SIGNING_SECRET=[...]
-	JIBOT_PORT=[3000]
-	JIBOT_NGROK_AUTH_TOKEN=[...]
-	JIBOT_NGROK_HOSTNAME=[...]
-	JIBOT_DO_SOCKET_MODE=[True]
+	JIBOT_SLACK_BOT_TOKEN=[xoxb-...]	# REQUIRED
+	JIBOT_SLACK_SIGNING_SECRET=[...]	# REQUIRED
+	JIBOT_SLACK_APP_TOKEN=[xapp-...]	# REQUIRED FOR SOCKET MODE
 
+	JIBOT_DO_SOCKET_MODE=[True]		# Enable/disable Socket Mode	(default True)
+	JIBOT_PORT=[3000]				# Port used for bot dev server	(default 3000)
+	JIBOT_SLACK_SLASH_COMMAND=[...]	# Slash command for bot use
+	JIBOT_SLACK_USER_TOKEN=[...]	# Currently Experimental
+	JIBOT_SLACK_WEBHOOK_URL=[...]	# Webhook url
 
+	JIBOT_NGROK_AUTH_TOKEN=[...]	# ngrok auth token for webhook proxy
+	JIBOT_NGROK_HOSTNAME=[...]		# ngrok hostname
+
+### Using virtual environment and adding your environment variables
 I (pegnott) am using VS Code on  MacOS...  I set up a virtual environment, and adding environment variables to be loaded on activations. Here's how I did it:
 * Install the [Microsoft Python extension for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
 * `python -m venv [venv_directory]`
@@ -85,17 +84,12 @@ I (pegnott) am using VS Code on  MacOS...  I set up a virtual environment, and a
 	python ./app.py
 
 ## Test the bot
-In a channel which includes the bot, or in a direct message to the bot, send a message which include the phrase "hello world" (without quotes). The bot will reply with a message that includes the filename that is running the code.
+If you have webhooks enabled and an evironment variable specified, the app will do some basic logging (in the channel specified when installing the webhook-enabled app). If you do not have webhooks enabled, you can test the bot as follows: in a channel which includes the bot, or in a direct message to the bot, send a message which include the phrase "hello world" (without quotes). The bot will reply with a message that includes the filename that is running the code.
 
 ## Adding plugins
 
 The plugins directory is separated into folders which are currently based on the event types available in slack, and which likely have analogous event listeners in other chat bot integrations, should we eventually want to move to or add other bots / frameworks.
 
-To add a plugin, simply add a new python file within the relevant event type directory in /plugins. The files in the plugins directories (currently each directory contains a `hello_world.py` to serve as an example) each contain two things,
+To add a plugin, simply add a new python file within the relevant event type directory in /plugins. In most cases, the filename is used to specify the "keyword" of the slack function involved, for example, the  `plugins/message/hello world.py` file is used to trigger an action when a slack message containing "hello world" is seen. The  `plugins/event/app_mention.py`, file is used to trigger an action when the bot is @mentioned.
 
-1. 	`keyword`
-1. 	`callback_function`
-
-The intent of the **keyword** variable will depend from event to event. In a message event type, the keyword is a string or a regular expression which is used as a search expression to match messages in chat locations where the bot is. in a slash command, it would the a string like `'/hello_world'`
-
-The **callback_function** will be run upon finding a matching event. The callback functions are currently only passed 2 arguments -- a payload object and a say function which allows for basic responses. This could probably be kwargs, but I think it's worthwhile to discuss your thoughts on this (not specifically about kwargs, but rather on whether we should expand the params passed to include more or all of them... I think keeping it simple until we need more is a reasonable approach)
+The file must contain a function called `callback_function` which will be run upon finding a matching event. The arguments passed to the callback function are outlined in the [plugins folder README.md](https://github.com/Joi/jibot3/blob/main/plugins/README.md) and more information is available in each plugin subdirectory README.
