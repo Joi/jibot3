@@ -6,11 +6,8 @@ import	inspect
 import	logging
 import	os
 import	re
-import	socket
-import	socketserver
 
-from http.server import BaseHTTPRequestHandler, HTTPServer
-from logging import Logger
+from http.server import  HTTPServer
 from pyngrok import ngrok
 from threading import Thread
 
@@ -23,7 +20,7 @@ from slack_sdk.errors import SlackApiError
 from slack_sdk.webhook import WebhookClient
 from slack_sdk.web import WebClient
 
-from lib.webhook import WebhookServerHandler
+from lib.server import WebhookServerHandler
 class app:
 	app_dir = os.getcwd()
 	plugins_dir = app_dir + os.sep +  'plugins'
@@ -36,7 +33,7 @@ class app:
 	user_token:str = os.environ.get("JIBOT_SLACK_USER_TOKEN", None)
 	verification_token:str = os.environ.get("JIBOT_SLACK_VERIFICATION_TOKEN", None)
 	port = int(os.environ.get("JIBOT_PORT", 3000))
-	webhook_proxy_port = int(os.environ.get("JIBOT_WEBSOCKET_PORT", port +1))
+	webhook_proxy_port = int(os.environ.get("JIBOT_WEBSOCKET_PORT", port))
 	webhook_proxy_server = None
 	webhook_url:str = os.environ.get("JIBOT_SLACK_WEBHOOK_URL", None)
 	webhook_client:WebhookClient = WebhookClient(webhook_url) if webhook_url is not None else None
@@ -62,8 +59,8 @@ class app:
 		logging.Logger.slack = self.log_to_slack
 		self.logging = logging.getLogger(self.bolt.name.upper())
 		self.test_slack_client_connection()
-		self.get_slack_info()
 		self.who_is_bot()
+		self.get_slack_info()
 		self.bot_says_hi()
 		self.load_plugins()
 		self.bolt.use(self.global_listener)
@@ -135,7 +132,6 @@ class app:
 			self.app_welcome_message.append("Detected ngrok, starting webhook tunnel...")
 			self.webhook_proxy_server = Thread(target=self.start_webhook_http_server)
 			self.webhook_proxy_server.start()
-			self.logging.info(self.webhook_proxy_port)
 			ngrok_tunnel = ngrok.connect(
 				self.webhook_proxy_port,
 				"http",
@@ -190,6 +186,7 @@ class app:
 
 	def bot_says_hi(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
+
 		if self.channels is not None:
 			bot_channels:list = []
 			for channel in self.channels:
@@ -219,9 +216,9 @@ class app:
 				self.slack_api_error(e)
 
 	def command_listener(self, ack, client, command, context, logger, next, options, payload, request, response, respond, say):
+		logger.debug(inspect.currentframe().f_code.co_name)
 		callback_args = locals()
 		del(callback_args['self'])
-		logger.info(inspect.currentframe().f_code.co_name)
 		command_text:str = command.get('text', None)
 		keyword = command_text.split()[0] if command_text is not None else None
 		callback_function = self.command_plugins.get(keyword, None) if keyword is not None else None
@@ -231,6 +228,5 @@ class app:
 
 	def global_listener(self, ack, action, client, command, context, event, logger, message, next, options, payload, request, response, respond, say, shortcut, view):
 		logger.debug(inspect.currentframe().f_code.co_name)
-		logger.info(payload)
 		next()
 	pass
