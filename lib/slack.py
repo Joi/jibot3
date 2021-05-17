@@ -1,11 +1,11 @@
 import	ast
 import 	glob
-import 	http
 import	importlib
 import	inspect
 import	logging
 import	os
 import	re
+import	time
 
 from http.server import  HTTPServer
 from pyngrok import ngrok
@@ -65,8 +65,6 @@ class app:
 		self.load_plugins()
 		self.bolt.use(self.global_listener)
 		try:
-			self.app_welcome_message.append("*Starting bot listeners...*")
-			self.logging.slack("\r".join(self.app_welcome_message))
 			self.start()
 		except KeyboardInterrupt:
 			self.close()
@@ -126,20 +124,21 @@ class app:
 			self.bolt.command(f"/{self.bot_slash_command}")(self.command_listener)
 		self.app_welcome_message.append("\r\t".join(log_message))
 
+
 	def start(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
-		if (self.has_ngrok is True):
-			self.app_welcome_message.append("Detected ngrok, starting webhook tunnel...")
-			self.webhook_proxy_server = Thread(target=self.start_webhook_http_server)
-			self.webhook_proxy_server.start()
-			ngrok_tunnel = ngrok.connect(
-				self.webhook_proxy_port,
-				"http",
-				subdomain=self.ngrok_hostname,
-			)
-			ngrok_process = ngrok.get_ngrok_process()
-			self.app_welcome_message.append("Webhook proxy url is: " + ngrok_tunnel.public_url)
-
+		self.app_welcome_message.append("*Starting bot listeners...*")
+		self.logging.slack("\r".join(self.app_welcome_message))
+		# if (self.has_ngrok is True):
+		# 	self.app_welcome_message.append("Detected ngrok, starting webhook tunnel...")
+		# 	self.webhook_proxy_server = Thread(target=self.start_webhook_http_server)
+		# 	self.webhook_proxy_server.start()
+		# 	ngrok_tunnel = ngrok.connect(
+		# 		self.webhook_proxy_port,
+		# 		"http",
+		# 		subdomain=self.ngrok_hostname,
+		# 	)
+		# 	self.app_welcome_message.append("Webhook proxy url is: " + ngrok_tunnel.public_url)
 		if self.do_socket_mode is True:
 			self.socket_mode = SocketModeHandler(self.bolt, self.app_token)
 			self.app_welcome_message.append("Starting bolt app in Socket mode....")
@@ -147,23 +146,24 @@ class app:
 		else:
 			self.bolt.start(port=self.port)
 
+	def close(self):
+		self.logging.info(inspect.currentframe().f_code.co_name)
+		self.logging.info("*Shutting jibot down...*")
+		if self.do_socket_mode is True:
+			self.logging.info("Disconnecting socket mode...")
+			self.socket_mode.disconnect()
+		# if self.has_ngrok is True:
+		# 	self.logging.info("Shutting down ngrok and webhook proxy...")
+		# 	ngrok.kill()
+		# 	# self.webhook_proxy_server.
+
+
 	def start_webhook_http_server(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
 		self.app_welcome_message.append("Setting up a simple http server to act as a webhook proxy...")
 		webhook_server_address = ('localhost', self.webhook_proxy_port)
 		webhook_server = HTTPServer(webhook_server_address, WebhookServerHandler)
-		try:
-			webhook_server.serve_forever()
-		except KeyboardInterrupt:
-			self.logging.slack("Closing webhook server proxy...")
-			webhook_server.server_close()
 
-	def close(self):
-		self.logging.debug(inspect.currentframe().f_code.co_name)
-		self.logging.slack("*Shutting jibot down...*")
-		if (self.has_ngrok is True):
-			ngrok.kill()
-			self.webhook_proxy_server._stop()
 
 	def test_slack_client_connection(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
