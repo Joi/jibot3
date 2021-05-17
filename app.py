@@ -1,14 +1,10 @@
-import glob
-import importlib
-import logging
-import os
-import re
+
 import lib.slack as bolt
+import logging
 logging.basicConfig(
 	level=logging.INFO,
 	format='%(levelname)s:%(message)s'
 )
-
 def main():
 	try:
 		bolt.app()
