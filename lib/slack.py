@@ -12,15 +12,10 @@ from pyngrok import ngrok
 from threading import Thread
 
 from slack_bolt import App
-from slack_bolt.error import BoltError
 from slack_bolt.adapter.socket_mode import SocketModeHandler
-from slack_bolt.authorization import  AuthorizeResult
-from slack_bolt.oauth.oauth_settings import OAuthSettings
 from slack_sdk.errors import SlackApiError
 from slack_sdk.webhook import WebhookClient
-from slack_sdk.web import WebClient
-
-from lib.server import WebhookServerHandler
+# from lib.server import WebhookServerHandler
 class app:
 	app_dir = os.getcwd()
 	plugins_dir = app_dir + os.sep +  'plugins'
@@ -67,6 +62,7 @@ class app:
 		try:
 			self.start()
 		except KeyboardInterrupt:
+			self.logging.slack("*Shutting down...*")
 			self.close()
 
 	def log_to_slack(self, message, *args, **kwargs):
@@ -82,7 +78,8 @@ class app:
 			message = f"The bot is missing proper oauth scope!({missing_scope}). Scopes are added to your bot at https://api.slack.com/apps."
 			self.logging.error(message)
 			self.logging.slack(message)
-		self.logging.error(error.response)
+
+		self.logging.error(error)
 
 	def load_plugins(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
@@ -155,15 +152,14 @@ class app:
 		# if self.has_ngrok is True:
 		# 	self.logging.info("Shutting down ngrok and webhook proxy...")
 		# 	ngrok.kill()
-		# 	# self.webhook_proxy_server.
+		# 	self.webhook_proxy_server.
 
-
-	def start_webhook_http_server(self):
-		self.logging.debug(inspect.currentframe().f_code.co_name)
-		self.app_welcome_message.append("Setting up a simple http server to act as a webhook proxy...")
-		webhook_server_address = ('localhost', self.webhook_proxy_port)
-		webhook_server = HTTPServer(webhook_server_address, WebhookServerHandler)
-
+	# def start_webhook_http_server(self):
+	# 	self.logging.debug(inspect.currentframe().f_code.co_name)
+	# 	self.app_welcome_message.append("Setting up a simple http server to act as a webhook proxy...")
+	# 	webhook_server_address = ('localhost', self.webhook_proxy_port)
+	# 	webhook_server = HTTPServer(webhook_server_address, WebhookServerHandler)
+	# 	webhook_server.serve_forever()
 
 	def test_slack_client_connection(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
@@ -186,7 +182,6 @@ class app:
 
 	def bot_says_hi(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
-
 		if self.channels is not None:
 			bot_channels:list = []
 			for channel in self.channels:
@@ -194,7 +189,7 @@ class app:
 					channel_members =  self.bolt.client.conversations_members(channel=channel.get('id')).get('members')
 					if self.bot_user is not None and self.bot_user.get('id') in channel_members:
 						bot_channels.append(channel.get('id'))
-						self.logging.slack(f"I am on #{channel.get('name')}. I should say hello.")
+						self.logging.slack(f"I am on #{channel.get('name')}. The bot say hello.")
 						self.bolt.client.chat_postMessage(
 							channel=channel.get('id'),
 							text=f"Hello #{channel.get('name')}! I am {self.bot_user.get('real_name')}. I am waking up."
@@ -215,16 +210,17 @@ class app:
 			except SlackApiError as e:
 				self.slack_api_error(e)
 
-	def command_listener(self, ack, client, command, context, logger, next, options, payload, request, response, respond, say):
+	def command_listener(self, ack, client, command, context, logger, next, payload, request, response, respond, say):
 		logger.debug(inspect.currentframe().f_code.co_name)
 		callback_args = locals()
 		del(callback_args['self'])
+		del(callback_args['ack'])
 		command_text:str = command.get('text', None)
 		keyword = command_text.split()[0] if command_text is not None else None
 		callback_function = self.command_plugins.get(keyword, None) if keyword is not None else None
 		if callback_function is not None:
-			callback_function(**callback_args)
 			ack()
+			callback_function(**callback_args)
 
 	def global_listener(self, ack, action, client, command, context, event, logger, message, next, options, payload, request, response, respond, say, shortcut, view):
 		logger.debug(inspect.currentframe().f_code.co_name)
