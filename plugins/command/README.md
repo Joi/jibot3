@@ -10,8 +10,5 @@ This directory contains plugins which are intended to respond to slack slack sla
 1. Optionally, enter a usage hint
 1. Optionally, specify whether channels, users, and links are sent to the app unescaped
 
-## `keyword`
-The keyword in these files should correspond to the triggering slash command name.
-
 ## `callback_function`
 The callback_function will be called when a triggering command is found. These functions are called with a set of arguments, each of which can be used in any order. Please see the plugins directory README.md file for details about the callback function arguments.
