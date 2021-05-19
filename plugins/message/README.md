@@ -1,5 +1,5 @@
 # Slack Messages
-This directory contains plugins which are intended to respond to slack slack messages which contain a string or regular expression.
+This directory contains plugins which are intended to respond to slack slack messages which contain a string or regular expression. The filename should correspond to the word or phrase you would like to listen for. If using a regular expression or characters which are not allowed within a filename, you may add a variable called `keyword` in the plugin file.
 
 ## Enable Events in your Slack App
 Go to https://api.slack.com/apps/ and then, in the **Features** submenu, click **Event Subscriptions**
@@ -8,7 +8,7 @@ Go to https://api.slack.com/apps/ and then, in the **Features** submenu, click *
 * message.channels
 
 ## `keyword`
-The keyword in these files should correspond to a triggering string or regular expression. Slack emoji's can be included as follows (or within a larger string or regular expression):
+Adding a keyword variable to the plugin file will allow you to override using the filename as the keyword. The keyword corresponds to a triggering string or regular expression. Slack emoji's can be included as follows (or within a larger string or regular expression):
 
     keyword=":wave:"
 

@@ -1,14 +1,11 @@
 # Slack Events
-This directory contains plugins which are intended to respond to slack events. The use of the word "event" in this context is intended to specifically mean events which occur in slack (such as when a member joins the slack or leaves a channel), not the generic idea of event listeners.
+This directory contains plugins which are intended to respond to slack events. The use of the word "event" in this context is intended to specifically mean events which occur in slack (such as when a member joins the slack or leaves a channel), not the generic idea of event listeners. The filename should correspond to a slack app event name.
 
 ## Enable Events in your Slack App
 Go to https://api.slack.com/apps/ and then, in the **Features** submenu, click **Event Subscriptions**
 
 ## Required Permissions
 * Your bot  must have permissions to the event you want to listen for, for example, if you want to listen for when the bot is @mentioned, you must subscribe to the `app_mention` event.
-
-### `keyword`
-The keyword in these files should correspond to the desired event name.
 
 **For a list and description of Slack API Events, visit <https://api.slack.com/events>**
 
