@@ -83,10 +83,10 @@ class app:
 
 	def load_plugins(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
-		self.app_welcome_message.append(f"Loading slack plugins...")
 		plugin_files = glob.glob(self.plugins_dir + os.sep + "**" + os.sep + "[!__]*.py", recursive=True)
 		path_regex = re.compile("^plugins\/(\w+)\/(.+)\.py$")
 		log_message:list = []
+		self.app_welcome_message.append("Loading slack plugins... ")
 		for plugin_path in plugin_files:
 			relative_path = os.path.relpath(plugin_path, os.getcwd())
 			matches = path_regex.match(relative_path)
@@ -101,7 +101,6 @@ class app:
 				keyword = plugin.get('name')
 				try:
 					keyword = plugin.get('lib').keyword
-					log_message.append(f"This plugin has a keyword specified ('{keyword}'), this overrides using the plugin filename as the keyword.")
 				except AttributeError as e:
 					assert(e)
 				plugin['keyword'] = keyword
@@ -109,18 +108,17 @@ class app:
 					plugin['callback_function'] = plugin.get('lib').callback_function
 				except:
 					self.logging.debug("Skipping plugin with no callback...")
-					assert('thing')
 				if plugin.get('callback_function') is not None:
 					handler_function:callable = getattr(self.bolt, plugin.get('type'))
 					if plugin.get('type') == 'command':
 						self.command_plugins[keyword] = plugin.get('callback_function')
 					else:
 						handler_function(plugin.get('keyword'))(plugin.get('callback_function'))
+
 		if self.bot_slash_command is not None:
 			log_message.append(f"Bot has a slash command (/{self.bot_slash_command}), setup command listener...")
 			self.bolt.command(f"/{self.bot_slash_command}")(self.command_listener)
-		self.app_welcome_message.append("\r\t".join(log_message))
-
+		self.app_welcome_message.append("\r".join(log_message))
 
 	def start(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
@@ -175,7 +173,7 @@ class app:
 		try:
 			bot_auth = self.bolt.client.auth_test(token=self.bot_token)
 			self.bot_user = self.bolt.client.users_info(user=bot_auth.get("user_id")).get("user")
-			self.app_welcome_message.append(f"Starting jibot. Jibot is named '{self.bot_user.get('real_name')}.'")
+			self.app_welcome_message.append(f"Starting jibot ({self.bot_user.get('real_name')}).")
 			self.logging.debug(self.bot_user)
 		except SlackApiError as e:
 			self.slack_api_error(e)
@@ -222,7 +220,21 @@ class app:
 			ack()
 			callback_function(**callback_args)
 
+	# def event_listener(self, ack, client, command, context, logger, next, payload, request, response, respond, say):
+	# 	logger.debug(inspect.currentframe().f_code.co_name)
+	# 	callback_args = locals()
+	# 	del(callback_args['self'])
+	# 	del(callback_args['ack'])
+	# 	command_text:str = command.get('text', None)
+	# 	keyword = command_text.split()[0] if command_text is not None else None
+	# 	callback_function = self.command_plugins.get(keyword, None) if keyword is not None else None
+	# 	if callback_function is not None:
+	# 		ack()
+	# 		callback_function(**callback_args)
+
 	def global_listener(self, ack, action, client, command, context, event, logger, message, next, options, payload, request, response, respond, say, shortcut, view):
 		logger.debug(inspect.currentframe().f_code.co_name)
+		logger.debug(payload)
+		logger.debug("++++++++++++++++++++++++++++++++++++")
 		next()
 	pass
