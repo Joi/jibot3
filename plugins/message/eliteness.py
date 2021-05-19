@@ -30,6 +30,6 @@ def callback_function(client, context, logger:logging.Logger, next, payload, req
 				plusses:int = eliteness[1]
 				minuses:int = eliteness[2]
 				total_score = plusses - minuses
-				say(f"Eliteness score updated for *'{word}'*: {total_score} `(+{plusses} -{minuses})`")
+				say(f"Eliteness score updated for *'{word}'*: {total_score}")
 			except sqlite3.Error as e:
 				logger.error(e)
