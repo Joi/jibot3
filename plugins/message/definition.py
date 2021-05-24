@@ -1,9 +1,10 @@
-import	inspect
+import inspect
 import json
 import logging
 import re
 from lib.database import SQLite
 from pathlib import Path
+from stop_words import get_stop_words
 
 spaces:str = "|".join([' ', '\xa0'])
 space_re = f"({spaces})+"
@@ -47,12 +48,12 @@ def callback_function(client, context, logger:logging.Logger, next, payload, req
 		operator = match.group('operator')
 		definition = match.group('definition')
 		object = user_id if user_id is not None else object
-		existing_definitions = _select(object)
-		definitions = set(existing_definitions) if existing_definitions is not None else set()
-		if operator in plus_operators:
-			definitions.add(definition)
-		elif definition in definitions:
-			definitions.remove(definition)
-
-		_define(object, list(definitions))
-		logger.info(f"{object} {operator} {definition}")
+		if definition not in get_stop_words('english'):
+			existing_definitions = _select(object)
+			definitions = set(existing_definitions) if existing_definitions is not None else set()
+			if operator in plus_operators:
+				definitions.add(definition)
+			elif definition in definitions:
+				definitions.remove(definition)
+			_define(object, list(definitions))
+			logger.info(f"{object} {operator} {definition}")
