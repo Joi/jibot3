@@ -1,22 +1,17 @@
 import	inspect
 import json
 import logging
-from pathlib import Path
 import re
 from lib.database import SQLite
+from pathlib import Path
 
 spaces:str = "|".join([' ', '\xa0'])
 space_re = f"({spaces})+"
-
-plus_operators = [
-	"is",
-]
-minus_operators = [
-	"is not",
-]
-
 user_re:str = "<@(?P<user_id>[A-Z0-9]+)>"
 object_re:str = "(?P<object>\w+)"
+
+plus_operators = ["is",]
+minus_operators = ["is not",]
 operator_re:str = f"(?P<operator>{'|'.join(minus_operators)}|{'|'.join(plus_operators)})"
 
 definition_re:str = "(?P<definition>\w+)"
