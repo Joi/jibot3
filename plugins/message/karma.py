@@ -18,11 +18,13 @@ def callback_function(client, context, logger:logging.Logger, next, payload, req
 			word:str = match[0]
 			operator:str = match[1]
 			column_name:str = "MINUS" if operator == minusminus else "PLUS"
-			select_query:str = f"SELECT * FROM {table_name} WHERE key = '{word}';"
+			select_query:str = "SELECT * FROM %s WHERE key = '%s';" % (table_name, word)
+
 			karma = db.cursor.execute(select_query).fetchone()
 			if karma is None:
-				db.cursor.execute(f"INSERT INTO {table_name}(key) VALUES('{word}')")
+				db.cursor.execute(f"INSERT INTO %s(key) VALUES('%s')" % (table_name, word))
 				karma = db.cursor.execute(select_query).fetchone()
+
 			update_query = f"UPDATE {table_name} SET {column_name} = {column_name} + 1 WHERE key = '{word}'"
 			db.cursor.execute(update_query)
 			db.connection.commit()
