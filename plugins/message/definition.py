@@ -8,9 +8,17 @@ from lib.database import SQLite
 spaces:str = "|".join([' ', '\xa0'])
 space_re = f"({spaces})+"
 
+plus_operators = [
+	"is",
+]
+minus_operators = [
+	"is not",
+]
+
 user_re:str = "<@(?P<user_id>[A-Z0-9]+)>"
 object_re:str = "(?P<object>\w+)"
-operator_re:str = "(?P<operator>is not|is)"
+operator_re:str = f"(?P<operator>{'|'.join(minus_operators)}|{'|'.join(plus_operators)})"
+
 definition_re:str = "(?P<definition>\w+)"
 keyword:re = re.compile(f"({user_re}|{object_re}){space_re}{operator_re}{space_re}{definition_re}")
 table_name = Path(__file__).stem
@@ -33,7 +41,7 @@ def _define(key, value):
 	db.connection.commit()
 
 def callback_function(client, context, logger:logging.Logger, next, payload, request, say):
-	global db, keyword, table_name
+	global db, keyword, table_name, plus_operators, minus_operators
 	db = SQLite()
 	db.cursor.execute(f"CREATE TABLE IF NOT EXISTS {table_name} (key text PRIMARY KEY, DEFS json);")
 	text = payload.get('text')
@@ -46,6 +54,10 @@ def callback_function(client, context, logger:logging.Logger, next, payload, req
 		object = user_id if user_id is not None else object
 		existing_definitions = _select(object)
 		definitions = set(existing_definitions) if existing_definitions is not None else set()
-		definitions.add(definition)
+		if operator in plus_operators:
+			definitions.add(definition)
+		elif definition in definitions:
+			definitions.remove(definition)
+
 		_define(object, list(definitions))
 		logger.info(f"{object} {operator} {definition}")
