@@ -5,11 +5,11 @@ import	inspect
 import	logging
 import	os
 import	re
-import	time
+from slack_bolt import BoltRequest
 
-from http.server import  HTTPServer
-from pyngrok import ngrok
-from threading import Thread
+# from http.server import  HTTPServer
+# from pyngrok import ngrok
+# from threading import Thread
 
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
@@ -40,7 +40,14 @@ class app:
 	bot_user = None
 	channels = None
 	users = None
-	command_plugins:dict = {}
+	# folder_plugin_types:set = {
+	# 	'command': {},
+	# 	'event': {}
+	# }
+	plugin_mapper:dict = {
+		'command': {},
+		'event': {}
+	}
 	app_welcome_message:list = []
 	bot_welcome_message:list = []
 	logging = logging
@@ -109,15 +116,53 @@ class app:
 				except:
 					self.logging.debug("Skipping plugin with no callback...")
 				if plugin.get('callback_function') is not None:
-					handler_function:callable = getattr(self.bolt, plugin.get('type'))
-					if plugin.get('type') == 'command':
-						self.command_plugins[keyword] = plugin.get('callback_function')
+					plugin_type = plugin.get('type')
+					handler_function:callable = getattr(self.bolt, plugin_type)
+					if plugin_type in self.plugin_mapper.keys():
+						arg_regex = re.compile("((?P<event_name>\w+)\/)?(?P<arg>\w+)")
+						matches = re.finditer(arg_regex, plugin.get('keyword'))
+						if matches is not None:
+							for match in matches:
+								event_name = match.group('event_name')
+								keyword = match.group('arg')
+								if event_name is not None:
+									print(f"!{event_name}:{keyword}")
+								else:
+									print(f"{plugin_type}!{keyword}")
+									self.plugin_mapper[plugin_type][keyword] = plugin.get('callback_function')
 					else:
 						handler_function(plugin.get('keyword'))(plugin.get('callback_function'))
+
+					# if plugin_type == 'command':
+					# 	self.plugin_mapper[plugin_type][keyword] = plugin.get('callback_function')
+					# else:
+					# 	print(plugin)
+					# 	print(plugin)
+					# 	print(plugin)
+					# 	print(plugin)
+					# if plugin_type == 'event':
+					# 	event_regex = re.compile("((?P<event_name>\w+)\/)?(?P<name>\w+)")
+					# 	matches = re.finditer(event_regex, plugin.get('keyword'))
+					# 	if matches is not None:
+					# 		for match in matches:
+					# 			event_name = match.group('event_name')
+					# 			name = match.group('name')
+					# 			# print(event_name)
+					# 			# print(name)
+					# 			# print(plugin)
+					# 	else:
+					# 		print("ASKDJALKSJDLKASJDLKAJSLDKJASLKDJSA")
+					# 		print(plugin)
+					# else:
+
 
 		if self.bot_slash_command is not None:
 			log_message.append(f"Bot has a slash command (/{self.bot_slash_command}), setup command listener...")
 			self.bolt.command(f"/{self.bot_slash_command}")(self.command_listener)
+
+
+		self.event_listener = self.command_listener
+		self.bolt.event("app_mention")(self.event_listener)
 		self.app_welcome_message.append("\r".join(log_message))
 
 	def start(self):
@@ -208,33 +253,29 @@ class app:
 			except SlackApiError as e:
 				self.slack_api_error(e)
 
-	def command_listener(self, ack, client, command, context, logger, next, payload, request, response, respond, say):
+	def command_listener(self, ack, client, command, context, event, logger, next, payload, request:BoltRequest, response, respond, say):
 		logger.debug(inspect.currentframe().f_code.co_name)
 		callback_args = locals()
+		event_type:str = None
+		text = payload.get('text')
+		keyword = text.split()[0] if text is not None else None
 		del(callback_args['self'])
-		del(callback_args['ack'])
-		command_text:str = command.get('text', None)
-		keyword = command_text.split()[0] if command_text is not None else None
-		callback_function = self.command_plugins.get(keyword, None) if keyword is not None else None
-		if callback_function is not None:
-			ack()
-			callback_function(**callback_args)
+		if command is not None: event_type = "command"
+		if event is not None: event_type = "event"
+		args = list(callback_args.keys())
+		for i in args:
+			arg = callback_args[i]
+			if arg is None:
+				del(callback_args[i])
 
-	# def event_listener(self, ack, client, command, context, logger, next, payload, request, response, respond, say):
-	# 	logger.debug(inspect.currentframe().f_code.co_name)
-	# 	callback_args = locals()
-	# 	del(callback_args['self'])
-	# 	del(callback_args['ack'])
-	# 	command_text:str = command.get('text', None)
-	# 	keyword = command_text.split()[0] if command_text is not None else None
-	# 	callback_function = self.command_plugins.get(keyword, None) if keyword is not None else None
-	# 	if callback_function is not None:
-	# 		ack()
-	# 		callback_function(**callback_args)
+		if keyword is not None:
+			if keyword in self.plugin_mapper[event_type].keys():
+			 	# SLASH COMMANDS WORK / EVENTS NOT YET
+				callback_function = self.plugin_mapper[event_type][keyword]
+				callback_function(**callback_args)
 
-	def global_listener(self, ack, action, client, command, context, event, logger, message, next, options, payload, request, response, respond, say, shortcut, view):
+	def global_listener(self, logger, next, payload, request, response, respond, say):
 		logger.debug(inspect.currentframe().f_code.co_name)
 		logger.debug(payload)
-		logger.debug("++++++++++++++++++++++++++++++++++++")
 		next()
 	pass
