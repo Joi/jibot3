@@ -82,7 +82,6 @@ class app:
 		try:
 			self.start()
 		except KeyboardInterrupt:
-			self.logging.slack("*Shutting down...*")
 			self.close()
 
 	def log_to_slack(self, message, *args, **kwargs):
@@ -161,7 +160,7 @@ class app:
 	def start(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
 		self.app_welcome_message.append("*Starting bot listeners...*")
-		self.logging.slack("\r".join(self.app_welcome_message))
+		# self.logging.slack("\r".join(self.app_welcome_message))
 		# if (self.has_ngrok is True):
 		# 	self.app_welcome_message.append("Detected ngrok, starting webhook tunnel...")
 		# 	self.webhook_proxy_server = Thread(target=self.start_webhook_http_server)
@@ -181,7 +180,8 @@ class app:
 
 	def close(self):
 		self.logging.info(inspect.currentframe().f_code.co_name)
-		self.logging.info("*Shutting jibot down...*")
+		self.logging.info("Shutting jibot down...")
+		self.bot_says_bye()
 		if self.do_socket_mode is True:
 			self.logging.info("Disconnecting socket mode...")
 			self.socket_mode.disconnect()
@@ -233,6 +233,18 @@ class app:
 					self.slack_api_error(e)
 			if len(bot_channels) == 0:
 				self.logging.warning("The bot is NOT on any slack channels. Should we consider having the bot create a channel (if scopes allow)? You can also add bot to a channel via @mention_bot_name")
+
+	def bot_says_bye(self):
+		self.logging.debug(inspect.currentframe().f_code.co_name)
+		if self.channels is not None:
+			for channel in self.channels:
+				try:
+					self.bolt.client.chat_postMessage(
+						channel=channel.get('id'),
+						text=f"Goodbye #{channel.get('name')}! I am shutting down."
+					)
+				except SlackApiError as e:
+					self.slack_api_error(e)
 
 	def get_slack_info(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
