@@ -16,6 +16,23 @@ from slack_bolt.adapter.socket_mode import SocketModeHandler
 from slack_sdk.errors import SlackApiError
 from slack_sdk.webhook import WebhookClient
 # from lib.server import WebhookServerHandler
+
+whitespace:str = "|".join([' ', '\xa0'])
+
+def get_bot_mention_text(bot_id, text):
+	logging.debug(inspect.currentframe().f_code.co_name)
+	global whitespace
+	space_re = f"({whitespace})+"
+	bot_mention_re:str = f"<@(?P<bot_id>{bot_id})>"
+	regex:re = re.compile(f"(?P<pretext>.*)(?P<bot_mention>{bot_mention_re}){space_re}(?P<text>.+)")
+	matches = re.finditer(regex, text)
+	mention_text = []
+	if matches is not None:
+		for match in matches: mention_text.append(match.group('text'))
+	if len(mention_text) == 0: return(text)
+	elif len(mention_text) == 1: return(mention_text[0])
+	else: return mention_text
+
 class app:
 	app_dir = os.getcwd()
 	plugins_dir = app_dir + os.sep +  'plugins'
@@ -40,11 +57,7 @@ class app:
 	bot_user = None
 	channels = None
 	users = None
-	# folder_plugin_types:set = {
-	# 	'command': {},
-	# 	'event': {}
-	# }
-	plugin_mapper:dict = {
+	plugin_garage:dict = {
 		'command': {},
 		'event': {}
 	}
@@ -118,7 +131,7 @@ class app:
 				if plugin.get('callback_function') is not None:
 					plugin_type = plugin.get('type')
 					handler_function:callable = getattr(self.bolt, plugin_type)
-					if plugin_type in self.plugin_mapper.keys():
+					if plugin_type in self.plugin_garage.keys():
 						arg_regex = re.compile("((?P<event_name>\w+)\/)?(?P<arg>\w+)")
 						matches = re.finditer(arg_regex, plugin.get('keyword'))
 						if matches is not None:
@@ -126,35 +139,15 @@ class app:
 								event_name = match.group('event_name')
 								keyword = match.group('arg')
 								if event_name is not None:
-									print(f"!{event_name}:{keyword}")
+									if event_name not in self.plugin_garage[plugin_type]:
+										self.plugin_garage[plugin_type][event_name] = dict()
+									self.bolt.event(event_name)(self.command_listener)
+									callback_garage = self.plugin_garage[plugin_type][event_name]
 								else:
-									print(f"{plugin_type}!{keyword}")
-									self.plugin_mapper[plugin_type][keyword] = plugin.get('callback_function')
+									callback_garage = self.plugin_garage[plugin_type]
+								callback_garage[keyword] = plugin.get('callback_function')
 					else:
 						handler_function(plugin.get('keyword'))(plugin.get('callback_function'))
-
-					# if plugin_type == 'command':
-					# 	self.plugin_mapper[plugin_type][keyword] = plugin.get('callback_function')
-					# else:
-					# 	print(plugin)
-					# 	print(plugin)
-					# 	print(plugin)
-					# 	print(plugin)
-					# if plugin_type == 'event':
-					# 	event_regex = re.compile("((?P<event_name>\w+)\/)?(?P<name>\w+)")
-					# 	matches = re.finditer(event_regex, plugin.get('keyword'))
-					# 	if matches is not None:
-					# 		for match in matches:
-					# 			event_name = match.group('event_name')
-					# 			name = match.group('name')
-					# 			# print(event_name)
-					# 			# print(name)
-					# 			# print(plugin)
-					# 	else:
-					# 		print("ASKDJALKSJDLKASJDLKAJSLDKJASLKDJSA")
-					# 		print(plugin)
-					# else:
-
 
 		if self.bot_slash_command is not None:
 			log_message.append(f"Bot has a slash command (/{self.bot_slash_command}), setup command listener...")
@@ -254,25 +247,27 @@ class app:
 				self.slack_api_error(e)
 
 	def command_listener(self, ack, client, command, context, event, logger, next, payload, request:BoltRequest, response, respond, say):
+		# # # # context.response_url
 		logger.debug(inspect.currentframe().f_code.co_name)
 		callback_args = locals()
-		event_type:str = None
-		text = payload.get('text')
-		keyword = text.split()[0] if text is not None else None
 		del(callback_args['self'])
+		text = get_bot_mention_text(context.get('bot_user_id'), payload.get('text'))
+		event_type:str = None
 		if command is not None: event_type = "command"
 		if event is not None: event_type = "event"
+		keyword = text.split()[0] if text is not None else None
 		args = list(callback_args.keys())
 		for i in args:
 			arg = callback_args[i]
 			if arg is None:
 				del(callback_args[i])
-
+		event_name = payload.get('type', None)
 		if keyword is not None:
-			if keyword in self.plugin_mapper[event_type].keys():
-			 	# SLASH COMMANDS WORK / EVENTS NOT YET
-				callback_function = self.plugin_mapper[event_type][keyword]
-				callback_function(**callback_args)
+			callback_garage = self.plugin_garage[event_type]
+			if event_name is not None and event_name in callback_garage:
+				callback_garage = callback_garage[event_name]
+			if keyword in callback_garage.keys():
+				callback_garage[keyword](**callback_args)
 
 	def global_listener(self, logger, next, payload, request, response, respond, say):
 		logger.debug(inspect.currentframe().f_code.co_name)
