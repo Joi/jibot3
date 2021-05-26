@@ -78,7 +78,7 @@ class app:
 		self.get_slack_info()
 		self.bot_says_hi()
 		self.load_plugins()
-		self.bolt.use(self.global_listener)
+		# self.bolt.use(self.global_listener)
 		try:
 			self.start()
 		except KeyboardInterrupt:
@@ -225,7 +225,6 @@ class app:
 					channel_members =  self.bolt.client.conversations_members(channel=channel.get('id')).get('members')
 					if self.bot_user is not None and self.bot_user.get('id') in channel_members:
 						bot_channels.append(channel.get('id'))
-						self.logging.slack(f"I am on #{channel.get('name')}. The bot say hello.")
 						self.bolt.client.chat_postMessage(
 							channel=channel.get('id'),
 							text=f"Hello #{channel.get('name')}! I am {self.bot_user.get('real_name')}. I am waking up."
@@ -247,7 +246,6 @@ class app:
 				self.slack_api_error(e)
 
 	def command_listener(self, ack, client, command, context, event, logger, next, payload, request:BoltRequest, response, respond, say):
-		# # # # context.response_url
 		logger.debug(inspect.currentframe().f_code.co_name)
 		callback_args = locals()
 		del(callback_args['self'])
