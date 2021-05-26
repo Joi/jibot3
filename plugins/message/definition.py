@@ -11,8 +11,8 @@ space_re = f"({spaces})+"
 user_re:str = "<@(?P<user_id>[A-Z0-9]+)>"
 object_re:str = "(?P<object>\w+)"
 
-plus_operators = ["is",]
-minus_operators = ["is not",]
+plus_operators = ["is", "are"]
+minus_operators = ["is not", "isn't", "are not", "aren't"]
 operator_re:str = f"(?P<operator>{'|'.join(minus_operators)}|{'|'.join(plus_operators)})"
 
 definition_re:str = "(?P<definition>\w+)"
