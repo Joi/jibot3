@@ -88,22 +88,16 @@ class app:
 			self.start()
 		except KeyboardInterrupt:
 			self.close()
-	def hello_decorator(self, func):
-		self.logging.info(inspect.currentframe().f_code.co_name)
-		self.logging.info(inspect.currentframe().f_code.co_name)
-		self.logging.info(inspect.currentframe().f_code.co_name)
-		return func
 
-
-	def help(self, ack, client:WebClient, command, context, logger, payload, request, respond, say):
+	def help(self, func):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
 		# ack()
 		# view = client.views_open(
 		# 	trigger_id=command.get('command'),
 		# 	view=json.dumps(self.plugin_docs)
 		# )
-		self.logging.info(command.get('command'))
-		self.logging.info(self.plugin_docs)
+		# self.logging.info(command.get('command'))
+		# self.logging.info(self.plugin_docs)
 
 	def log_to_slack(self, message, *args, **kwargs):
 		self.logging.info(message)
