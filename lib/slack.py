@@ -59,17 +59,12 @@ class app:
 	channels = None
 	bot_channels:list = []
 	users = None
+	plugins:list = []
 	plugin_garage:dict = {
 		'command': dict(),
 		'event': dict()
 	}
 	logging = logging
-	plugin_docs = {
-		"type": "modal",
-		"title": { "type": "plain_text", "text": "Help", "emoji": True },
-		"close": {"type": "plain_text", "text": "Close"},
-		"blocks": []
-	}
 	def __init__(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
 		self.bolt = App(
@@ -82,22 +77,12 @@ class app:
 		self.who_is_bot()
 		self.get_slack_info()
 		self.bot_says_hi()
+		self.bolt.use(self.shortcut_listener)
 		self.load_plugins()
-		# self.bolt.use(self.global_listener)
 		try:
 			self.start()
 		except KeyboardInterrupt:
 			self.close()
-
-	def help(self, func):
-		self.logging.debug(inspect.currentframe().f_code.co_name)
-		# ack()
-		# view = client.views_open(
-		# 	trigger_id=command.get('command'),
-		# 	view=json.dumps(self.plugin_docs)
-		# )
-		# self.logging.info(command.get('command'))
-		# self.logging.info(self.plugin_docs)
 
 	def log_to_slack(self, message, *args, **kwargs):
 		self.logging.info(message)
@@ -119,7 +104,7 @@ class app:
 		plugin_files = glob.glob(self.plugins_dir + os.sep + "**" + os.sep + "[!__]*.py", recursive=True)
 		path_regex = re.compile("^plugins\/(\w+)\/(.+)\.py$")
 		log_message:list = []
-		self.plugin_garage['command']['help'] = self.help
+		fields: list = []
 		for plugin_path in plugin_files:
 			relative_path = os.path.relpath(plugin_path, os.getcwd())
 			matches = path_regex.match(relative_path)
@@ -144,7 +129,6 @@ class app:
 
 				if plugin.get('callback_function') is not None:
 					plugin_type = plugin.get('type')
-					help_text:str = f"type: {plugin_type}"
 					handler_function:callable = getattr(self.bolt, plugin_type)
 					if plugin_type in self.plugin_garage.keys():
 						arg_regex = re.compile("((?P<event_name>\w+)\/)?(?P<arg>\w+)")
@@ -153,8 +137,10 @@ class app:
 							for match in matches:
 								event_name = match.group('event_name')
 								keyword = match.group('arg')
+								plugin['keyword'] = keyword
 								self.logging.info(f"type: {plugin_type} event name:{event_name} keyword: {keyword}")
 								if event_name is not None:
+									plugin['event_name'] = event_name
 									if event_name not in self.plugin_garage[plugin_type]:
 										self.plugin_garage[plugin_type][event_name] = dict()
 									self.bolt.event(event_name)(self.command_listener)
@@ -166,14 +152,7 @@ class app:
 
 					else:
 						handler_function(plugin.get('keyword'))(plugin.get('callback_function'))
-
-				self.plugin_docs['blocks'].append({
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": f"{plugin_type} {keyword}"
-					}
-				})
+					self.plugins.append(plugin)
 				# {
 				# 	"type": "section",
 				# 	"text": {
@@ -183,8 +162,7 @@ class app:
 				# },
 				# {
 				# 	"type": "divider"
-				# },
-
+				# }
 
 		if self.bot_slash_command is not None:
 			log_message.append(f"Bot has a slash command (/{self.bot_slash_command}), setup command listener...")
@@ -290,7 +268,7 @@ class app:
 			except SlackApiError as e:
 				self.slack_api_error(e)
 
-	def command_listener(self, ack, client, command, context, event, logger, next, payload, request:BoltRequest, response, respond, say):
+	def command_listener(self, command, context, event, logger, payload, request:BoltRequest, response):
 		logger.debug(inspect.currentframe().f_code.co_name)
 		callback_args = locals()
 		del(callback_args['self'])
@@ -317,9 +295,15 @@ class app:
 					required_arg_names=arg_names,
 					this_func=callback_garage[keyword],
 				))
-
-	def global_listener(self, logger, next, payload, request, response, respond, say):
-		logger.debug(inspect.currentframe().f_code.co_name)
-		logger.debug(payload)
+	def shortcut_listener(self, context, logger, next, request, shortcut):
+		if shortcut is not None:
+			logger.debug(inspect.currentframe().f_code.co_name)
+			callback_id = request.body.get('callback_id')
+			if callback_id == 'help': shortcut['plugins'] = self.plugins
 		next()
+
+	# def global_listener(self, shortcut):
+	# 	# logger.debug(inspect.currentframe().f_code.co_name)
+	# 	# logger.debug(payload)
+	# 	next()
 	pass
