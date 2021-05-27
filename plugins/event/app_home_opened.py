@@ -46,7 +46,7 @@ def callback_function(event, client, context, request):
 				],
 
 			})
-	brain_query:str = "SELECT key, json(DEFS) FROM definition ORDER BY key ASC;"
+	brain_query:str = "SELECT * FROM definition ORDER BY key ASC;"
 	brain = db.cursor.execute(brain_query).fetchall()
 	if brain is not None:
 		blocks.append({"type": "divider"},)
@@ -58,11 +58,10 @@ def callback_function(event, client, context, request):
 				"emoji": True
 			}
 		})
-		fields:list = []
+		fields:list = list()
 		for b in brain:
 			thing:str = b[0]
-			definitions = list(json.loads(b[1]))
-
+			definitions = json.loads(b[1])
 			fields.append({
 				"type": "mrkdwn",
 				"text": "\n".join([
@@ -70,7 +69,6 @@ def callback_function(event, client, context, request):
 					", ".join(definitions)
 				]),
 			})
-		print(fields)
 		blocks.append({
 			"type": "section",
 			"fields": fields
