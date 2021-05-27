@@ -41,7 +41,7 @@ def callback_function(event, client, context, request):
 				"text": {
 					"type": "mrkdwn",
 					"text": "\n".join([
-						f"*{word}* {emoji} *{total_score}* `(+{plusses}/-{minuses})`"
+						f"{emoji} *{word} {total_score}* `(+{plusses}/-{minuses})`"
 					])
 				}
 			})
