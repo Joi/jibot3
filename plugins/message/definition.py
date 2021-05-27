@@ -44,7 +44,7 @@ def callback_function(client, context, logger:logging.Logger, next, payload, req
 	matches = re.finditer(keyword, text)
 	for match in matches:
 		user_id = match.group('user_id')
-		object = match.group('object')
+		object = match.group('object').lower()
 		operator = match.group('operator')
 		definition = match.group('definition')
 		object = user_id if user_id is not None else object
