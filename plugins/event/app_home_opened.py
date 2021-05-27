@@ -6,15 +6,13 @@ def callback_function(event, client, context, request):
 	user_id = event["user"]
 	view_blocks = {
 		"type": "home",
-		"blocks": [
-			{
-				"type": "section",
-				"text": {
-					"type": "mrkdwn",
-					"text": f"*Hi <@{user_id}>!* :clap: :raised_hands: This code is running from: {__file__}!!!!"
-				}
-			},
-		]
+		"blocks": [{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": f"*Hi <@{user_id}>!* :clap: :raised_hands: This code is running from: {__file__}!!!!"
+			}
+		}]
 	}
 	db:SQLite = SQLite()
 	karma_karma_karma_karma_karma_queryaaaaa:str = "SELECT * FROM karma;"
@@ -43,7 +41,7 @@ def callback_function(event, client, context, request):
 				"text": {
 					"type": "mrkdwn",
 					"text": "\n".join([
-						f"*{word}* {emoji} `(+{plusses}/-{minuses})`"
+						f"*{word}* {emoji} *{total_score}* `(+{plusses}/-{minuses})`"
 					])
 				}
 			})
