@@ -56,6 +56,7 @@ class app:
 	api_connected:bool = False
 	bot_user = None
 	channels = None
+	bot_channels:list = []
 	users = None
 	plugin_garage:dict = {
 		'command': {},
@@ -134,20 +135,22 @@ class app:
 						arg_regex = re.compile("((?P<event_name>\w+)\/)?(?P<arg>\w+)")
 						matches = re.finditer(arg_regex, plugin.get('keyword'))
 						if matches is not None:
+							self.logging.info("_____________________________________________________")
 							for match in matches:
 								event_name = match.group('event_name')
 								keyword = match.group('arg')
+								self.logging.info(f"{plugin_type} {event_name} {keyword}")
 								if event_name is not None:
 									if event_name not in self.plugin_garage[plugin_type]:
 										self.plugin_garage[plugin_type][event_name] = dict()
 									self.bolt.event(event_name)(self.command_listener)
-									callback_garage = self.plugin_garage[plugin_type][event_name]
+									self.plugin_garage[plugin_type][event_name][keyword] = plugin.get('callback_function')
 								else:
-									callback_garage = self.plugin_garage[plugin_type]
-								callback_garage[keyword] = plugin.get('callback_function')
+									handler_function(plugin.get('keyword'))(plugin.get('callback_function'))
 					else:
 						handler_function(plugin.get('keyword'))(plugin.get('callback_function'))
 
+		print(self.plugin_garage)
 		if self.bot_slash_command is not None:
 			log_message.append(f"Bot has a slash command (/{self.bot_slash_command}), setup command listener...")
 			self.bolt.command(f"/{self.bot_slash_command}")(self.command_listener)
@@ -218,26 +221,32 @@ class app:
 
 	def bot_says_hi(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
+		self.bolt.client.users_setPresence(presence="auto")
 		if self.channels is not None:
-			bot_channels:list = []
 			for channel in self.channels:
 				try:
 					channel_members =  self.bolt.client.conversations_members(channel=channel.get('id')).get('members')
 					if self.bot_user is not None and self.bot_user.get('id') in channel_members:
-						bot_channels.append(channel.get('id'))
+						self.bot_channels.append(channel)
+						bot_profile = self.bolt.client.users_profile_get()
+						# if self.user_token is not None:
+						# 	self.bolt.client.users_profile_set(
+						# 		status_emoji=":brain:",
+						# 		token=self.user_token,
+						# 		user=self.bot_user.get('bot_id'),
+						# 	)
 						self.bolt.client.chat_postMessage(
 							channel=channel.get('id'),
-							text=f"Hello #{channel.get('name')}! I am {self.bot_user.get('real_name')}. I am waking up."
+							text=f"Hello #{channel.get('name')}! I am waking up."
 						)
 				except SlackApiError as e:
 					self.slack_api_error(e)
-			if len(bot_channels) == 0:
-				self.logging.warning("The bot is NOT on any slack channels. Should we consider having the bot create a channel (if scopes allow)? You can also add bot to a channel via @mention_bot_name")
 
 	def bot_says_bye(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
-		if self.channels is not None:
-			for channel in self.channels:
+		self.bolt.client.users_setPresence(presence="away")
+		if self.bot_channels is not None:
+			for channel in self.bot_channels:
 				try:
 					self.bolt.client.chat_postMessage(
 						channel=channel.get('id'),
@@ -273,6 +282,9 @@ class app:
 				del(callback_args[i])
 		event_name = payload.get('type', None)
 		if keyword is not None:
+			print(keyword)
+			print(keyword)
+			print(keyword)
 			callback_garage = self.plugin_garage[event_type]
 			if event_name is not None and event_name in callback_garage:
 				callback_garage = callback_garage[event_name]
