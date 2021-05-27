@@ -10,16 +10,17 @@ def callback_function(event, client, context, request):
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": f"*Hi <@{user_id}>!* :clap: :raised_hands: This code is running from: {__file__}!!!!"
+				"text": f"*Hi <@{user_id}>!* :clap: :raised_hands:"
 			}
 		}]
 	}
+	blocks:list = view_blocks['blocks']
 	db:SQLite = SQLite()
-	karma_karma_karma_karma_karma_queryaaaaa:str = "SELECT * FROM karma;"
+	karma_karma_karma_karma_karma_queryaaaaa:str = "SELECT * FROM karma ORDER BY key ASC;"
 	karma = db.cursor.execute(karma_karma_karma_karma_karma_queryaaaaa).fetchall()
 	if karma is not None:
-		view_blocks['blocks'].append({"type": "divider"},)
-		view_blocks['blocks'].append({
+		blocks.append({"type": "divider"},)
+		blocks.append({
 			"type": "header",
 			"text": {
 				"type": "plain_text",
@@ -32,24 +33,24 @@ def callback_function(event, client, context, request):
 			plusses:int = k[1]
 			minuses:int = k[2]
 			total_score = plusses - minuses
-
 			emoji:str = ":yin_yang:"
 			if total_score > 0: emoji = ":thumbsup:"
 			if total_score < 0: emoji = ":thumbsdown:"
-			view_blocks['blocks'].append({
+			blocks.append({
 				"type": "section",
-				"text": {
-					"type": "mrkdwn",
-					"text": "\n".join([
-						f"{emoji} *{word} {total_score}* `(+{plusses}/-{minuses})`"
-					])
-				}
+				"fields": [
+					{
+						"type": "mrkdwn",
+						"text": f"{emoji} *{word}: {total_score}* `(+{plusses}/-{minuses})`"
+					}
+				],
+
 			})
-	brain_query:str = "SELECT KEY, json(DEFS) FROM definition;"
+	brain_query:str = "SELECT key, json(DEFS) FROM definition ORDER BY key ASC;"
 	brain = db.cursor.execute(brain_query).fetchall()
 	if brain is not None:
-		view_blocks['blocks'].append({"type": "divider"},)
-		view_blocks['blocks'].append({
+		blocks.append({"type": "divider"},)
+		blocks.append({
 			"type": "header",
 			"text": {
 				"type": "plain_text",
@@ -57,18 +58,22 @@ def callback_function(event, client, context, request):
 				"emoji": True
 			}
 		})
+		fields:list = []
 		for b in brain:
 			thing:str = b[0]
 			definitions = list(json.loads(b[1]))
-			view_blocks['blocks'].append({
-				"type": "section",
-				"text": {
-					"type": "mrkdwn",
-					"text": "\n".join([
-						f"*{thing}*",
-						", ".join(definitions)
-					])
-				}
+
+			fields.append({
+				"type": "mrkdwn",
+				"text": "\n".join([
+					f"*{thing}*",
+					", ".join(definitions)
+				]),
 			})
+		print(fields)
+		blocks.append({
+			"type": "section",
+			"fields": fields
+		})
 	if view_id is None: client.views_publish(user_id=context.get('user_id'),view=json.dumps(view_blocks))
 	else: client.views_update(view_id=view.get('id'), view=json.dumps(view_blocks))
