@@ -3,12 +3,8 @@ from lib.slack import get_bot_mention_text
 from pathlib import Path
 from wikipedia import WikipediaPage, WikipediaException
 
-def callback_function(**args):
+def callback_function(ack, context, payload, say):
 	keyword = Path(__file__).stem
-	ack = args.get('ack')
-	say = args.get('say')
-	context = args.get('context')
-	payload = args.get('payload')
 	text = get_bot_mention_text(context.get('bot_user_id'), payload.get('text'))
 	message:list = []
 	if text is not None:

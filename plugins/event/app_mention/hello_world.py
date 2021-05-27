@@ -1,5 +1,3 @@
-def callback_function(**args):
-	say = args['say']
-	payload = args['payload']
-	user = payload['user']
+def callback_function(event, say):
+	user = event['user']
 	say(f"HELLO WORLD (and you, <@{user}>)! This code is running from: {__file__}")

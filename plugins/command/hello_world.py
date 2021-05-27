@@ -1,7 +1,11 @@
-def callback_function(**args):
-	ack = args['ack']
-	payload = args['payload']
-	say = args['say']
-	user = payload['user_id']
+def callback_function(ack, client, request, respond, command):
 	ack()
-	say(f"HELLO WORLD (and you, <@{user}>)! This code is running from: {__file__}")
+	response_url = request.body.get('response_url', None)
+	user_id = command.get('user_id')
+	if response_url is not None:
+		respond(f"HELLO WORLD (and you, <@{user_id}>)! This code is running from: {__file__}")
+	else:
+		client.chat_postMessage(
+			channel=user_id,
+			text=f"Hello <@{user_id}>! :wave:"
+		)
