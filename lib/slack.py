@@ -1,10 +1,11 @@
-import	ast
-import 	glob
-import	importlib
-import	inspect
-import	logging
-import	os
-import	re
+import ast
+import glob
+import importlib
+import inspect
+import json
+import logging
+import os
+import re
 from slack_bolt import BoltRequest
 
 # from http.server import  HTTPServer
@@ -13,12 +14,13 @@ from slack_bolt import BoltRequest
 
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
+from slack_bolt.kwargs_injection import build_required_kwargs
 from slack_sdk.errors import SlackApiError
 from slack_sdk.webhook import WebhookClient
+from slack_sdk.web import WebClient
 # from lib.server import WebhookServerHandler
 
 whitespace:str = "|".join([' ', '\xa0'])
-
 def get_bot_mention_text(bot_id, text):
 	logging.debug(inspect.currentframe().f_code.co_name)
 	global whitespace
@@ -45,27 +47,29 @@ class app:
 	user_token:str = os.environ.get("JIBOT_SLACK_USER_TOKEN", None)
 	verification_token:str = os.environ.get("JIBOT_SLACK_VERIFICATION_TOKEN", None)
 	port = int(os.environ.get("JIBOT_PORT", 3000))
-	webhook_proxy_port = int(os.environ.get("JIBOT_WEBSOCKET_PORT", port))
-	webhook_proxy_server = None
-	webhook_url:str = os.environ.get("JIBOT_SLACK_WEBHOOK_URL", None)
-	webhook_client:WebhookClient = WebhookClient(webhook_url) if webhook_url is not None else None
-	ngrok_token:str = os.environ.get("JIBOT_NGROK_AUTH_TOKEN", None)
-	ngrok_hostname:str = os.environ.get("JIBOT_NGROK_HOSTNAME", None)
-	has_ngrok:bool = True if ngrok_token is not None else False
+	# webhook_proxy_port = int(os.environ.get("JIBOT_WEBSOCKET_PORT", port))
+	# webhook_proxy_server = None
+	# webhook_url:str = os.environ.get("JIBOT_SLACK_WEBHOOK_URL", None)
+	# webhook_client:WebhookClient = WebhookClient(webhook_url) if webhook_url is not None else None
+	# ngrok_token:str = os.environ.get("JIBOT_NGROK_AUTH_TOKEN", None)
+	# ngrok_hostname:str = os.environ.get("JIBOT_NGROK_HOSTNAME", None)
+	# has_ngrok:bool = True if ngrok_token is not None else False
 	do_socket_mode:bool = ast.literal_eval(os.environ.get("JIBOT_DO_SOCKET_MODE", 'True'))
-	api_connected:bool = False
 	bot_user = None
 	channels = None
 	bot_channels:list = []
 	users = None
 	plugin_garage:dict = {
-		'command': {},
-		'event': {}
+		'command': dict(),
+		'event': dict()
 	}
-	app_welcome_message:list = []
-	bot_welcome_message:list = []
 	logging = logging
-
+	plugin_docs = {
+		"type": "modal",
+		"title": { "type": "plain_text", "text": "Help", "emoji": True },
+		"close": {"type": "plain_text", "text": "Close"},
+		"blocks": []
+	}
 	def __init__(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
 		self.bolt = App(
@@ -84,6 +88,22 @@ class app:
 			self.start()
 		except KeyboardInterrupt:
 			self.close()
+	def hello_decorator(self, func):
+		self.logging.info(inspect.currentframe().f_code.co_name)
+		self.logging.info(inspect.currentframe().f_code.co_name)
+		self.logging.info(inspect.currentframe().f_code.co_name)
+		return func
+
+
+	def help(self, ack, client:WebClient, command, context, logger, payload, request, respond, say):
+		self.logging.debug(inspect.currentframe().f_code.co_name)
+		# ack()
+		# view = client.views_open(
+		# 	trigger_id=command.get('command'),
+		# 	view=json.dumps(self.plugin_docs)
+		# )
+		self.logging.info(command.get('command'))
+		self.logging.info(self.plugin_docs)
 
 	def log_to_slack(self, message, *args, **kwargs):
 		self.logging.info(message)
@@ -98,7 +118,6 @@ class app:
 			message = f"The bot is missing proper oauth scope!({missing_scope}). Scopes are added to your bot at https://api.slack.com/apps."
 			self.logging.error(message)
 			self.logging.slack(message)
-
 		self.logging.error(error)
 
 	def load_plugins(self):
@@ -106,7 +125,7 @@ class app:
 		plugin_files = glob.glob(self.plugins_dir + os.sep + "**" + os.sep + "[!__]*.py", recursive=True)
 		path_regex = re.compile("^plugins\/(\w+)\/(.+)\.py$")
 		log_message:list = []
-		self.app_welcome_message.append("Loading slack plugins... ")
+		self.plugin_garage['command']['help'] = self.help
 		for plugin_path in plugin_files:
 			relative_path = os.path.relpath(plugin_path, os.getcwd())
 			matches = path_regex.match(relative_path)
@@ -128,44 +147,61 @@ class app:
 					plugin['callback_function'] = plugin.get('lib').callback_function
 				except:
 					self.logging.debug("Skipping plugin with no callback...")
+
 				if plugin.get('callback_function') is not None:
 					plugin_type = plugin.get('type')
+					help_text:str = f"type: {plugin_type}"
 					handler_function:callable = getattr(self.bolt, plugin_type)
 					if plugin_type in self.plugin_garage.keys():
 						arg_regex = re.compile("((?P<event_name>\w+)\/)?(?P<arg>\w+)")
 						matches = re.finditer(arg_regex, plugin.get('keyword'))
 						if matches is not None:
-							self.logging.info("_____________________________________________________")
 							for match in matches:
 								event_name = match.group('event_name')
 								keyword = match.group('arg')
-								self.logging.info(f"{plugin_type} {event_name} {keyword}")
+								self.logging.info(f"type: {plugin_type} event name:{event_name} keyword: {keyword}")
 								if event_name is not None:
 									if event_name not in self.plugin_garage[plugin_type]:
 										self.plugin_garage[plugin_type][event_name] = dict()
 									self.bolt.event(event_name)(self.command_listener)
 									self.plugin_garage[plugin_type][event_name][keyword] = plugin.get('callback_function')
 								else:
-									handler_function(plugin.get('keyword'))(plugin.get('callback_function'))
+									print(f"{plugin_type} {keyword}")
+									self.plugin_garage[plugin_type][keyword] = plugin.get('callback_function')
+									handler_function(keyword)(self.command_listener)
+
 					else:
 						handler_function(plugin.get('keyword'))(plugin.get('callback_function'))
 
-		print(self.plugin_garage)
+				self.plugin_docs['blocks'].append({
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": f"{plugin_type} {keyword}"
+					}
+				})
+				# {
+				# 	"type": "section",
+				# 	"text": {
+				# 		"type": "mrkdwn",
+				# 		"text": "*1️⃣ Use the `/task` command*. Type `/task` followed by a short description of your tasks and I'll ask for a due date (if applicable). Try it out by using the `/task` command in this channel."
+				# 	}
+				# },
+				# {
+				# 	"type": "divider"
+				# },
+
+
 		if self.bot_slash_command is not None:
 			log_message.append(f"Bot has a slash command (/{self.bot_slash_command}), setup command listener...")
 			self.bolt.command(f"/{self.bot_slash_command}")(self.command_listener)
-
-
 		self.event_listener = self.command_listener
 		self.bolt.event("app_mention")(self.event_listener)
-		self.app_welcome_message.append("\r".join(log_message))
+		# self.plugin_doc['blocks'].append()
 
 	def start(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
-		self.app_welcome_message.append("*Starting bot listeners...*")
-		# self.logging.slack("\r".join(self.app_welcome_message))
 		# if (self.has_ngrok is True):
-		# 	self.app_welcome_message.append("Detected ngrok, starting webhook tunnel...")
 		# 	self.webhook_proxy_server = Thread(target=self.start_webhook_http_server)
 		# 	self.webhook_proxy_server.start()
 		# 	ngrok_tunnel = ngrok.connect(
@@ -173,17 +209,14 @@ class app:
 		# 		"http",
 		# 		subdomain=self.ngrok_hostname,
 		# 	)
-		# 	self.app_welcome_message.append("Webhook proxy url is: " + ngrok_tunnel.public_url)
 		if self.do_socket_mode is True:
 			self.socket_mode = SocketModeHandler(self.bolt, self.app_token)
-			self.app_welcome_message.append("Starting bolt app in Socket mode....")
 			self.socket_mode.start()
 		else:
 			self.bolt.start(port=self.port)
 
 	def close(self):
-		self.logging.info(inspect.currentframe().f_code.co_name)
-		self.logging.info("Shutting jibot down...")
+		self.logging.debug(inspect.currentframe().f_code.co_name)
 		self.bot_says_bye()
 		if self.do_socket_mode is True:
 			self.logging.info("Disconnecting socket mode...")
@@ -195,7 +228,6 @@ class app:
 
 	# def start_webhook_http_server(self):
 	# 	self.logging.debug(inspect.currentframe().f_code.co_name)
-	# 	self.app_welcome_message.append("Setting up a simple http server to act as a webhook proxy...")
 	# 	webhook_server_address = ('localhost', self.webhook_proxy_port)
 	# 	webhook_server = HTTPServer(webhook_server_address, WebhookServerHandler)
 	# 	webhook_server.serve_forever()
@@ -203,8 +235,7 @@ class app:
 	def test_slack_client_connection(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
 		try:
-			self.api_connected = self.bolt.client.api_test().get("ok")
-			self.app_welcome_message.append("Slack web client connection established...")
+			self.bolt.client.api_test().get("ok")
 		except SlackApiError as e:
 			self.logging.error("Unable to establish a slack web client connection!")
 			self.slack_api_error(e)
@@ -214,7 +245,6 @@ class app:
 		try:
 			bot_auth = self.bolt.client.auth_test(token=self.bot_token)
 			self.bot_user = self.bolt.client.users_info(user=bot_auth.get("user_id")).get("user")
-			self.app_welcome_message.append(f"Starting jibot ({self.bot_user.get('real_name')}).")
 			self.logging.debug(self.bot_user)
 		except SlackApiError as e:
 			self.slack_api_error(e)
@@ -278,18 +308,21 @@ class app:
 		args = list(callback_args.keys())
 		for i in args:
 			arg = callback_args[i]
-			if arg is None:
-				del(callback_args[i])
+			if arg is None: del(callback_args[i])
 		event_name = payload.get('type', None)
 		if keyword is not None:
-			print(keyword)
-			print(keyword)
-			print(keyword)
 			callback_garage = self.plugin_garage[event_type]
 			if event_name is not None and event_name in callback_garage:
 				callback_garage = callback_garage[event_name]
 			if keyword in callback_garage.keys():
-				callback_garage[keyword](**callback_args)
+				arg_names = inspect.getfullargspec(callback_garage[keyword]).args
+				callback_garage[keyword](**build_required_kwargs(
+					logger=logger,
+					request=request,
+					response=response,
+					required_arg_names=arg_names,
+					this_func=callback_garage[keyword],
+				))
 
 	def global_listener(self, logger, next, payload, request, response, respond, say):
 		logger.debug(inspect.currentframe().f_code.co_name)
