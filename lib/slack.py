@@ -221,14 +221,14 @@ class app:
 
 	def bot_says_hi(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
-		self.bolt.client.users_setPresence(presence="auto")
+		# self.bolt.client.users_setPresence(presence="auto")
 		if self.channels is not None:
 			for channel in self.channels:
 				try:
 					channel_members =  self.bolt.client.conversations_members(channel=channel.get('id')).get('members')
 					if self.bot_user is not None and self.bot_user.get('id') in channel_members:
 						self.bot_channels.append(channel)
-						bot_profile = self.bolt.client.users_profile_get()
+						# bot_profile = self.bolt.client.users_profile_get()
 						# if self.user_token is not None:
 						# 	self.bolt.client.users_profile_set(
 						# 		status_emoji=":brain:",
@@ -244,7 +244,7 @@ class app:
 
 	def bot_says_bye(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
-		self.bolt.client.users_setPresence(presence="away")
+		# self.bolt.client.users_setPresence(presence="away")
 		if self.bot_channels is not None:
 			for channel in self.bot_channels:
 				try:
