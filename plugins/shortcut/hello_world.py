@@ -1,7 +1,5 @@
-import os
 from slack_bolt import Ack, BoltContext, BoltRequest, BoltResponse, Respond, Say
 from slack_sdk.web import WebClient
-
 def callback_function(ack:Ack, client:WebClient, context:BoltContext, logger, payload, request:BoltRequest, response:BoltResponse, respond:Respond, say:Say, shortcut):
 	ack()
 	view = client.views_open(
