@@ -22,6 +22,7 @@ from slack_sdk.web import WebClient
 
 whitespace:str = "|".join([' ', '\xa0'])
 def get_bot_mention_text(bot_id, text):
+	if text is None: return text
 	logging.debug(inspect.currentframe().f_code.co_name)
 	global whitespace
 	space_re = f"({whitespace})+"
@@ -138,7 +139,6 @@ class app:
 								event_name = match.group('event_name')
 								keyword = match.group('arg')
 								plugin['keyword'] = keyword
-								self.logging.info(f"type: {plugin_type} event name:{event_name} keyword: {keyword}")
 								if event_name is not None:
 									plugin['event_name'] = event_name
 									if event_name not in self.plugin_garage[plugin_type]:
@@ -146,30 +146,15 @@ class app:
 									self.bolt.event(event_name)(self.command_listener)
 									self.plugin_garage[plugin_type][event_name][keyword] = plugin.get('callback_function')
 								else:
-									print(f"{plugin_type} {keyword}")
-									self.plugin_garage[plugin_type][keyword] = plugin.get('callback_function')
-									handler_function(keyword)(self.command_listener)
-
+									if plugin_type == 'command':
+										self.plugin_garage[plugin_type][keyword] = plugin.get('callback_function')
+									else:
+										handler_function(keyword)(plugin.get('callback_function'))
 					else:
-						handler_function(plugin.get('keyword'))(plugin.get('callback_function'))
+						handler_function(keyword)(plugin.get('callback_function'))
 					self.plugins.append(plugin)
-				# {
-				# 	"type": "section",
-				# 	"text": {
-				# 		"type": "mrkdwn",
-				# 		"text": "*1️⃣ Use the `/task` command*. Type `/task` followed by a short description of your tasks and I'll ask for a due date (if applicable). Try it out by using the `/task` command in this channel."
-				# 	}
-				# },
-				# {
-				# 	"type": "divider"
-				# }
-
 		if self.bot_slash_command is not None:
-			log_message.append(f"Bot has a slash command (/{self.bot_slash_command}), setup command listener...")
 			self.bolt.command(f"/{self.bot_slash_command}")(self.command_listener)
-		self.event_listener = self.command_listener
-		self.bolt.event("app_mention")(self.event_listener)
-		# self.plugin_doc['blocks'].append()
 
 	def start(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
