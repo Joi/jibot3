@@ -1,6 +1,7 @@
 import json
 from lib.database import SQLite
-def callback_function(event, client, context, request):
+def callback_function(ack, event, client, context):
+	ack()
 	view = event.get('view', None)
 	view_id = view.get('id') if view is not None else None
 	user_id = event["user"]
