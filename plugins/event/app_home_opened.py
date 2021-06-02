@@ -59,20 +59,17 @@ def callback_function(ack, event, client, context):
 				"emoji": True
 			}
 		})
-		fields:list = list()
 		for b in brain:
 			thing:str = b[0]
 			definitions = json.loads(b[1])
-			fields.append({
-				"type": "mrkdwn",
-				"text": "\n".join([
-					f"*{thing}*",
-					", ".join(definitions)
-				]),
+			blocks.append({
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "\n".join([
+						f"*{thing}:* {', '.join(definitions)}"
+					]),
+				}
 			})
-		blocks.append({
-			"type": "section",
-			"fields": fields
-		})
 	if view_id is None: client.views_publish(user_id=context.get('user_id'),view=json.dumps(view_blocks))
 	else: client.views_update(view_id=view.get('id'), view=json.dumps(view_blocks))
