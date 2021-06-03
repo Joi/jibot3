@@ -16,3 +16,4 @@ def callback_function(ack, context, payload, say):
 			message.append(str(e))
 	say(text=" ".join(message))
 	ack()
+callback_function.__doc__ = f"Wikipedia lookup"

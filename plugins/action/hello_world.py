@@ -1,9 +1,11 @@
+import os
 from slack_bolt import Ack, BoltRequest, BoltResponse, Respond, Say
 from slack_sdk.web import WebClient
 def callback_function(ack:Ack, client:WebClient, logger, request:BoltRequest):
 	ack()
 	container = request.body.get('container')
 	view = request.body.get(container.get('type'))
+	relative_path = os.path.relpath(__file__, os.getcwd())
 	client.views_update(view_id=view.get('id'), view={
 		"type": view.get('type'),
 		"title": view.get('title'),
@@ -12,7 +14,7 @@ def callback_function(ack:Ack, client:WebClient, logger, request:BoltRequest):
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": f"*Thank you for clicking!* :clap: :raised_hands: This code is running from: {__file__}"
+				"text": f"*Thank you for clicking!* :clap: :raised_hands: This code is running from: {relative_path}"
 			}
 		}]
 	})

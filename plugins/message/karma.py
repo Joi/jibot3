@@ -36,3 +36,4 @@ def callback_function(client, context, logger:logging.Logger, next, payload, req
 				say(f"*{word}* has {total_score} karma")
 			except sqlite3.Error as e:
 				logger.error(e)
+callback_function.__doc__ = "Typing [word]++ adds to the karma of [word]. [word]-- subtracts from the karma of [word]."

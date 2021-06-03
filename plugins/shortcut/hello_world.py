@@ -1,7 +1,10 @@
+import os
 from slack_bolt import Ack, BoltContext, BoltRequest, BoltResponse, Respond, Say
 from slack_sdk.web import WebClient
 def callback_function(ack:Ack, client:WebClient, context:BoltContext, logger, payload, request:BoltRequest, response:BoltResponse, respond:Respond, say:Say, shortcut):
 	ack()
+	user_id = shortcut.get('user_id')
+	relative_path = os.path.relpath(__file__, os.getcwd())
 	view = client.views_open(
         trigger_id=shortcut["trigger_id"],
 		view={
@@ -21,7 +24,7 @@ def callback_function(ack:Ack, client:WebClient, context:BoltContext, logger, pa
                     "elements": [
                         {
                             "type": "mrkdwn",
-                            "text": "I am jibot app."
+                            "text": f"HELLO WORLD (and you, <@{user_id}>)! This code is running from: {relative_path}"
                         }
                     ]
                 },

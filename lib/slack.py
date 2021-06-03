@@ -40,6 +40,7 @@ def get_bot_mention_text(bot_id, text):
 class Plugin:
 	event_name:str = None
 	keyword:str = None
+	regex:re = None
 	type:str = None
 	callback:callable = None
 	def __init__(self, file_name:str, import_path:str, plugin_type:str):
@@ -48,7 +49,11 @@ class Plugin:
 			self.type = plugin_type
 			self.callback = plugin_code.callback_function
 			if hasattr(plugin_code, 'keyword'):
+				keyword = plugin_code.keyword
 				self.keyword = plugin_code.keyword
+				if type(keyword) == type(re.compile("/.*/")):
+					self.regex = self.keyword
+					self.keyword = file_name
 			else:
 				self.keyword = file_name
 			arg_regex = re.compile("((?P<event_name>\w+)\/)?(?P<arg>\w+)")
