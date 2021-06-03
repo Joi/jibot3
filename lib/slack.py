@@ -5,6 +5,7 @@ import inspect
 import json
 import logging
 import os
+from plugins.shortcut.help import callback_function
 import re
 from slack_bolt import BoltRequest
 
@@ -36,9 +37,34 @@ def get_bot_mention_text(bot_id, text):
 	elif len(mention_text) == 1: return(mention_text[0])
 	else: return mention_text
 
+class Plugin:
+	event_name:str = None
+	keyword:str = None
+	type:str = None
+	callback:callable = None
+	def __init__(self, file_name:str, import_path:str, plugin_type:str):
+		plugin_code = importlib.import_module(import_path)
+		if hasattr(plugin_code, 'callback_function'):
+			self.type = plugin_type
+			self.callback = plugin_code.callback_function
+			if hasattr(plugin_code, 'keyword'):
+				self.keyword = plugin_code.keyword
+			else:
+				self.keyword = file_name
+			arg_regex = re.compile("((?P<event_name>\w+)\/)?(?P<arg>\w+)")
+			if type(self.keyword) == type(str()):
+				matches = re.finditer(arg_regex, self.keyword)
+				if matches is not None:
+					for match in matches:
+						event_name = match.group('event_name')
+						if event_name is not None:
+							self.event_name = event_name
+							self.keyword = match.group('arg')
+	pass
+
 class app:
-	app_dir = os.getcwd()
-	plugins_dir = app_dir + os.sep +  'plugins'
+	app_dir:str = os.getcwd()
+	plugins_dir:str = app_dir + os.sep +  'plugins'
 	app_token:str = os.environ.get("JIBOT_SLACK_APP_TOKEN", None)
 	bot_token:str = os.environ.get("JIBOT_SLACK_BOT_TOKEN", None)
 	bot_slash_command:str = os.environ.get("JIBOT_SLACK_SLASH_COMMAND", None)
@@ -61,10 +87,6 @@ class app:
 	bot_channels:list = []
 	users = None
 	plugins:list = []
-	plugin_garage:dict = {
-		'command': dict(),
-		'event': dict()
-	}
 	logging = logging
 	def __init__(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
@@ -104,57 +126,22 @@ class app:
 		self.logging.debug(inspect.currentframe().f_code.co_name)
 		plugin_files = glob.glob(self.plugins_dir + os.sep + "**" + os.sep + "[!__]*.py", recursive=True)
 		path_regex = re.compile("^plugins\/(\w+)\/(.+)\.py$")
-		log_message:list = []
-		fields: list = []
 		for plugin_path in plugin_files:
 			relative_path = os.path.relpath(plugin_path, os.getcwd())
 			matches = path_regex.match(relative_path)
 			if matches is not None:
-				plugin = {
-					"path": plugin_path,
-					"import_path": matches.group(0).replace(".py", "").replace("/","."),
-					"type": matches.group(1),
-					"name": matches.group(2),
-				}
-				plugin['lib'] = importlib.import_module(plugin.get('import_path'))
-				keyword = plugin.get('name')
-				try:
-					keyword = plugin.get('lib').keyword
-				except AttributeError as e:
-					assert(e)
-				plugin['keyword'] = keyword
-				try:
-					plugin['callback_function'] = plugin.get('lib').callback_function
-				except:
-					self.logging.debug("Skipping plugin with no callback...")
-
-				if plugin.get('callback_function') is not None:
-					plugin_type = plugin.get('type')
-					handler_function:callable = getattr(self.bolt, plugin_type)
-					if plugin_type in self.plugin_garage.keys():
-						arg_regex = re.compile("((?P<event_name>\w+)\/)?(?P<arg>\w+)")
-						matches = re.finditer(arg_regex, plugin.get('keyword'))
-						if matches is not None:
-							for match in matches:
-								event_name = match.group('event_name')
-								keyword = match.group('arg')
-								plugin['keyword'] = keyword
-								if event_name is not None:
-									plugin['event_name'] = event_name
-									if event_name not in self.plugin_garage[plugin_type]:
-										self.plugin_garage[plugin_type][event_name] = dict()
-									self.bolt.event(event_name)(self.command_listener)
-									self.plugin_garage[plugin_type][event_name][keyword] = plugin.get('callback_function')
-								else:
-									if plugin_type == 'command':
-										self.plugin_garage[plugin_type][keyword] = plugin.get('callback_function')
-									else:
-										handler_function(keyword)(plugin.get('callback_function'))
-					else:
-						handler_function(keyword)(plugin.get('callback_function'))
-					self.plugins.append(plugin)
+				file_name = matches.group(2)
+				import_path = matches.group(0).replace(".py", "").replace(os.sep, ".")
+				plugin_type = matches.group(1)
+				plugin = Plugin(file_name, import_path, plugin_type)
+				self.plugins.append(plugin)
+				bolt_event_handler:callable = getattr(self.bolt, plugin.type)
+				if plugin.type == 'command' or plugin.event_name is not None:
+					bolt_event_handler(plugin.event_name)(self.events_with_arguments_listener)
+				else:
+					bolt_event_handler(plugin.keyword)(plugin.callback)
 		if self.bot_slash_command is not None:
-			self.bolt.command(f"/{self.bot_slash_command}")(self.command_listener)
+			self.bolt.command(f"/{self.bot_slash_command}")(self.events_with_arguments_listener)
 
 	def start(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
@@ -253,42 +240,29 @@ class app:
 			except SlackApiError as e:
 				self.slack_api_error(e)
 
-	def command_listener(self, command, context, event, logger, payload, request:BoltRequest, response):
+	def events_with_arguments_listener(self, command, context, event, logger, payload, request:BoltRequest, response):
 		logger.debug(inspect.currentframe().f_code.co_name)
 		callback_args = locals()
 		del(callback_args['self'])
+		plugin_type:str = None
+		if command is not None: plugin_type = "command"
+		if event is not None: plugin_type = "event"
 		text = get_bot_mention_text(context.get('bot_user_id'), payload.get('text'))
-		event_type:str = None
-		if command is not None: event_type = "command"
-		if event is not None: event_type = "event"
 		keyword = text.split()[0] if text is not None else None
-		args = list(callback_args.keys())
-		for i in args:
-			arg = callback_args[i]
-			if arg is None: del(callback_args[i])
-		event_name = payload.get('type', None)
-		if keyword is not None:
-			callback_garage = self.plugin_garage[event_type]
-			if event_name is not None and event_name in callback_garage:
-				callback_garage = callback_garage[event_name]
-			if keyword in callback_garage.keys():
-				arg_names = inspect.getfullargspec(callback_garage[keyword]).args
-				callback_garage[keyword](**build_required_kwargs(
+		for plugin in self.plugins:
+			if plugin_type == plugin.type and keyword == plugin.keyword:
+				arg_names = inspect.getfullargspec(plugin.callback).args
+				plugin.callback(**build_required_kwargs(
 					logger=logger,
 					request=request,
 					response=response,
 					required_arg_names=arg_names,
-					this_func=callback_garage[keyword],
+					this_func=plugin.callback,
 				))
-	def shortcut_listener(self, context, logger, next, request, shortcut):
+	def shortcut_listener(self, logger, next, request, shortcut):
 		if shortcut is not None:
 			logger.debug(inspect.currentframe().f_code.co_name)
 			callback_id = request.body.get('callback_id')
 			if callback_id == 'help': shortcut['plugins'] = self.plugins
 		next()
-
-	# def global_listener(self, shortcut):
-	# 	# logger.debug(inspect.currentframe().f_code.co_name)
-	# 	# logger.debug(payload)
-	# 	next()
 	pass
