@@ -10,12 +10,14 @@ def callback_function(ack:Ack, action:dict, client:WebClient, context, logger:lo
 	view:dict = request.body.get(container.get('type'))
 	title:dict = view.get('title')
 	title.update(text="Configuration")
+	close_button = view.get('close')
+	close_button.update(text="Go Back")
 	client.views_push(
 		trigger_id=request.body.get('trigger_id'),
 		view={
 			"type": view.get('type'),
 			"title": title,
-			"close": view.get('close'),
+			"close": close_button,
 			"blocks": [
 				{
 					"type": "header",
