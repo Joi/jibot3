@@ -5,7 +5,7 @@ import inspect
 import json
 import logging
 import os
-from plugins.shortcut.help import callback_function
+from plugins.shortcut.jibot import callback_function
 import re
 from slack_bolt import BoltRequest
 
@@ -68,6 +68,7 @@ class Plugin:
 	pass
 
 class app:
+	bolt:App = None
 	app_dir:str = os.getcwd()
 	plugins_dir:str = app_dir + os.sep +  'plugins'
 	app_token:str = os.environ.get("JIBOT_SLACK_APP_TOKEN", None)
@@ -105,7 +106,7 @@ class app:
 		self.who_is_bot()
 		self.get_slack_info()
 		self.bot_says_hi()
-		self.bolt.use(self.shortcut_listener)
+		self.bolt.use(self.global_middleware_listener)
 		self.load_plugins()
 		try:
 			self.start()
@@ -264,10 +265,12 @@ class app:
 					required_arg_names=arg_names,
 					this_func=plugin.callback,
 				))
-	def shortcut_listener(self, logger, next, request, shortcut):
-		if shortcut is not None:
-			logger.debug(inspect.currentframe().f_code.co_name)
-			callback_id = request.body.get('callback_id')
-			if callback_id == 'help': shortcut['plugins'] = self.plugins
+
+	def global_middleware_listener(self, logger:logging.Logger, action, next, request, shortcut):
+		logger.debug(inspect.currentframe().f_code.co_name)
+		if action is not None:
+			action_id = action.get('action_id', None)
+			if action_id == 'jibot_plugin_help':
+				action['plugins'] = self.plugins
 		next()
 	pass
