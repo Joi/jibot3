@@ -29,8 +29,8 @@ def callback_function(ack:Ack, action:dict, client:WebClient, context, logger:lo
 
 	title:dict = view.get('title')
 	title.update(text="Plugin Info")
-	client.views_update(
-		view_id=view.get('id'),
+	client.views_push(
+		trigger_id=request.body.get('trigger_id'),
 		view={
 			"type": view.get('type'),
 			"title": title,

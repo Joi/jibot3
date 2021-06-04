@@ -10,8 +10,8 @@ def callback_function(ack:Ack, action:dict, client:WebClient, context, logger:lo
 	view:dict = request.body.get(container.get('type'))
 	title:dict = view.get('title')
 	title.update(text="Configuration")
-	client.views_update(
-		view_id=view.get('id'),
+	client.views_push(
+		trigger_id=request.body.get('trigger_id'),
 		view={
 			"type": view.get('type'),
 			"title": title,
