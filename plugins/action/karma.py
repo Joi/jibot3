@@ -1,10 +1,9 @@
 import logging
 from slack_bolt import Ack, BoltRequest
 from slack_sdk.web import WebClient
-from lib.blocks.karma import blocks as karma
+from lib.blocks.karma import get_blocks as get_karma
 
 def callback_function(ack:Ack, client:WebClient, logger:logging.Logger, request:BoltRequest):
-	ack()
 	container = request.body.get('container', None)
 	view:dict = request.body.get(container.get('type'))
 	title:dict = view.get('title')
@@ -12,7 +11,7 @@ def callback_function(ack:Ack, client:WebClient, logger:logging.Logger, request:
 	close_button = view.get('close')
 	close_button.update(text="Go Back")
 	content:list = list()
-	content.extend(karma)
+	content.extend(get_karma())
 	client.views_push(
 		trigger_id=request.body.get('trigger_id'),
 		view={
@@ -22,3 +21,4 @@ def callback_function(ack:Ack, client:WebClient, logger:logging.Logger, request:
 			"blocks": content
 		}
 	)
+	ack()
