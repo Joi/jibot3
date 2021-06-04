@@ -100,6 +100,8 @@ class app:
 
 	def load_plugins(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
+		if self.bot_slash_command is not None:
+			self.bolt.command(f"/{self.bot_slash_command}")(self.events_with_arguments_listener)
 		plugin_files = glob.glob(self.plugins_dir + os.sep + "**" + os.sep + "[!__]*.py", recursive=True)
 		path_regex = re.compile("^plugins\/(\w+)\/(.+)\.py$")
 		for plugin_path in plugin_files:
@@ -115,9 +117,10 @@ class app:
 				if plugin.type == 'command' or plugin.event_name is not None:
 					bolt_event_handler(plugin.event_name)(self.events_with_arguments_listener)
 				else:
-					bolt_event_handler(plugin.keyword)(plugin.callback)
-		if self.bot_slash_command is not None:
-			self.bolt.command(f"/{self.bot_slash_command}")(self.events_with_arguments_listener)
+					listener_keyword_or_regex = plugin.keyword
+					if plugin.regex is not None:
+						listener_keyword_or_regex = plugin.regex
+					bolt_event_handler(listener_keyword_or_regex)(plugin.callback)
 
 	def start(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
@@ -171,7 +174,6 @@ class app:
 
 	def bot_says_hi(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
-		# self.bolt.client.users_setPresence(presence="auto")
 		if self.channels is not None:
 			for channel in self.channels:
 				try:

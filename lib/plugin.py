@@ -15,7 +15,7 @@ class Plugin:
 				keyword = plugin_code.keyword
 				self.keyword = plugin_code.keyword
 				if type(keyword) == type(re.compile("/.*/")):
-					self.regex = self.keyword
+					self.regex = keyword
 					self.keyword = file_name
 			else:
 				self.keyword = file_name
