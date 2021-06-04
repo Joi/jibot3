@@ -1,34 +1,24 @@
 import json
+import logging
 import os
+from slack_bolt import Ack, BoltRequest
 from slack_sdk.web import WebClient
-def callback_function(ack, client:WebClient, logger, shortcut):
+
+def callback_function(ack:Ack, action:dict, client:WebClient, context, logger:logging.Logger, request:BoltRequest):
 	ack()
-	view = {
-		"type": "modal",
-		"title": {
-			"type": "plain_text",
-			"text": "Help",
-			"emoji": True
-		},
-		"close": {
-			"type": "plain_text",
-			"text": "Close",
-			"emoji": True
-		},
-		"blocks": []
-	}
-	plugins = shortcut.get('plugins')
-	blocks = view.get('blocks')
+	container = request.body.get('container')
+	view:dict = request.body.get(container.get('type'))
+	plugins = action.get('plugins', None)
 	bot_slash_command:str = os.environ.get("JIBOT_SLACK_SLASH_COMMAND", None)
+	plugin_help_content:list = []
 	if plugins is not None:
 		for plugin in plugins:
 			if plugin.type == "action": continue
 			if plugin.callback.__doc__ is not None:
-				blocks.append({
+				plugin_help_content.append({
 					"type": "section",
 					"text": {
 						"type": "mrkdwn",
-						# "text": f"{plugin.event_name} {plugin.keyword} {plugin.regex} {plugin.type}"
 						"text": " ".join([
 								f"*{plugin.event_name}* _{plugin.keyword}_" if plugin.event_name is not None and plugin.type != "command" else ""
 								f"*/{bot_slash_command}* _{plugin.keyword}_" if plugin.type == "command" else f"*{plugin.type}* _{plugin.keyword}_" if plugin.event_name is None else "",
@@ -36,7 +26,15 @@ def callback_function(ack, client:WebClient, logger, shortcut):
 							])
 					}
 				})
-	view = client.views_open(
-        trigger_id=shortcut["trigger_id"],
-		view=json.dumps(view)
-    )
+
+	title:dict = view.get('title')
+	title.update(text="Plugin Info")
+	client.views_update(
+		view_id=view.get('id'),
+		view={
+			"type": view.get('type'),
+			"title": title,
+			"close": view.get('close'),
+			"blocks": plugin_help_content
+		}
+	)
