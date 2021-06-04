@@ -65,6 +65,22 @@ def callback_function(ack: Ack, client:WebClient, context, logger:logging.Logger
 					"action_id": "karma",
 				}
 			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "The bot tries to learn, check out it's brain."
+				},
+				"accessory": {
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "View Brains",
+						"emoji": True
+					},
+					"action_id": "brain",
+				}
+			},
 		]
 	}
 	client.views_open(
