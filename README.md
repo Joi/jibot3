@@ -38,9 +38,10 @@ WEBHOOKS ARE COMING! Please see the webhook readme files for details as they eme
 The setup instructions presume that we have a slack robot setup already. The slack bot we have been using for the previous iteration of has permissions appropriate to this code. I will ammend these instructions with detailed information about slack bot setup and permissions once we determine where/how to move this code into existing jibot repo.
 
 ## Packages
-	pip install pyngrok
 	pip install slack-bolt
 	pip install slack_sdk
+	pip install stop_words
+	pip install wikipedia
 
 ## Environment Variables
 Replace [] values as shown below with the appropriate values from your slack bot configuration and import as appropriate to your local development environment. **BOT_TOKEN and SIGNING_SECRET are required. JIBOT_SLACK_APP_TOKEN is required to run in socket mode**
