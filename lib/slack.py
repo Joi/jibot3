@@ -1,11 +1,8 @@
 import ast
 import glob
-import importlib
 import inspect
-import json
 import logging
 import os
-from plugins.shortcut.jibot import callback_function
 import re
 from slack_bolt import BoltRequest
 
@@ -19,6 +16,8 @@ from slack_bolt.kwargs_injection import build_required_kwargs
 from slack_sdk.errors import SlackApiError
 from slack_sdk.webhook import WebhookClient
 from slack_sdk.web import WebClient
+
+from lib.plugin import Plugin
 # from lib.server import WebhookServerHandler
 
 whitespace:str = "|".join([' ', '\xa0'])
@@ -36,36 +35,6 @@ def get_bot_mention_text(bot_id, text):
 	if len(mention_text) == 0: return(text)
 	elif len(mention_text) == 1: return(mention_text[0])
 	else: return mention_text
-
-class Plugin:
-	event_name:str = None
-	keyword:str = None
-	regex:re = None
-	type:str = None
-	callback:callable = None
-	def __init__(self, file_name:str, import_path:str, plugin_type:str):
-		plugin_code = importlib.import_module(import_path)
-		if hasattr(plugin_code, 'callback_function'):
-			self.type = plugin_type
-			self.callback = plugin_code.callback_function
-			if hasattr(plugin_code, 'keyword'):
-				keyword = plugin_code.keyword
-				self.keyword = plugin_code.keyword
-				if type(keyword) == type(re.compile("/.*/")):
-					self.regex = self.keyword
-					self.keyword = file_name
-			else:
-				self.keyword = file_name
-			arg_regex = re.compile("((?P<event_name>\w+)\/)?(?P<arg>\w+)")
-			if type(self.keyword) == type(str()):
-				matches = re.finditer(arg_regex, self.keyword)
-				if matches is not None:
-					for match in matches:
-						event_name = match.group('event_name')
-						if event_name is not None:
-							self.event_name = event_name
-							self.keyword = match.group('arg')
-	pass
 
 class app:
 	bolt:App = None
@@ -94,6 +63,7 @@ class app:
 	users = None
 	plugins:list = []
 	logging = logging
+
 	def __init__(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
 		self.bolt = App(
@@ -208,13 +178,6 @@ class app:
 					channel_members =  self.bolt.client.conversations_members(channel=channel.get('id')).get('members')
 					if self.bot_user is not None and self.bot_user.get('id') in channel_members:
 						self.bot_channels.append(channel)
-						# bot_profile = self.bolt.client.users_profile_get()
-						# if self.user_token is not None:
-						# 	self.bolt.client.users_profile_set(
-						# 		status_emoji=":brain:",
-						# 		token=self.user_token,
-						# 		user=self.bot_user.get('bot_id'),
-						# 	)
 						self.bolt.client.chat_postMessage(
 							channel=channel.get('id'),
 							text=f"Hello #{channel.get('name')}! I am waking up."
@@ -224,7 +187,6 @@ class app:
 
 	def bot_says_bye(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
-		# self.bolt.client.users_setPresence(presence="away")
 		if self.bot_channels is not None:
 			for channel in self.bot_channels:
 				try:
@@ -266,8 +228,7 @@ class app:
 					this_func=plugin.callback,
 				))
 
-	def global_middleware_listener(self, logger:logging.Logger, action, next, request, shortcut):
-		logger.debug(inspect.currentframe().f_code.co_name)
+	def global_middleware_listener(self, logger:logging.Logger, action, next, request, shortcut, view):
 		if action is not None:
 			action_id = action.get('action_id', None)
 			if action_id == 'jibot_plugin_help':
