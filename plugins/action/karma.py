@@ -1,4 +1,3 @@
-import json
 import logging
 from slack_bolt import Ack, BoltRequest
 from slack_sdk.web import WebClient
