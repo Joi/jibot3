@@ -231,7 +231,7 @@ class app:
 	def global_middleware_listener(self, logger:logging.Logger, action, next, request, shortcut, view):
 		if action is not None:
 			action_id = action.get('action_id', None)
-			if action_id == 'jibot_plugin_help':
+			if action_id == 'plugin_help':
 				action['plugins'] = self.plugins
 		next()
 	pass

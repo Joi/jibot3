@@ -30,7 +30,7 @@ def callback_function(ack: Ack, client:WebClient, context, logger:logging.Logger
 						"text": "Plugin Help",
 						"emoji": True
 					},
-					"action_id": "jibot_plugin_help",
+					"action_id": "plugin_help",
 				}
 			},
 			{
@@ -46,7 +46,7 @@ def callback_function(ack: Ack, client:WebClient, context, logger:logging.Logger
 						"text": "Configuration",
 						"emoji": True
 					},
-					"action_id": "jibot_config",
+					"action_id": "bot_config",
 				}
 			},
 		]
