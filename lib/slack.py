@@ -111,7 +111,6 @@ class app:
 				file_name = matches.group(2)
 				import_path = matches.group(0).replace(".py", "").replace(os.sep, ".")
 				plugin_type = matches.group(1)
-				print(plugin_type)
 				plugin = Plugin(file_name, import_path, plugin_type)
 				self.plugins.append(plugin)
 				bolt_event_handler:callable = getattr(self.bolt, plugin.type)

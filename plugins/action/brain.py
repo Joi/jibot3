@@ -2,7 +2,7 @@ import json
 import logging
 from slack_bolt import Ack, BoltRequest
 from slack_sdk.web import WebClient
-from lib.blocks.brain import get_blocks as get_brain
+from include.blocks.brain import get_blocks as get_brain
 
 def callback_function(ack:Ack, client:WebClient, logger:logging.Logger, request:BoltRequest):
 	container = request.body.get('container', None)
