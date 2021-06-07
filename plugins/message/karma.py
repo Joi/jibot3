@@ -2,7 +2,6 @@ import logging
 from pathlib import Path
 import re
 import sqlite3
-from typing import List
 from lib.database import SQLite
 
 plusplus:str = "\+\+"
@@ -12,7 +11,7 @@ def callback_function(client, context, logger:logging.Logger, next, payload, req
 	db:SQLite = SQLite()
 	table_name:str = Path(__file__).stem
 	db.cursor.execute(f"CREATE TABLE IF NOT EXISTS {table_name} (key text PRIMARY KEY, PLUS int DEFAULT 0, MINUS int DEFAULT 0);")
-	matches:List = keyword.findall(payload.get('text'))
+	matches:list = keyword.findall(payload.get('text'))
 	if matches is not None:
 		for match in matches:
 			word:str = match[0]
