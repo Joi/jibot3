@@ -1,1 +1,1 @@
-from lib.wikipedia import callback_function
+from include.wikipedia import callback_function
