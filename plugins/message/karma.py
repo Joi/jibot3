@@ -6,8 +6,7 @@ from lib.database import SQLite
 
 plusplus:str = "\+\+"
 minusminus:str = "--"
-# keyword:re = re.compile(f"(<@\w+>|\w+)({plusplus}|{minusminus})")
-keyword:re = re.compile(f"(.*)({plusplus}|{minusminus})")
+keyword:re = re.compile(f"(<@\w+>|\w+)({plusplus}|{minusminus})")
 def callback_function(logger:logging.Logger, payload, say):
 	db:SQLite = SQLite()
 	table_name:str = Path(__file__).stem
@@ -19,12 +18,10 @@ def callback_function(logger:logging.Logger, payload, say):
 			operator:str = match[1]
 			column_name:str = "MINUS" if operator == minusminus else "PLUS"
 			select_query:str = "SELECT * FROM %s WHERE key = '%s';" % (table_name, word)
-
 			karma = db.cursor.execute(select_query).fetchone()
 			if karma is None:
 				db.cursor.execute(f"INSERT INTO %s(key) VALUES('%s')" % (table_name, word))
 				karma = db.cursor.execute(select_query).fetchone()
-
 			update_query = f"UPDATE {table_name} SET {column_name} = {column_name} + 1 WHERE key = '{word}'"
 			db.cursor.execute(update_query)
 			db.connection.commit()
