@@ -53,6 +53,22 @@ def callback_function(ack: Ack, client:WebClient, context, logger:logging.Logger
 				"type": "section",
 				"text": {
 					"type": "mrkdwn",
+					"text": "View a list of links which have been shared."
+				},
+				"accessory": {
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "View Links",
+						"emoji": True
+					},
+					"action_id": "shared_links",
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
 					"text": "Karma karma karma karma karma queryaaaah!"
 				},
 				"accessory": {
