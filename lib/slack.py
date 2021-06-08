@@ -21,6 +21,13 @@ from lib.plugin import Plugin
 # from lib.server import WebhookServerHandler
 
 whitespace:str = "|".join([' ', '\xa0'])
+slack_app_token:str = os.environ.get("JIBOT_SLACK_APP_TOKEN", None)
+slack_bot_token:str = os.environ.get("JIBOT_SLACK_BOT_TOKEN", None)
+slack_bot_slash_command:str = os.environ.get("JIBOT_SLACK_SLASH_COMMAND", None)
+slack_client_id:str = os.environ.get("JIBOT_SLACK_CLIENT_ID", None)
+slack_signing_secret:str = os.environ.get("JIBOT_SLACK_SIGNING_SECRET", None)
+slack_port = int(os.environ.get("JIBOT_PORT", 3000))
+
 def get_bot_mention_text(bot_id, text):
 	if text is None: return text
 	logging.debug(inspect.currentframe().f_code.co_name)
@@ -37,18 +44,15 @@ def get_bot_mention_text(bot_id, text):
 	else: return mention_text
 
 class app:
+	global 	slack_app_token, slack_bot_token, slack_bot_slash_command, slack_signing_secret, slack_port
 	bolt:App = None
 	app_dir:str = os.getcwd()
 	plugins_dir:str = app_dir + os.sep +  'plugins'
-	app_token:str = os.environ.get("JIBOT_SLACK_APP_TOKEN", None)
-	bot_token:str = os.environ.get("JIBOT_SLACK_BOT_TOKEN", None)
-	bot_slash_command:str = os.environ.get("JIBOT_SLACK_SLASH_COMMAND", None)
-	client_id:str = os.environ.get("JIBOT_SLACK_CLIENT_ID", None)
-	client_secret:str = os.environ.get("JIBOT_SLACK_CLIENT_SECRET", None)
-	signing_secret:str = os.environ.get("JIBOT_SLACK_SIGNING_SECRET", None)
-	user_token:str = os.environ.get("JIBOT_SLACK_USER_TOKEN", None)
-	verification_token:str = os.environ.get("JIBOT_SLACK_VERIFICATION_TOKEN", None)
-	port = int(os.environ.get("JIBOT_PORT", 3000))
+	app_token:str = slack_app_token
+	bot_token:str = slack_bot_token
+	bot_slash_command:str = slack_bot_slash_command
+	signing_secret:str = slack_signing_secret
+	port = slack_port
 	# webhook_proxy_port = int(os.environ.get("JIBOT_WEBSOCKET_PORT", port))
 	# webhook_proxy_server = None
 	# webhook_url:str = os.environ.get("JIBOT_SLACK_WEBHOOK_URL", None)
