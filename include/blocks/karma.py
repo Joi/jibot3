@@ -1,11 +1,11 @@
 from lib.database import SQLite
 def get_blocks():
 	blocks:list = []
-	_db:SQLite = SQLite()
-	_karma_karma_karma_karma_karma_queryaaaaa:str = "SELECT * FROM karma ORDER BY key ASC;"
-	_karma = _db.cursor.execute(_karma_karma_karma_karma_karma_queryaaaaa).fetchall()
-	if _karma is not None:
-		for k in _karma:
+	db:SQLite = SQLite()
+	karma_karma_karma_karma_karma_queryaaaaa:str = "SELECT * FROM karma ORDER BY key ASC;"
+	karma = db.cursor.execute(karma_karma_karma_karma_karma_queryaaaaa).fetchall()
+	if karma is not None:
+		for k in karma:
 			word:str = k[0]
 			plusses:int = k[1]
 			minuses:int = k[2]
