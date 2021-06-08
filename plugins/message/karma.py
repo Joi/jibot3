@@ -6,8 +6,9 @@ from lib.database import SQLite
 
 plusplus:str = "\+\+"
 minusminus:str = "--"
-keyword:re = re.compile(f"(\w+)({plusplus}|{minusminus})")
-def callback_function(client, context, logger:logging.Logger, next, payload, request, say):
+# keyword:re = re.compile(f"(<@\w+>|\w+)({plusplus}|{minusminus})")
+keyword:re = re.compile(f"(.*)({plusplus}|{minusminus})")
+def callback_function(logger:logging.Logger, payload, say):
 	db:SQLite = SQLite()
 	table_name:str = Path(__file__).stem
 	db.cursor.execute(f"CREATE TABLE IF NOT EXISTS {table_name} (key text PRIMARY KEY, PLUS int DEFAULT 0, MINUS int DEFAULT 0);")
