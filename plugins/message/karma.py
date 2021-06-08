@@ -14,7 +14,7 @@ def callback_function(logger:logging.Logger, payload, say):
 	matches:list = keyword.findall(payload.get('text'))
 	if matches is not None:
 		for match in matches:
-			word:str = match[0]
+			word:str = match[0].lower()
 			operator:str = match[1]
 			column_name:str = "MINUS" if operator == minusminus else "PLUS"
 			select_query:str = "SELECT * FROM %s WHERE key = '%s';" % (table_name, word)
