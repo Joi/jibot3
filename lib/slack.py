@@ -87,21 +87,6 @@ class app:
 		except KeyboardInterrupt:
 			self.close()
 
-	def log_to_slack(self, message, *args, **kwargs):
-		self.logging.info(message)
-		if self.webhook_client is not None:
-			self.webhook_client.send(text=message)
-
-	def slack_api_error(self, error: SlackApiError):
-		error_name = error.response['error']
-		assert(error_name)
-		if error_name == 'missing_scope':
-			missing_scope = error.response['needed']
-			message = f"The bot is missing proper oauth scope!({missing_scope}). Scopes are added to your bot at https://api.slack.com/apps."
-			self.logging.error(message)
-			self.logging.slack(message)
-		self.logging.error(error)
-
 	def load_plugins(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
 		if self.bot_slash_command is not None:
@@ -240,4 +225,18 @@ class app:
 			if action_id == 'plugin_help':
 				action['plugins'] = self.plugins
 		next()
-	pass
+
+	def log_to_slack(self, message):
+		self.logging.info(message)
+		if self.webhook_client is not None:
+			self.webhook_client.send(text=message)
+
+	def slack_api_error(self, error: SlackApiError):
+		error_name = error.response['error']
+		assert(error_name)
+		if error_name == 'missing_scope':
+			missing_scope = error.response['needed']
+			message = f"The bot is missing proper oauth scope!({missing_scope}). Scopes are added to your bot at https://api.slack.com/apps."
+			self.logging.error(message)
+			self.logging.slack(message)
+		self.logging.error(error)
