@@ -1,7 +1,12 @@
 import json
 from lib.database import SQLite
-from include.blocks.karma import get_blocks as get_karma
-from include.blocks.brain import get_blocks as get_brain
+
+from include.user_likes import blocks as user_likes
+
+# from include.blocks.karma import get_blocks as get_karma
+# from include.blocks.brain import get_blocks as get_brain
+# from include.herald import blocks as herald_blocks
+
 
 from slack_bolt.context import BoltContext
 from slack_bolt.context.ack import Ack
@@ -29,6 +34,8 @@ def callback_function(ack:Ack, body:dict, event:dict, client:WebClient, context:
 			}
 		}]
 	}
+	app_home_view['blocks'].extend(user_likes(user_id))
+
 	# if user.get('is_admin') or user.get('is_owner'):
 	# 	if user.get('is_admin'):
 	# 		app_home_view['blocks'].extend([
@@ -52,16 +59,15 @@ def callback_function(ack:Ack, body:dict, event:dict, client:WebClient, context:
 	# 				}
 	# 			},
 	# 		])
-	app_home_view['blocks'].append({
-		"type": "header",
-		"text": { "type": "plain_text", "text": ":yin_yang: Karma" }
-	})
-	app_home_view['blocks'].extend(get_karma())
-
-	app_home_view['blocks'].append({
-		"type": "header",
-		"text": { "type": "plain_text", "text": ":brain: Brains" }
-	})
-	app_home_view['blocks'].extend(get_brain())
+	# app_home_view['blocks'].append({
+	# 	"type": "header",
+	# 	"text": { "type": "plain_text", "text": ":yin_yang: Karma" }
+	# })
+	# app_home_view['blocks'].extend(get_karma())
+	# app_home_view['blocks'].append({
+	# 	"type": "header",
+	# 	"text": { "type": "plain_text", "text": ":brain: Brains" }
+	# })
+	# app_home_view['blocks'].extend(get_brain())
 	if view_id is None: client.views_publish(user_id=context.get('user_id'),view=json.dumps(app_home_view))
 	else: client.views_update(view_id=view.get('id'), view=json.dumps(app_home_view))
