@@ -3,13 +3,13 @@ import logging
 import os
 from slack_bolt import Ack, BoltRequest
 from slack_sdk.web import WebClient
+from lib.slack import slack_bot_slash_command as bot_slash_command
 
 def callback_function(ack:Ack, action:dict, client:WebClient, context, logger:logging.Logger, request:BoltRequest):
 	ack()
 	container = request.body.get('container')
 	view:dict = request.body.get(container.get('type'))
 	plugins = action.get('plugins', None)
-	bot_slash_command:str = os.environ.get("JIBOT_SLACK_SLASH_COMMAND", None)
 	plugin_help_content:list = []
 	if plugins is not None:
 		for plugin in plugins:

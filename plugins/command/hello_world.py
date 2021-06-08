@@ -1,4 +1,6 @@
 import os
+from lib.slack import slack_bot_slash_command as bot_slash_command
+
 def callback_function(ack, client, request, respond, command):
 	ack()
 	response_url = request.body.get('response_url', None)
@@ -11,6 +13,4 @@ def callback_function(ack, client, request, respond, command):
 			channel=user_id,
 			text=f"Hello <@{user_id}>! :wave:"
 		)
-
-bot_slash_command:str = os.environ.get("JIBOT_SLACK_SLASH_COMMAND", None)
-callback_function.__doc__ = f"When a user types `{bot_slash_command} hello world` the bot says hello back."
+callback_function.__doc__ = f"When a user types `/{bot_slash_command} hello world` the bot says hello back."
