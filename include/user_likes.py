@@ -1,4 +1,4 @@
-from lib.database import SQLite
+from lib.database import SQLite, db_query, get_table, create_table
 from lib.slack import whitespace
 
 from pathlib import Path
@@ -20,25 +20,14 @@ content_re:str = "(?P<content>.[^.]*)"
 keyword:re = re.compile(f"({i_like_re}|{user_likes_re}){space_re}{content_re}")
 table_name = Path(__file__).stem
 
-db:SQLite = SQLite()
-get_table = db.cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}'")
-if get_table is None:
-	db.cursor.execute(f"CREATE TABLE IF NOT EXISTS {table_name} (ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, USER_ID text NOT NULL, LIKES text NOT NULL);")
-	db.connection.commit()
-db.connection.close()
-
-def db_query(**kwargs):
-	global table_name
-	columns = kwargs.get('columns', "*")
-	order_by = kwargs.get('order_by', "ID")
-	order = kwargs.get('order', "ASC")
-	where = kwargs.get('where', "")
-	return f"SELECT DISTINCT {columns} FROM {table_name} {where} ORDER BY {order_by} {order};"
+if get_table(table_name) is None:
+	create_table(table_name, "(ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, USER_ID text NOT NULL, LIKES text NOT NULL)")
 
 def blocks(user_id:str):
+	global table_name
 	blocks:list = []
 	db:SQLite = SQLite()
-	query = db_query(columns="LIKES", order_by="LIKES", where='WHERE USER_ID=?')
+	query = db_query(table_name, columns="LIKES", order_by="LIKES", distinct=True, where='WHERE USER_ID=?')
 	db_response = db.cursor.execute(query, [user_id]).fetchall()
 	if db_response is not None:
 		blocks.append({
