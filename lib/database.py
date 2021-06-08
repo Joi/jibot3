@@ -22,7 +22,7 @@ def get_table(table_name):
 
 def create_table(table_name:str, table_details:str):
 	db:SQLite = SQLite()
-	db.cursor.execute(f"CREATE TABLE IF NOT EXISTS {table_name} {table_details};")
+	db.cursor.execute(f"CREATE TABLE IF NOT EXISTS {table_name} ({table_details});")
 
 def db_query(table_name, **kwargs):
 	distinct = "DISTINCT" if kwargs.get('distinct', False) is True else ""
