@@ -94,7 +94,7 @@ def callback_function(ack: Ack, client:WebClient, context, logger:logging.Logger
 						"text": "View Brains",
 						"emoji": True
 					},
-					"action_id": "brain",
+					"action_id": "definition",
 				}
 			},
 		]
