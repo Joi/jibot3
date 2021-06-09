@@ -1,4 +1,4 @@
-from lib.database import SQLite, db_query, get_table, create_table
+from lib.database import SQLite, select_query, get_table, create_table
 from pathlib import Path
 import logging
 import re
@@ -16,7 +16,7 @@ def blocks():
 	global table_name
 	blocks:list = []
 	db:SQLite = SQLite()
-	karma_karma_karma_karma_karma_queryaaaaa:str = db_query(table_name)
+	karma_karma_karma_karma_karma_queryaaaaa:str = select_query(table_name)
 	karma = db.cursor.execute(karma_karma_karma_karma_karma_queryaaaaa).fetchall()
 	if karma is not None:
 		for k in karma:
@@ -40,6 +40,7 @@ def callback_function(logger:logging.Logger, payload, say):
 	global table_name
 	matches:list = keyword.findall(payload.get('text'))
 	if matches is not None:
+		db:SQLite = SQLite()
 		for match in matches:
 			word:str = match[0].lower()
 			operator:str = match[1]
