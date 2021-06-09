@@ -20,6 +20,7 @@ def get_table(table_name):
 	db:SQLite = SQLite()
 	return db.cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}'")
 
+
 def create_table(table_name:str, table_details:str):
 	db:SQLite = SQLite()
 	db.cursor.execute(f"CREATE TABLE IF NOT EXISTS {table_name} ({table_details});")
