@@ -1,7 +1,7 @@
 import logging
 from slack_bolt import Ack, BoltRequest
 from slack_sdk.web import WebClient
-from include.blocks.shared_links import get_blocks as get_shared_links
+from include.shared_links import blocks as get_shared_links
 
 def callback_function(ack:Ack, client:WebClient, logger:logging.Logger, request:BoltRequest):
 	container = request.body.get('container', None)
