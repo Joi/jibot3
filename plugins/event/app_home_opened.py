@@ -2,7 +2,7 @@ import json
 from lib.database import SQLite
 
 from include.user_likes import blocks as user_likes
-
+from include.karma import blocks as karma
 # from include.blocks.karma import get_blocks as get_karma
 # from include.blocks.brain import get_blocks as get_brain
 # from include.herald import blocks as herald_blocks
@@ -35,6 +35,7 @@ def callback_function(ack:Ack, body:dict, event:dict, client:WebClient, context:
 		}]
 	}
 	app_home_view['blocks'].extend(user_likes(user_id))
+	# app_home_view['blocks'].extend(karma())
 
 	# if user.get('is_admin') or user.get('is_owner'):
 	# 	if user.get('is_admin'):
