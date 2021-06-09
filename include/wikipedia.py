@@ -19,4 +19,3 @@ def callback_function(ack, context, payload, say, respond:Respond):
 	else:
 		say(text=" ".join(message))
 	ack()
-callback_function.__doc__ = f"Wikipedia lookup"
