@@ -21,7 +21,7 @@ keyword:re = re.compile(f"({i_like_re}|{user_likes_re}){space_re}{content_re}", 
 table_name = Path(__file__).stem
 
 if get_table(table_name) is None:
-	create_table(table_name, "(ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, USER_ID text NOT NULL, LIKES text NOT NULL)")
+	create_table(table_name, "ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, USER_ID text NOT NULL, LIKES text NOT NULL")
 
 def blocks(user_id:str):
 	global table_name
