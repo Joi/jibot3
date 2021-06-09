@@ -1,8 +1,7 @@
-import json
 import logging
 from slack_bolt import Ack, BoltRequest
 from slack_sdk.web import WebClient
-from include.definition import blocks as get_definitions
+import include.definition as definitions
 
 def callback_function(ack:Ack, client:WebClient, logger:logging.Logger, request:BoltRequest):
 	container = request.body.get('container', None)
@@ -17,7 +16,7 @@ def callback_function(ack:Ack, client:WebClient, logger:logging.Logger, request:
 			"type": view.get('type'),
 			"title": title,
 			"close": close_button,
-			"blocks": get_definitions()
+			"blocks": definitions.blocks()
 		}
 	)
 	ack()

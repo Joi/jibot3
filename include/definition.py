@@ -31,7 +31,6 @@ def _select(key:str = None):
 		query:str = select_query(table_name, columns="KEY, json(DEFS)")
 		db_response =  db.cursor.execute(query, [key]).fetchall()
 	else:
-		# query:str = f"SELECT json(DEFS) FROM {table_name} WHERE key=?"
 		query:str = select_query(table_name, columns="KEY, json(DEFS)", where="WHERE key=?")
 		values = db.cursor.execute(query, [key]).fetchone()
 		if type(values) == type(tuple()):
