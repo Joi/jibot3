@@ -24,7 +24,7 @@ def create_table(table_name:str, table_details:str):
 	db:SQLite = SQLite()
 	db.cursor.execute(f"CREATE TABLE IF NOT EXISTS {table_name} ({table_details});")
 
-def db_query(table_name, **kwargs):
+def select_query(table_name, **kwargs):
 	distinct = "DISTINCT" if kwargs.get('distinct', False) is True else ""
 	columns = kwargs.get('columns', "*")
 	order_by = kwargs.get('order_by', "key")
