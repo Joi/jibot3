@@ -1,4 +1,4 @@
-from include.user_likes import blocks as user_likes
+import include.user_likes as user_likes
 from slack_bolt.context import BoltContext
 from slack_bolt.context.ack import Ack
 from slack_sdk import WebClient
@@ -45,6 +45,6 @@ def callback_function(ack:Ack, event:dict, client:WebClient, context: BoltContex
 					}
 				},
 			])
-	app_home_view['blocks'].extend(user_likes(user_id))
+	app_home_view['blocks'].extend(user_likes.blocks(user_id))
 	if view_id is None: client.views_publish(user_id=context.get('user_id'),view=json.dumps(app_home_view))
 	else: client.views_update(view_id=view.get('id'), view=json.dumps(app_home_view))

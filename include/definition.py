@@ -19,7 +19,7 @@ definition_re:str = "(?P<definition>\w+)"
 keyword:re = re.compile(f"({user_re}|{object_re}){space_re}{operator_re}{space_re}{definition_re}")
 table_name = Path(__file__).stem
 
-if get_table(table_name) is None:
+if get_table(table_name).rowcount == -1:
 	create_table(table_name, "key text PRIMARY KEY, DEFS json")
 
 def _select(key:str = None):

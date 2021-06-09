@@ -7,7 +7,7 @@ import sqlite3
 
 keyword:re = re.compile("(\w+:\/\/[-a-zA-Z0-9:@;?&=\/%\+\.\*!'\(\),\$_\{\}\^~\[\]`#|]+)", re.IGNORECASE)
 table_name:str = Path(__file__).stem
-if get_table(table_name) is None:
+if get_table(table_name).rowcount == -1:
 	create_table(table_name, "ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, URL text NOT NULL")
 
 def callback_function(logger:logging.Logger, payload:dict):

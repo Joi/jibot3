@@ -20,9 +20,11 @@ content_re:str = "(?P<content>.[^.]*)"
 keyword:re = re.compile(f"({i_like_re}|{user_likes_re}){space_re}{content_re}", re.IGNORECASE)
 table_name = Path(__file__).stem
 
-if get_table(table_name) is None:
+if get_table(table_name).rowcount == -1:
 	create_table(table_name, "ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, USER_ID text NOT NULL, LIKES text NOT NULL")
 
+
+	print()
 def blocks(user_id:str):
 	global table_name
 	blocks:list = []

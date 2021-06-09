@@ -9,7 +9,7 @@ minusminus:str = "--"
 keyword:re = re.compile(f"(<@\w+>|\w+)({plusplus}|{minusminus})")
 table_name:str = Path(__file__).stem
 
-if get_table(table_name) is None:
+if get_table(table_name).rowcount == -1:
 	create_table(table_name, "key text PRIMARY KEY, PLUS int DEFAULT 0, MINUS int DEFAULT 0")
 
 def blocks():
