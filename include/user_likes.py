@@ -62,5 +62,3 @@ def callback_function(logger:logging.Logger, payload, say):
 			content = match.group('content')
 			db.cursor.execute(f"INSERT INTO {table_name} (USER_ID, LIKES) VALUES(?, ?)", (user_id, content))
 			db.connection.commit()
-
-callback_function.__doc__ = "The bot will watch for phrases indicating that users like things, and will keep track of it."
