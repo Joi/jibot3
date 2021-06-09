@@ -8,7 +8,7 @@ import re
 space_re = f"({whitespace})+"
 self_affirmatives: str = "|".join(["like", "love"])
 self_affirmative_re:str = f"({self_affirmatives})"
-i_like_re:str = f"(?P<self_reference>I {self_affirmative_re})"
+i_like_re:str = f"(?P<self_reference>I{space_re}{self_affirmative_re})"
 
 affirmatives: str = "|".join(["likes", "loves"])
 affirmative_re:str = f"({affirmatives})"
@@ -17,7 +17,7 @@ user_mention_re = "(<@(?P<user_id>[A-Z0-9]+)>)"
 user_likes_re = f"{user_mention_re}{space_re}{affirmative_re}"
 content_re:str = "(?P<content>.[^.]*)"
 
-keyword:re = re.compile(f"({i_like_re}|{user_likes_re}){space_re}{content_re}")
+keyword:re = re.compile(f"({i_like_re}|{user_likes_re}){space_re}{content_re}", re.IGNORECASE)
 table_name = Path(__file__).stem
 
 if get_table(table_name) is None:
