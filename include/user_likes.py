@@ -1,4 +1,4 @@
-from lib.database import SQLite, db_query, get_table, create_table
+from lib.database import SQLite, select_query, get_table, create_table
 from lib.slack import whitespace
 
 from pathlib import Path
@@ -27,7 +27,7 @@ def blocks(user_id:str):
 	global table_name
 	blocks:list = []
 	db:SQLite = SQLite()
-	query = db_query(table_name, columns="LIKES", order_by="LIKES", distinct=True, where='WHERE USER_ID=?')
+	query = select_query(table_name, columns="LIKES", order_by="LIKES", distinct=True, where='WHERE USER_ID=?')
 	db_response = db.cursor.execute(query, [user_id]).fetchall()
 	if db_response is not None:
 		blocks.append({
