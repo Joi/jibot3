@@ -12,11 +12,11 @@ class Plugin:
 			self.type = plugin_type
 			self.callback = plugin_code.callback_function
 			if hasattr(plugin_code, 'keyword'):
-				keyword = plugin_code.keyword
-				self.keyword = plugin_code.keyword
-				if type(keyword) == type(re.compile("/.*/")):
-					self.regex = keyword
+				if type(plugin_code.keyword) == type(re.compile("/.*/")):
+					self.regex = plugin_code.keyword
 					self.keyword = file_name
+				else:
+					self.keyword = plugin_code.keyword
 			else:
 				self.keyword = file_name
 			arg_regex = re.compile("((?P<event_name>\w+)\/)?(?P<arg>\w+)")
