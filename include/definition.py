@@ -44,6 +44,24 @@ def _define(key, value):
 	db.cursor.execute(f"INSERT OR REPLACE INTO {table_name} VALUES(?, json(?))", (key, json.dumps(value)))
 	db.connection.commit()
 
+def blocks():
+	blocks:list = []
+	db:SQLite = SQLite()
+	definition_query:str = "SELECT * FROM definition ORDER BY key ASC;"
+	definition = db.cursor.execute(definition_query).fetchall()
+	if definition is not None:
+		for d in definition:
+			thing:str = d[0]
+			definitions = json.loads(d[1])
+			blocks.append({
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": f"*{thing}:* {', '.join(definitions)}"
+				}
+			})
+	return(blocks)
+
 def callback_function(logger:logging.Logger, payload, request, say):
 	global keyword, table_name, plus_operators, minus_operators
 	text = payload.get('text')
