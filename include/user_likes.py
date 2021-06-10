@@ -21,10 +21,8 @@ keyword:re = re.compile(f"({i_like_re}|{user_likes_re}){space_re}{content_re}", 
 table_name = Path(__file__).stem
 
 if get_table(table_name).rowcount == -1:
-	create_table(table_name, "ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, USER_ID text NOT NULL, LIKES text NOT NULL")
+	create_table(table_name, "ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, USER_ID text NOT NULL, LIKES text NOT NULL, UNIQUE(USER_ID, LIKES)")
 
-
-	print()
 def blocks(user_id:str):
 	global table_name
 	blocks:list = []
@@ -62,5 +60,5 @@ def callback_function(logger:logging.Logger, payload, say):
 			if self_reference is not None:
 				user_id = payload.get('user')
 			content = match.group('content')
-			db.cursor.execute(f"INSERT INTO {table_name} (USER_ID, LIKES) VALUES(?, ?)", (user_id, content))
+			db.cursor.execute(f"INSERT OR IGNORE INTO {table_name} (USER_ID, LIKES) VALUES(?, ?)", (user_id, content))
 			db.connection.commit()
