@@ -10,19 +10,6 @@ table_name:str = Path(__file__).stem
 if get_table(table_name).rowcount == -1:
 	create_table(table_name, "ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, URL text NOT NULL")
 
-def callback_function(logger:logging.Logger, payload:dict):
-	global table_name
-	db:SQLite = SQLite()
-	matches:list = keyword.findall(payload.get('text'))
-	if matches is not None:
-		for url in matches:
-			logger.info(f"Saving link: {url}")
-			try:
-				db.cursor.execute(f"INSERT INTO {table_name} (URL) VALUES(?)", (url,))
-				db.connection.commit()
-			except sqlite3.Error as e:
-				logger.error(e)
-
 def blocks():
 	blocks:list = []
 	db:SQLite = SQLite()
@@ -41,3 +28,16 @@ def blocks():
 				},
 			})
 	return(blocks)
+
+def callback_function(logger:logging.Logger, payload:dict):
+	global table_name
+	db:SQLite = SQLite()
+	matches:list = keyword.findall(payload.get('text'))
+	if matches is not None:
+		for url in matches:
+			logger.info(f"Saving link: {url}")
+			try:
+				db.cursor.execute(f"INSERT INTO {table_name} (URL) VALUES(?)", (url,))
+				db.connection.commit()
+			except sqlite3.Error as e:
+				logger.error(e)
