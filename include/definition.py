@@ -9,8 +9,6 @@ from pathlib import Path
 from slack_bolt import Ack, BoltRequest, BoltResponse, Respond, Say
 from stop_words import get_stop_words
 
-
-
 def _select(key:str = None):
 	logging.debug(inspect.currentframe().f_code.co_name)
 	db:SQLite = SQLite()
