@@ -1,8 +1,10 @@
 import ast
 import glob
 import inspect
+import importlib
 import logging
 import os
+from pathlib import Path
 import re
 from slack_bolt import BoltRequest
 
@@ -68,6 +70,14 @@ class app:
 	plugins:list = []
 	logging = logging
 
+	event_types:list = [
+		# "action",
+		# "command",
+		# "event",
+		"message",
+		"shortcut"
+	]
+
 	def __init__(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
 		self.bolt = App(
@@ -89,27 +99,46 @@ class app:
 
 	def load_plugins(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
-		if self.bot_slash_command is not None:
-			self.bolt.command(f"/{self.bot_slash_command}")(self.events_with_arguments_listener)
-		plugin_files = glob.glob(self.plugins_dir + os.sep + "**" + os.sep + "[!__]*.py", recursive=True)
-		path_regex = re.compile("^plugins\/(\w+)\/(.+)\.py$")
+		plugins_dir:str = self.app_dir + os.sep +  'include'
+		plugin_files = glob.glob(plugins_dir + os.sep + "[!__]*.py", recursive=True)
 		for plugin_path in plugin_files:
 			relative_path = os.path.relpath(plugin_path, os.getcwd())
-			matches = path_regex.match(relative_path)
-			if matches is not None:
-				file_name = matches.group(2)
-				import_path = matches.group(0).replace(".py", "").replace(os.sep, ".")
-				plugin_type = matches.group(1)
-				plugin = Plugin(file_name, import_path, plugin_type)
-				self.plugins.append(plugin)
-				bolt_event_handler:callable = getattr(self.bolt, plugin.type)
-				if plugin.type == 'command' or plugin.event_name is not None:
-					bolt_event_handler(plugin.event_name)(self.events_with_arguments_listener)
-				else:
-					listener_keyword_or_regex = plugin.keyword
-					if plugin.regex is not None:
-						listener_keyword_or_regex = plugin.regex
-					bolt_event_handler(listener_keyword_or_regex)(plugin.callback)
+			import_path = relative_path.replace(".py", "").replace(os.sep, ".")
+			file_name = Path(plugin_path).stem
+			plugin = importlib.import_module(import_path)
+			for event_type in self.event_types:
+				if hasattr(plugin, event_type):
+					callback = getattr(plugin, event_type)
+					keyword:str|re = None
+					if hasattr(callback, 'keyword'):
+						keyword = getattr(callback, 'keyword')
+					else:
+						keyword = file_name
+					event_handler:callable = getattr(self.bolt, event_type)
+					event_handler(keyword)(callback)
+
+		#
+		# if self.bot_slash_command is not None:
+		# 	self.bolt.command(f"/{self.bot_slash_command}")(self.events_with_arguments_listener)
+		# plugin_files = glob.glob(self.plugins_dir + os.sep + "**" + os.sep + "[!__]*.py", recursive=True)
+		# path_regex = re.compile("^plugins\/(\w+)\/(.+)\.py$")
+		# for plugin_path in plugin_files:
+		# 	relative_path = os.path.relpath(plugin_path, os.getcwd())
+		# 	matches = path_regex.match(relative_path)
+		# 	if matches is not None:
+		# 		file_name = matches.group(2)
+		# 		import_path = matches.group(0).replace(".py", "").replace(os.sep, ".")
+		# 		plugin_type = matches.group(1)
+		# 		plugin = Plugin(file_name, import_path, plugin_type)
+		# 		self.plugins.append(plugin)
+		# 		bolt_event_handler:callable = getattr(self.bolt, plugin.type)
+		# 		if plugin.type == 'command' or plugin.event_name is not None:
+		# 			bolt_event_handler(plugin.event_name)(self.events_with_arguments_listener)
+		# 		else:
+		# 			listener_keyword_or_regex = plugin.keyword
+		# 			if plugin.regex is not None:
+		# 				listener_keyword_or_regex = plugin.regex
+		# 			bolt_event_handler(listener_keyword_or_regex)(plugin.callback)
 
 	def start(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
