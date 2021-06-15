@@ -16,14 +16,33 @@ class SQLite():
 		except Error as e:
 			logging.error(e)
 
-def get_table(table_name):
+def column_exists(table_name:str, column_name:str):
 	db:SQLite = SQLite()
-	return db.cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}'")
+	exists:bool = False
+	try:
+		db_response = db.cursor.execute(f"SELECT {column_name} from {table_name} LIMIT 1;")
+		exists = True
+	except:
+		pass
+	return exists
 
+def table_exists(table_name:str):
+	db:SQLite = SQLite()
+	exists:bool = False
+	try:
+		db_response:Cursor = db.cursor.execute(f"SELECT count(name) FROM sqlite_master WHERE type='table' AND name='{table_name}'")
+		exists = db.cursor.fetchone()[0] == 1
+	except:
+		pass
+	return exists
 
 def create_table(table_name:str, table_details:str):
 	db:SQLite = SQLite()
 	db.cursor.execute(f"CREATE TABLE IF NOT EXISTS {table_name} ({table_details});")
+
+def delete_table(table_name:str):
+	db:SQLite = SQLite()
+	db.cursor.execute(f"DROP TABLE IF EXISTS {table_name};")
 
 def select_query(table_name, **kwargs):
 	distinct = "DISTINCT" if kwargs.get('distinct', False) is True else ""
@@ -32,3 +51,6 @@ def select_query(table_name, **kwargs):
 	order = kwargs.get('order', "ASC")
 	where = kwargs.get('where', "")
 	return f"SELECT {distinct} {columns} FROM {table_name} {where} ORDER BY {order_by} {order};"
+
+def delete_query(table_name:str, where:str):
+	return f"DELETE FROM {table_name} {where};"
