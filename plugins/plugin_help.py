@@ -1,7 +1,5 @@
-import json
 from lib.plugin import Plugin
 import logging
-import os
 from slack_bolt import Ack, BoltRequest
 from slack_sdk.web import WebClient
 from lib.slack import slack_bot_slash_command as bot_slash_command
@@ -17,11 +15,12 @@ class action:
 			for p in plugins:
 				plugin:Plugin = p
 				if plugin.callback.__doc__ is not None:
+					label = plugin.keyword if type(plugin.keyword) == type("") else plugin.file_name
 					plugin_help_content.append({
 						"type": "section",
 						"text": {
 							"type": "mrkdwn",
-							"text": plugin.callback.__doc__
+							"text": f"*{label}:* {plugin.callback.__doc__}"
 						}
 					})
 		title:dict = view.get('title')
