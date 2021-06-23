@@ -6,7 +6,6 @@ import logging
 import os
 from pathlib import Path
 import re
-from slack_bolt import BoltRequest
 
 # from http.server import  HTTPServer
 # from pyngrok import ngrok
@@ -69,15 +68,6 @@ class app:
 	users = None
 	plugins:list = []
 	logging = logging
-
-	event_types:list = [
-		# "action",
-		# "command",
-		# "event",
-		"message",
-		"shortcut"
-	]
-
 	def __init__(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
 		self.bolt = App(
@@ -99,46 +89,16 @@ class app:
 
 	def load_plugins(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
-		plugins_dir:str = self.app_dir + os.sep +  'include'
-		plugin_files = glob.glob(plugins_dir + os.sep + "[!__]*.py", recursive=True)
+		plugin_files = glob.glob(self.plugins_dir + os.sep + "**" + os.sep + "[!__]*.py", recursive=True)
+
 		for plugin_path in plugin_files:
 			relative_path = os.path.relpath(plugin_path, os.getcwd())
 			import_path = relative_path.replace(".py", "").replace(os.sep, ".")
-			file_name = Path(plugin_path).stem
-			plugin = importlib.import_module(import_path)
-			for event_type in self.event_types:
-				if hasattr(plugin, event_type):
-					callback = getattr(plugin, event_type)
-					keyword:str|re = None
-					if hasattr(callback, 'keyword'):
-						keyword = getattr(callback, 'keyword')
-					else:
-						keyword = file_name
-					event_handler:callable = getattr(self.bolt, event_type)
-					event_handler(keyword)(callback)
-
-		#
-		# if self.bot_slash_command is not None:
-		# 	self.bolt.command(f"/{self.bot_slash_command}")(self.events_with_arguments_listener)
-		# plugin_files = glob.glob(self.plugins_dir + os.sep + "**" + os.sep + "[!__]*.py", recursive=True)
-		# path_regex = re.compile("^plugins\/(\w+)\/(.+)\.py$")
-		# for plugin_path in plugin_files:
-		# 	relative_path = os.path.relpath(plugin_path, os.getcwd())
-		# 	matches = path_regex.match(relative_path)
-		# 	if matches is not None:
-		# 		file_name = matches.group(2)
-		# 		import_path = matches.group(0).replace(".py", "").replace(os.sep, ".")
-		# 		plugin_type = matches.group(1)
-		# 		plugin = Plugin(file_name, import_path, plugin_type)
-		# 		self.plugins.append(plugin)
-		# 		bolt_event_handler:callable = getattr(self.bolt, plugin.type)
-		# 		if plugin.type == 'command' or plugin.event_name is not None:
-		# 			bolt_event_handler(plugin.event_name)(self.events_with_arguments_listener)
-		# 		else:
-		# 			listener_keyword_or_regex = plugin.keyword
-		# 			if plugin.regex is not None:
-		# 				listener_keyword_or_regex = plugin.regex
-		# 			bolt_event_handler(listener_keyword_or_regex)(plugin.callback)
+			plugin = Plugin(importlib.import_module(import_path))
+			event_handler:callable = getattr(self.bolt, plugin.type)
+			if hasattr(self.bolt, plugin.type):
+				event_handler(plugin.keyword)(plugin.callback)
+				self.plugins.append(plugin)
 
 	def start(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
@@ -228,31 +188,8 @@ class app:
 			except SlackApiError as e:
 				self.slack_api_error(e)
 
-	def events_with_arguments_listener(self, command, context, event, logger, payload, request:BoltRequest, response):
-		logger.debug(inspect.currentframe().f_code.co_name)
-		callback_args = locals()
-		del(callback_args['self'])
-		plugin_type:str = None
-		if command is not None: plugin_type = "command"
-		if event is not None: plugin_type = "event"
-		text = get_bot_mention_text(context.get('bot_user_id'), payload.get('text'))
-		keyword = text.split()[0] if text is not None else None
-		for plugin in self.plugins:
-			if plugin_type == plugin.type and keyword == plugin.keyword:
-				arg_names = inspect.getfullargspec(plugin.callback).args
-				plugin.callback(**build_required_kwargs(
-					logger=logger,
-					request=request,
-					response=response,
-					required_arg_names=arg_names,
-					this_func=plugin.callback,
-				))
-
-	def global_middleware_listener(self, logger:logging.Logger, action, next, request, shortcut, view):
-		if action is not None:
-			action_id = action.get('action_id', None)
-			if action_id == 'plugin_help':
-				action['plugins'] = self.plugins
+	def global_middleware_listener(self, payload:dict, next):
+		payload['plugins'] = self.plugins
 		next()
 
 	def log_to_slack(self, message):
