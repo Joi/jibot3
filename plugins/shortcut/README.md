@@ -1,4 +1,0 @@
-# Slack Shortcuts
-Shortcuts are similar to slack commands, but accept no direct user input. A shortcut can be used to create UI elements to allow multiple functionalities to be available within one shortcut. Each shortcut must be created within the [slack app configuration](https://api.slack.com/apps/) (Features -> Interactivity & Shortcuts) before a listener will catch it at execute the callback function.
-
-Shortcuts are involved globally (via the shortcuts menu on the chat input: a lightning icon) or per message(using the `[...]` context menu on a single slack message). Each shortcut requires a `Callback ID` and this callback ID will correspond to the filename in this directory.
