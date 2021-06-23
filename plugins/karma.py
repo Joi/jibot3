@@ -59,6 +59,7 @@ class action:
 		ack()
 class message:
 	keyword:re = re.compile(f"(<@\w+>|\w+)({plusplus}|{minusminus})")
+	__doc__ = "Typing `[WORD]++` adds to the karma of [WORD]. `[WORD]--` subtracts from the karma of [WORD]."
 	def __init__(self, logger:logging.Logger, payload:dict, say:Say):
 		matches:list = self.keyword.findall(payload.get('text'))
 		if matches is not None:
