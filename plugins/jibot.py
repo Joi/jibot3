@@ -12,7 +12,7 @@ from slack_sdk.web import WebClient
 class command:
 	keyword = f"/{Path(__file__).stem}"
 	__doc__ = "\n".join([
-		f"The following functions are examples of available slash command functions:",
+		f"The following functions are examples of available bot slash commands:",
 		f"`{keyword} wikipedia [SEARCH TERM OR PHRASE]`",
 		f"`{keyword} hello_world`",
 		# etc
@@ -40,7 +40,7 @@ class command:
 		respond(f"HELLO <@{payload['user_id']}> :wave: !")
 
 class shortcut:
-	def __init__(Ack, client:WebClient, shortcut:dict):
+	def __init__(self, ack:Ack, client:WebClient, shortcut:dict):
 		view = {
 			"type": "modal",
 			"title": {
@@ -70,22 +70,22 @@ class shortcut:
 						"action_id": "plugin_help",
 					}
 				},
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": "Configuration options and settings things."
-					},
-					"accessory": {
-						"type": "button",
-						"text": {
-							"type": "plain_text",
-							"text": "Configuration",
-							"emoji": True
-						},
-						"action_id": "bot_config",
-					}
-				},
+				# {
+				# 	"type": "section",
+				# 	"text": {
+				# 		"type": "mrkdwn",
+				# 		"text": "Configuration options and settings things."
+				# 	},
+				# 	"accessory": {
+				# 		"type": "button",
+				# 		"text": {
+				# 			"type": "plain_text",
+				# 			"text": "Configuration",
+				# 			"emoji": True
+				# 		},
+				# 		"action_id": "bot_config",
+				# 	}
+				# },
 				{
 					"type": "section",
 					"text": {
