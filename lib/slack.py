@@ -6,20 +6,11 @@ import logging
 import os
 from pathlib import Path
 import re
-
-# from http.server import  HTTPServer
-# from pyngrok import ngrok
-# from threading import Thread
-
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
-from slack_bolt.kwargs_injection import build_required_kwargs
 from slack_sdk.errors import SlackApiError
-from slack_sdk.webhook import WebhookClient
-from slack_sdk.web import WebClient
 
 from lib.plugin import Plugin
-# from lib.server import WebhookServerHandler
 
 whitespace:str = "|".join([' ', '\xa0'])
 slack_app_token:str = os.environ.get("JIBOT_SLACK_APP_TOKEN", None)
@@ -67,6 +58,13 @@ class app:
 	bot_channels:list = []
 	users = None
 	plugins:list = []
+	event_types:list = [
+		"action",
+		"command",
+		"event",
+		"message",
+		"shortcut"
+	]
 	logging = logging
 	def __init__(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
@@ -90,26 +88,19 @@ class app:
 	def load_plugins(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
 		plugin_files = glob.glob(self.plugins_dir + os.sep + "**" + os.sep + "[!__]*.py", recursive=True)
-
 		for plugin_path in plugin_files:
 			relative_path = os.path.relpath(plugin_path, os.getcwd())
 			import_path = relative_path.replace(".py", "").replace(os.sep, ".")
-			plugin = Plugin(importlib.import_module(import_path))
-			event_handler:callable = getattr(self.bolt, plugin.type)
-			if hasattr(self.bolt, plugin.type):
-				event_handler(plugin.keyword)(plugin.callback)
-				self.plugins.append(plugin)
+			for event_type in self.event_types:
+				plugin = Plugin(event_type, importlib.import_module(import_path))
+				if plugin.callback is not None:
+					event_handler:callable = getattr(self.bolt, plugin.type)
+					if hasattr(self.bolt, plugin.type):
+						event_handler(plugin.keyword)(plugin.callback)
+						self.plugins.append(plugin)
 
 	def start(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
-		# if (self.has_ngrok is True):
-		# 	self.webhook_proxy_server = Thread(target=self.start_webhook_http_server)
-		# 	self.webhook_proxy_server.start()
-		# 	ngrok_tunnel = ngrok.connect(
-		# 		self.webhook_proxy_port,
-		# 		"http",
-		# 		subdomain=self.ngrok_hostname,
-		# 	)
 		if self.do_socket_mode is True:
 			self.socket_mode = SocketModeHandler(self.bolt, self.app_token)
 			self.socket_mode.start()
@@ -122,16 +113,6 @@ class app:
 		if self.do_socket_mode is True:
 			self.logging.info("Disconnecting socket mode...")
 			self.socket_mode.disconnect()
-		# if self.has_ngrok is True:
-		# 	self.logging.info("Shutting down ngrok and webhook proxy...")
-		# 	ngrok.kill()
-		# 	self.webhook_proxy_server.
-
-	# def start_webhook_http_server(self):
-	# 	self.logging.debug(inspect.currentframe().f_code.co_name)
-	# 	webhook_server_address = ('localhost', self.webhook_proxy_port)
-	# 	webhook_server = HTTPServer(webhook_server_address, WebhookServerHandler)
-	# 	webhook_server.serve_forever()
 
 	def test_slack_client_connection(self):
 		self.logging.debug(inspect.currentframe().f_code.co_name)
