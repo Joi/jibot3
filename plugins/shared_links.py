@@ -57,6 +57,7 @@ class action:
 		)
 		ack()
 class message:
+	__doc__ = "The bot will save any shared links that is sees. You can view this in the app home."
 	keyword:re = re.compile("(\w+:\/\/[-a-zA-Z0-9:@;?&=\/%\+\.\*!'\(\),\$_\{\}\^~\[\]`#|]+)", re.IGNORECASE)
 	def __init__(self, logger:logging.Logger, payload:dict):
 		db:SQLite = SQLite()
