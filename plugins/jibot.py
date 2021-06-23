@@ -18,6 +18,7 @@ class command:
 		# etc
 	])
 	def __init__(self, ack:Ack, logger:logging.Logger, payload:dict, request:BoltRequest, response: BoltResponse):
+		ack()
 		keyword = payload.get('text').split()[0]
 		if hasattr(self, keyword):
 			event_handler = getattr(self, keyword)
@@ -29,18 +30,22 @@ class command:
 				required_arg_names=arg_names,
 				this_func=event_handler,
 			))
-			ack()
 
-	def wikipedia(self, payload:dict, respond:Respond):
+
+	def wikipedia(self, ack: Ack, payload:dict, respond:Respond):
+		ack()
 		search_term = payload.get('text')
 		search_result = get_wikipedia_url(search_term)
 		respond(search_result)
 
-	def hello_world(self, payload:dict, respond:Respond):
+
+	def hello_world(self, ack: Ack, payload:dict, respond:Respond):
+		ack()
 		respond(f"HELLO <@{payload['user_id']}> :wave: !")
 
 class shortcut:
 	def __init__(self, ack:Ack, client:WebClient, shortcut:dict):
+		ack()
 		view = {
 			"type": "modal",
 			"title": {
