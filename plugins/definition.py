@@ -74,6 +74,7 @@ def blocks():
 
 class action:
 	def __init__(self, ack:Ack, client:WebClient, logger:logging.Logger, request:BoltRequest):
+		ack()
 		container = request.body.get('container', None)
 		view:dict = request.body.get(container.get('type'))
 		title:dict = view.get('title')
@@ -89,7 +90,7 @@ class action:
 				"blocks": blocks()
 			}
 		)
-		ack()
+
 
 class message:
 	# __doc__ = "The bot tries to learn about stuff, when you say a declarative statement, such as `[SOMETHING] is [SOMEATTRIBUTE]`, the bot will save that information."
