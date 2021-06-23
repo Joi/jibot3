@@ -92,7 +92,7 @@ class action:
 		ack()
 
 class message:
-	__doc__ = "The bot tries to learn, when you say a declarative statement, such as `[SOMETHING] is [SOMEATTRIBUTE]`, the bot will save that information."
+	# __doc__ = "The bot tries to learn about stuff, when you say a declarative statement, such as `[SOMETHING] is [SOMEATTRIBUTE]`, the bot will save that information."
 	spaces:str = "|".join([' ', '\xa0'])
 	space_re = f"({spaces})+"
 	user_re:str = "<@(?P<user_id>[A-Z0-9]+)>"
