@@ -63,7 +63,8 @@ class app:
 		"command",
 		"event",
 		"message",
-		"shortcut"
+		"shortcut",
+        "view"
 	]
 	logging = logging
 	def __init__(self):
@@ -80,6 +81,7 @@ class app:
 		self.bot_says_hi()
 		self.bolt.use(self.global_middleware_listener)
 		self.load_plugins()
+
 		try:
 			self.start()
 		except KeyboardInterrupt:
@@ -94,8 +96,8 @@ class app:
 			for event_type in self.event_types:
 				plugin = Plugin(event_type, importlib.import_module(import_path))
 				if plugin.callback is not None:
-					event_handler:callable = getattr(self.bolt, plugin.type)
 					if hasattr(self.bolt, plugin.type):
+						event_handler:callable = getattr(self.bolt, plugin.type)
 						event_handler(plugin.keyword)(plugin.callback)
 						self.plugins.append(plugin)
 
