@@ -1,5 +1,6 @@
 from lib.slack import get_bot_mention_text
 from include.wikipedia import get_url as get_wikipedia_url
+from include.zotero import Zotero
 
 from slack_bolt import Ack, BoltRequest, BoltResponse, Respond, Say
 from slack_bolt.context import BoltContext
@@ -13,8 +14,10 @@ class event:
 	__doc__ = "\n".join([
 		"The following functions are available when you @mention the bot:",
 		"`wikipedia [SEARCH TERM OR PHRASE]`",
+		"`zotero`",
 		# etc
 	])
+	zotero = Zotero().read
 	def __init__(self, ack:Ack, event:dict, client:WebClient, context:BoltContext, logger:logging.Logger, payload:dict, request:BoltRequest, response:BoltResponse):
 		text = get_bot_mention_text(context.get('bot_user_id'), payload.get('text'))
 		keyword = text.split()[0]
