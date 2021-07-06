@@ -56,7 +56,7 @@ def _cipher():
 		length=32,
 		salt=os.urandom(16),
 	)
-	passphrase = os.environ.get("JIBOT_CRYPTO_PASS_PHRASE", "").encode('UTF-8')
+	passphrase = os.environ.get("JIBOT_CRYPTO_PASS_PHRASE", "").encode('utf-8')
 	key = base64.urlsafe_b64encode(kdf.derive(passphrase))
 	fernet:Fernet = Fernet(key)
 	return fernet
