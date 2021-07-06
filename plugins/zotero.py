@@ -15,12 +15,13 @@ def _get_config(user_id):
         db:SQLite = SQLite()
         select = select_query(table_name, where=f"user_id = '{user_id}'")
         config = db.cursor.execute(select).fetchone()
-        return {
-            'user_id' : config[0],
-            'zotero_library_type' : config[1],
-            'zotero_library_id' : config[2],
-            'zotero_api_key' : config[3],
-        }
+        if config:
+            return {
+                'user_id' : config[0] if config is not None else None,
+                'zotero_library_type' : config[1] if config is not None else None,
+                'zotero_library_id' : config[2] if config is not None else None,
+                'zotero_api_key' : config[3] if config is not None else None,
+            }
 
 class view:
     keyword:str = table_name
@@ -54,7 +55,6 @@ class view:
         placeholder:str = ','.join(placeholders)
         field_names:str = ', '.join(sql_fields.keys())
         insert_query = f"INSERT OR REPLACE INTO {table_name} ({field_names}) VALUES({placeholder})"
-        print(insert_query)
         db.cursor.execute(insert_query, list(sql_fields.values()))
         db.connection.commit()
         ack()
@@ -62,7 +62,6 @@ class view:
 class action:
     keyword:str = table_name
     def __init__(self, ack:Ack, client:WebClient, context:BoltContext, logger:logging.Logger, payload:dict, request:BoltRequest):
-
         bot_config = _get_config(context.get('bot_user_id'))
 
         container = request.body.get('container', None)
@@ -94,7 +93,6 @@ class action:
             "element": {
                 "type": "plain_text_input",
                 "action_id": "zotero_library_id",
-                "initial_value": bot_config.get('zotero_library_id', ""),
                 "placeholder": {
                     "type": "plain_text",
                     "text": "Helpful placeholder text goes here",
@@ -108,6 +106,7 @@ class action:
                 "emoji": True
             }
         }
+
         library_type_options = [
             {
                 "text": {
@@ -127,8 +126,6 @@ class action:
             }
         ]
 
-        current_library_type = next((x for x in library_type_options if x.get('value') == bot_config.get('type')), library_type_options[0])
-
         library_type = {
             "type": "input",
             "element": {
@@ -138,7 +135,6 @@ class action:
                     "text": "Library Type",
                     "emoji": True
                 },
-                "initial_option": current_library_type,
                 "options": library_type_options,
                 "action_id": "zotero_library_type"
             },
@@ -148,6 +144,13 @@ class action:
                 "emoji": True
             }
         }
+
+        if bot_config:
+            current_library_type = next((x for x in library_type_options if x.get('value') == bot_config.get('zotero_library_type')), library_type_options[0])
+
+            library_type['element']["initial_option"] = current_library_type
+            library_id['element']["initial_value"] = bot_config.get('zotero_library_id')
+
         api_key = {
             "type": "input",
             "element": {
