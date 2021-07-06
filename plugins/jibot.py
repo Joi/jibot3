@@ -104,7 +104,7 @@ class shortcut:
 							"text": "Zotero Integration",
 							"emoji": True
 						},
-						"action_id": "zotero_config",
+						"action_id": "zotero",
 					}
 				},
 				{
