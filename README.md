@@ -51,6 +51,7 @@ The setup instructions presume that we have a slack robot setup already. The sla
 	pip install slack_sdk
 	pip install stop_words
 	pip install wikipedia
+	pip install Pyzotero
 
 ## Environment Variables
 Replace [] values as shown below with the appropriate values from your slack bot configuration and import as appropriate to your local development environment. **BOT_TOKEN and SIGNING_SECRET are required. JIBOT_SLACK_APP_TOKEN is required to run in socket mode**
@@ -63,6 +64,7 @@ Replace [] values as shown below with the appropriate values from your slack bot
 	JIBOT_PORT=[3000]				# Port used for bot dev server	(default 3000)
 	JIBOT_SLACK_SLASH_COMMAND=[...]	# Slash command for bot use
 	JIBOT_SLACK_USER_TOKEN=[...]	# Currently Experimental
+	JIBOT_CRYPTO_PASS_PHRASE=[PASSPHRASE]	# Used to create key to encrypt/decript sensitive stuff in db
 
 ### Using virtual environment and adding your environment variables
 I (pegnott) am using VS Code on  MacOS...  I set up a virtual environment, and adding environment variables to be loaded on activations. Here's how I did it:
@@ -85,6 +87,8 @@ I (pegnott) am using VS Code on  MacOS...  I set up a virtual environment, and a
 		source ./[venv_directory]/bin/activate
 
 * NOTE: The MS Python extension for VS Code will ask if you want to use this as a workspace -- doing so will mean that when you open a new terminal window, the virtual environment will be acticvated automatically, allowing you to skip this step next time.
+
+## Zotero Setup
 
 ## Run the bot
 	python ./app.py
