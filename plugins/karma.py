@@ -68,7 +68,7 @@ class message:
 				word:str = match[0].lower()
 				operator:str = match[1]
 				column_name:str = "MINUS" if operator == minusminus else "PLUS"
-				select_query:str = "SELECT * FROM %s WHERE key = '%s';" % (table_name, word)
+				select_query:str = select_query(table_name,  where=f"key = '{word}';")
 				karma = db.cursor.execute(select_query).fetchone()
 				if karma is None:
 					db.cursor.execute(f"INSERT INTO %s(key) VALUES('%s')" % (table_name, word))

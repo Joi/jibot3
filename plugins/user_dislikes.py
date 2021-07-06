@@ -13,7 +13,7 @@ def blocks(user_id:str):
 	global table_name
 	blocks:list = []
 	db:SQLite = SQLite()
-	query = select_query(table_name, columns="DISLIKES", order_by="DISLIKES", distinct=True, where='WHERE USER_ID=?')
+	query = select_query(table_name, columns="DISLIKES", order_by="DISLIKES", distinct=True, where='USER_ID=?')
 	db_response = db.cursor.execute(query, [user_id]).fetchall()
 	if db_response is not None:
 		blocks.append({

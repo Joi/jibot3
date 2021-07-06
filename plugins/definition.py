@@ -18,7 +18,7 @@ def _select(key:str = None):
 		query:str = select_query(table_name, columns="OBJECT, ATTRIBUTE", order_by="OBJECT")
 		db_response =  db.cursor.execute(query).fetchall()
 	else:
-		query:str = select_query(table_name, columns="OBJECT, ATTRIBUTE", order_by="OBJECT", where="WHERE OBJECT=?")
+		query:str = select_query(table_name, columns="OBJECT, ATTRIBUTE", order_by="OBJECT", where="OBJECT=?")
 		db.cursor.execute(query, [key]).fetchall()
 	# if type(values) == type(tuple()):
 	# 	db_response =  json.loads(values[0])

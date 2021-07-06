@@ -1,6 +1,11 @@
+import base64
 import logging
+import os
 import sqlite3
 from sqlite3 import Connection, Cursor, Error
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 class SQLite():
 	connection:Connection = None
@@ -44,13 +49,28 @@ def delete_table(table_name:str):
 	db:SQLite = SQLite()
 	db.cursor.execute(f"DROP TABLE IF EXISTS {table_name};")
 
+def _cipher():
+	kdf = PBKDF2HMAC(
+		algorithm=hashes.SHA256(),
+		iterations=100000,
+		length=32,
+		salt=os.urandom(16),
+	)
+	passphrase = os.environ.get("JIBOT_CRYPTO_PASS_PHRASE", "").encode('UTF-8')
+	key = base64.urlsafe_b64encode(kdf.derive(passphrase))
+	fernet:Fernet = Fernet(key)
+	return fernet
+
+cipher = _cipher()
+
 def select_query(table_name, **kwargs):
 	distinct = "DISTINCT" if kwargs.get('distinct', False) is True else ""
 	columns = kwargs.get('columns', "*")
-	order_by = kwargs.get('order_by', "key")
-	order = kwargs.get('order', "ASC")
-	where = kwargs.get('where', "")
-	return f"SELECT {distinct} {columns} FROM {table_name} {where} ORDER BY {order_by} {order};"
+
+	order_by = f"ORDER BY {kwargs.get('order_by')}" if kwargs.get('order_by') else ""
+	order = kwargs.get('order') if  kwargs.get('order') else ""
+	where = f"WHERE {kwargs.get('where')}" if kwargs.get('where') else ""
+	return f"SELECT {distinct} {columns} FROM {table_name} {where} {order_by} {order};"
 
 def delete_query(table_name:str, where:str):
 	return f"DELETE FROM {table_name} {where};"
