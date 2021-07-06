@@ -1,4 +1,5 @@
 from lib.database import SQLite, select_query, table_exists, create_table, delete_table, column_exists, cipher
+from include.zotero import Zotero
 
 from pathlib import Path
 from slack_bolt import Ack, BoltRequest, BoltResponse
@@ -11,26 +12,17 @@ table_name:str = Path(__file__).stem
 if not table_exists(table_name):
     create_table(table_name, "user_id text PRIMARY KEY UNIQUE, zotero_library_type text NOT NULL, zotero_library_id text NOT NULL, zotero_api_key BLOB NOT NULL")
 
-def _get_config(user_id):
-        db:SQLite = SQLite()
-        select = select_query(table_name, where=f"user_id = '{user_id}'")
-        config = db.cursor.execute(select).fetchone()
-        if config:
-            return {
-                'user_id' : config[0] if config is not None else None,
-                'zotero_library_type' : config[1] if config is not None else None,
-                'zotero_library_id' : config[2] if config is not None else None,
-                'zotero_api_key' : config[3] if config is not None else None,
-            }
 
 class view:
+    zotero: None
     keyword:str = table_name
+
     def __init__(self, ack:Ack, client:WebClient, context:BoltContext, logger:logging.Logger, request:BoltRequest, view:View):
-        bot_config = _get_config(context.get('bot_user_id'))
+        self.zotero = Zotero(context.get('bot_user_id'))
+        bot_config = self.zotero.config(context.get('bot_user_id'))
         state:dict = view.get('state')
         form_fields:dict = state['values']
         sql_fields:dict = { 'user_id': context.get('bot_user_id') }
-
         for i in form_fields:
             form_field:dict = form_fields[i]
             for t in form_field:
@@ -38,13 +30,18 @@ class view:
                 field = form_field[t]
                 field_type = field.get('type')
                 field_value:dict = field.get('value')
+
                 if field_type == 'static_select':
                     field_value = field.get('selected_option').get('value')
 
                 if field_value is None:
-                   field_value = bot_config.get(field_name)
+                    field_value = bot_config.get(field_name)
+
+                    if field_name == 'zotero_api_key':
+                        field_value =  cipher.decrypt(bot_config.get(field_name))
 
                 sql_fields[field_name] =  field_value
+
                 if field_name == 'zotero_api_key':
                     sql_fields[field_name] =  cipher.encrypt(field_value.encode('UTF-8'))
 
@@ -61,8 +58,10 @@ class view:
 
 class action:
     keyword:str = table_name
+    zotero = None
     def __init__(self, ack:Ack, client:WebClient, context:BoltContext, logger:logging.Logger, payload:dict, request:BoltRequest):
-        bot_config = _get_config(context.get('bot_user_id'))
+        self.zotero = Zotero(context.get('bot_user_id'))
+        bot_config = self.zotero.config(context.get('bot_user_id'))
 
         container = request.body.get('container', None)
         view:dict = request.body.get(container.get('type'))
@@ -71,8 +70,6 @@ class action:
         close_button = view.get('close')
         close_button.update(text="Go Back")
         blocks:list = list()
-        db:SQLite = SQLite()
-        select = select_query(table_name, where=f"user_id = '{context.get('bot_user_id')}'")
 
         intro = {
             "type": "header",
@@ -98,7 +95,6 @@ class action:
                     "text": "Helpful placeholder text goes here",
                     "emoji": True
                 },
-
             },
             "label": {
                 "type": "plain_text",
@@ -147,7 +143,6 @@ class action:
 
         if bot_config:
             current_library_type = next((x for x in library_type_options if x.get('value') == bot_config.get('zotero_library_type')), library_type_options[0])
-
             library_type['element']["initial_option"] = current_library_type
             library_id['element']["initial_value"] = bot_config.get('zotero_library_id')
 
