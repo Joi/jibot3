@@ -1,6 +1,6 @@
-import plugins.shared_links as shared_links
-import plugins.user_likes as user_likes
-import plugins.user_dislikes as user_dislikes
+from plugins.shared_links import shared_links
+from plugins.user_likes import user_likes
+from plugins.user_dislikes import user_dislikes
 
 from slack_bolt.context import BoltContext
 from slack_bolt.context.ack import Ack
@@ -49,8 +49,8 @@ class event:
 						}
 					},
 				])
-		app_home_view['blocks'].extend(user_likes.blocks(user_id))
-		app_home_view['blocks'].extend(user_dislikes.blocks(user_id))
-		app_home_view['blocks'].extend(shared_links.blocks())
+		app_home_view['blocks'].extend(user_likes().blocks(user_id))
+		app_home_view['blocks'].extend(user_dislikes().blocks(user_id))
+		app_home_view['blocks'].extend(shared_links().blocks())
 		if view_id is None: client.views_publish(user_id=context.get('user_id'),view=json.dumps(app_home_view))
 		else: client.views_update(view_id=view.get('id'), view=json.dumps(app_home_view))

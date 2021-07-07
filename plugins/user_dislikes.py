@@ -1,4 +1,4 @@
-from lib.database import SQLite, select_query, table_exists, create_table
+from lib.database import SQLite
 from lib.slack import whitespace
 
 from pathlib import Path
@@ -6,36 +6,41 @@ import logging
 import re
 
 table_name = Path(__file__).stem
-if not table_exists(table_name):
-	create_table(table_name, "ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, USER_ID text NOT NULL, DISLIKES text NOT NULL, UNIQUE(USER_ID, DISLIKES)")
+table_params = "ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, USER_ID text NOT NULL, DISLIKES text NOT NULL, UNIQUE(USER_ID, DISLIKES)"
+SQLite().create_table(table_name, table_params)
 
-def blocks(user_id:str):
-	global table_name
-	blocks:list = []
-	db:SQLite = SQLite()
-	query = select_query(table_name, columns="DISLIKES", order_by="DISLIKES", distinct=True, where='USER_ID=?')
-	db_response = db.cursor.execute(query, [user_id]).fetchall()
-	if db_response is not None:
-		blocks.append({
-			"type": "header",
-			"text": {
-				"type": "plain_text",
-				"text": ":thumbsdown: You dislike:",
-				"emoji": True
-			}
-		})
-		for r in db_response:
-			like = r[0]
+class user_dislikes:
+	db:SQLite
+	select_query:str
+
+	def __init__(self):
+		self.db = SQLite()
+		self.select_query = self.db.select_query(table_name, columns="DISLIKES", order_by="DISLIKES", distinct=True, where='USER_ID=?')
+
+	def blocks(self, user_id:str):
+		blocks:list = []
+		db_response = self.db.cursor.execute(self.select_query, [user_id]).fetchall()
+		if db_response is not None:
 			blocks.append({
-				"type": "section",
+				"type": "header",
 				"text": {
-					"type": "mrkdwn",
-					"text": like
+					"type": "plain_text",
+					"text": ":thumbsdown: You dislike:",
+					"emoji": True
 				}
 			})
-	return blocks
+			for r in db_response:
+				like = r[0]
+				blocks.append({
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": like
+					}
+				})
+		return blocks
 
-class message:
+class message(user_dislikes):
 	# @TODO: make this better, possible look up synonyms and conjugate to `I <dislike>...`, `@user <dislikes>...`  etc
 	space_re = f"({whitespace})+"
 	self_negatives: str = "|".join(["dislike", "don't like", "do not like", "don't love", "hate", "abhor"])
@@ -46,12 +51,10 @@ class message:
 	user_mention_re = "(<@(?P<user_id>[A-Z0-9]+)>)"
 	user_dislikes_re = f"{user_mention_re}{space_re}{negative_re}"
 	content_re:str = "(?P<content>.[^.]*)"
-
 	keyword:re = re.compile(f"({i_dislike_re}|{user_dislikes_re}){space_re}{content_re}", re.IGNORECASE)
 
 	def __init__(self, logger:logging.Logger, payload, say):
-		global table_name
-		db:SQLite = SQLite()
+		super().__init__()
 		matches:list = self.keyword.finditer(payload.get('text'))
 		if matches is not None:
 			for match in matches:
@@ -60,5 +63,5 @@ class message:
 				if self_reference is not None:
 					user_id = payload.get('user')
 				content = match.group('content')
-				db.cursor.execute(f"INSERT OR IGNORE INTO {table_name} (USER_ID, DISLIKES) VALUES(?, ?)", (user_id, content))
-				db.connection.commit()
+				self.db.cursor.execute(f"INSERT OR IGNORE INTO {table_name} (USER_ID, DISLIKES) VALUES(?, ?)", (user_id, content))
+				self.db.connection.commit()

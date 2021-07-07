@@ -1,4 +1,4 @@
-from lib.database import SQLite, select_query, table_exists, create_table
+from lib.database import SQLite
 from lib.slack import whitespace
 
 from pathlib import Path
@@ -6,38 +6,43 @@ import logging
 import re
 from slack_bolt import Ack, BoltRequest, BoltResponse, Respond, Say
 
+
 table_name = Path(__file__).stem
+table_params = "ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, USER_ID text NOT NULL, LIKES text NOT NULL, UNIQUE(USER_ID, LIKES)"
+SQLite().create_table(table_name, table_params)
 
-if not table_exists(table_name):
-	create_table(table_name, "ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, USER_ID text NOT NULL, LIKES text NOT NULL, UNIQUE(USER_ID, LIKES)")
+class user_likes:
+	db:SQLite
+	select_query:str
 
-def blocks(user_id:str):
-	global table_name
-	blocks:list = []
-	db:SQLite = SQLite()
-	query = select_query(table_name, columns="LIKES", order_by="LIKES", distinct=True, where='USER_ID=?')
-	db_response = db.cursor.execute(query, [user_id]).fetchall()
-	if db_response is not None:
-		blocks.append({
-			"type": "header",
-			"text": {
-				"type": "plain_text",
-				"text": ":+1: You like:",
-				"emoji": True
-			}
-		})
-		for r in db_response:
-			like = r[0]
+	def __init__(self):
+		self.db = SQLite()
+		self.select_query = self.db.select_query(table_name, columns="LIKES", order_by="LIKES", distinct=True, where='USER_ID=?')
+
+	def blocks(self, user_id:str):
+		blocks:list = []
+		db_response = self.db.cursor.execute(self.select_query, [user_id]).fetchall()
+		if db_response is not None:
 			blocks.append({
-				"type": "section",
+				"type": "header",
 				"text": {
-					"type": "mrkdwn",
-					"text": like
+					"type": "plain_text",
+					"text": ":+1: You like:",
+					"emoji": True
 				}
 			})
-	return blocks
+			for r in db_response:
+				like = r[0]
+				blocks.append({
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": like
+					}
+				})
+		return blocks
 
-class message:
+class message(user_likes):
 	space_re = f"({whitespace})+"
 	self_affirmatives: str = "|".join(["like", "love"])
 	self_affirmative_re:str = f"({self_affirmatives})"
@@ -50,7 +55,7 @@ class message:
 	keyword:re = re.compile(f"({i_like_re}|{user_likes_re}){space_re}{content_re}", re.IGNORECASE)
 
 	def __init__(self, logger:logging.Logger, payload:dict, say:Say):
-		db:SQLite = SQLite()
+		super().__init__()
 		matches:list = self.keyword.finditer(payload.get('text'))
 		if matches is not None:
 			for match in matches:
@@ -59,5 +64,5 @@ class message:
 				if self_reference is not None:
 					user_id = payload.get('user')
 				content = match.group('content')
-				db.cursor.execute(f"INSERT OR IGNORE INTO {table_name} (USER_ID, LIKES) VALUES(?, ?)", (user_id, content))
-				db.connection.commit()
+				self.db.cursor.execute(f"INSERT OR IGNORE INTO {table_name} (USER_ID, LIKES) VALUES(?, ?)", (user_id, content))
+				self.db.connection.commit()
