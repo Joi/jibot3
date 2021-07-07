@@ -31,6 +31,23 @@ class Zotero:
                 self.zotero_api_key = self.db.cipher.decrypt(config[3]).decode('utf-8')
                 self.library = PyZotero.Zotero(self.zotero_library_id, self.zotero_library_type, self.zotero_api_key)
 
-    def read(self, ack:Ack, context:BoltContext, logger:logging.Logger, payload:dict, request: BoltRequest, respond:Respond):
-        items = self.library.items()
-        print(items)
+    def block(self, zotero_item):
+        zotero_data = zotero_item.get('data')
+        return {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": f"<{zotero_data.get('url')}|{zotero_data.get('title')}>"
+            },
+        }
+    def blocks(self, zotero_items):
+        blocks:list = []
+        for zotero_item in zotero_items:
+            blocks.append(self.block(zotero_item))
+        return blocks
+
+    def read(self, search_term:str = None):
+        if not search_term:
+            return self.library.items()
+        else:
+            return self.library.items(q=search_term)

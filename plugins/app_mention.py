@@ -1,3 +1,4 @@
+import json
 from lib.slack import get_bot_mention_text
 from include.wikipedia import get_url as get_wikipedia_url
 from include.zotero import Zotero
@@ -14,13 +15,15 @@ class event:
 	__doc__ = "\n".join([
 		"The following functions are available when you @mention the bot:",
 		"`wikipedia [SEARCH TERM OR PHRASE]`",
-		"`zotero`",
+		"`zotero [SEARCH TERM OR PHRASE]`",
 		# etc
 	])
-	# zotero = Zotero().read
+
 	def __init__(self, ack:Ack, event:dict, client:WebClient, context:BoltContext, logger:logging.Logger, payload:dict, request:BoltRequest, response:BoltResponse):
 		text = get_bot_mention_text(context.get('bot_user_id'), payload.get('text'))
-		keyword = text.split()[0]
+		keyword, sep, payload_text = text.partition(" ")
+		payload['text'] = payload_text
+		print(keyword)
 		if hasattr(self, keyword):
 			event_handler = getattr(self, keyword)
 			arg_names = inspect.getfullargspec(event_handler).args
@@ -32,12 +35,17 @@ class event:
 				this_func=event_handler,
 			))
 
-	def wikipedia(self, ack:Ack, context:BoltContext, logger:logging.Logger, payload:dict, respond:Respond, say:Say):
-		text = get_bot_mention_text(context.get('bot_user_id'), payload.get('text'))
-		keyword = inspect.currentframe().f_code.co_name
-		if text is not None:
-			search_term = text.replace(keyword, "").strip()
-			if search_term:
-				wiki_url = get_wikipedia_url(search_term)
-				if wiki_url: say(text=wiki_url)
+	def wikipedia(self, ack:Ack, context:BoltContext, logger:logging.Logger, payload:dict, say:Say):
 		ack()
+		wiki_url = get_wikipedia_url(payload.get('text'))
+		if wiki_url: say(text=wiki_url)
+
+	def zotero(self, ack:Ack, client:WebClient, context:BoltContext, logger:logging.Logger, payload:dict, say:Say):
+		ack()
+		search_term = payload.get('text')
+		zotero = Zotero(context.get('bot_user_id'))
+		results = zotero.read(search_term)
+		if len(results):
+			say(blocks=zotero.blocks(results))
+		else:
+			say(f"I did not find any zotero items matching `{search_term}`")
