@@ -1,25 +1,18 @@
-from lib.database import SQLite, select_query, table_exists, create_table, delete_table, column_exists, cipher
-from include.zotero import Zotero
+import include.zotero as Zotero
 
-from pathlib import Path
 from slack_bolt import Ack, BoltRequest, BoltResponse
 from slack_bolt.context import BoltContext
 from slack_sdk.models.views import View
 from slack_sdk.web import WebClient
 import logging
 
-table_name:str = Path(__file__).stem
-if not table_exists(table_name):
-    create_table(table_name, "user_id text PRIMARY KEY UNIQUE, zotero_library_type text NOT NULL, zotero_library_id text NOT NULL, zotero_api_key BLOB NOT NULL")
 
-
-class view:
+class view(Zotero.Zotero):
     zotero: None
-    keyword:str = table_name
 
     def __init__(self, ack:Ack, client:WebClient, context:BoltContext, logger:logging.Logger, request:BoltRequest, view:View):
-        self.zotero = Zotero(context.get('bot_user_id'))
-        bot_config = self.zotero.config(context.get('bot_user_id'))
+        super().__init__()
+        self.zotero = Zotero.Zotero(context.get('bot_user_id'))
         state:dict = view.get('state')
         form_fields:dict = state['values']
         sql_fields:dict = { 'user_id': context.get('bot_user_id') }
@@ -30,39 +23,33 @@ class view:
                 field = form_field[t]
                 field_type = field.get('type')
                 field_value:dict = field.get('value')
-
                 if field_type == 'static_select':
                     field_value = field.get('selected_option').get('value')
 
-                if field_value is None:
-                    field_value = bot_config.get(field_name)
+                if field_value is None and hasattr(self.zotero, field_name):
+                    field_value = getattr(self.zotero, field_name)
 
-                    if field_name == 'zotero_api_key':
-                        field_value =  cipher.decrypt(bot_config.get(field_name))
+                if field_name == 'zotero_api_key':
+                    field_value =  self.db.cipher.encrypt(field_value.encode('utf-8'))
 
                 sql_fields[field_name] =  field_value
 
-                if field_name == 'zotero_api_key':
-                    sql_fields[field_name] =  cipher.encrypt(field_value.encode('UTF-8'))
-
         placeholders: list = []
-        for i in range (0, len(sql_fields)): placeholders.append("?")
+        for i in range (0, len(sql_fields)):
+            placeholders.append("?")
 
-        db:SQLite = SQLite()
         placeholder:str = ','.join(placeholders)
         field_names:str = ', '.join(sql_fields.keys())
-        insert_query = f"INSERT OR REPLACE INTO {table_name} ({field_names}) VALUES({placeholder})"
-        db.cursor.execute(insert_query, list(sql_fields.values()))
-        db.connection.commit()
+        insert_query = f"INSERT OR REPLACE INTO {self.table_name} ({field_names}) VALUES({placeholder})"
+        self.db.cursor.execute(insert_query, list(sql_fields.values()))
+        self.db.connection.commit()
         ack()
 
-class action:
-    keyword:str = table_name
+class action(Zotero.Zotero):
     zotero = None
     def __init__(self, ack:Ack, client:WebClient, context:BoltContext, logger:logging.Logger, payload:dict, request:BoltRequest):
-        self.zotero = Zotero(context.get('bot_user_id'))
-        bot_config = self.zotero.config(context.get('bot_user_id'))
-
+        super().__init__()
+        self.zotero = Zotero.Zotero(context.get('bot_user_id'))
         container = request.body.get('container', None)
         view:dict = request.body.get(container.get('type'))
         title:dict = view.get('title')
@@ -141,10 +128,12 @@ class action:
             }
         }
 
-        if bot_config:
-            current_library_type = next((x for x in library_type_options if x.get('value') == bot_config.get('zotero_library_type')), library_type_options[0])
+        if self.zotero.zotero_library_type is not None:
+            current_library_type = next((x for x in library_type_options if x.get('value') == self.zotero.zotero_library_type), library_type_options[0])
             library_type['element']["initial_option"] = current_library_type
-            library_id['element']["initial_value"] = bot_config.get('zotero_library_id')
+
+        if self.zotero.zotero_library_id is not None:
+            library_id['element']["initial_value"] = self.zotero.zotero_library_id
 
         api_key = {
             "type": "input",

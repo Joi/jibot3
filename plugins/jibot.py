@@ -1,3 +1,4 @@
+from slack_bolt.context.context import BoltContext
 from include.wikipedia import get_url as get_wikipedia_url
 from include.zotero import Zotero
 
@@ -12,7 +13,7 @@ from slack_sdk.web import WebClient
 
 class command:
 	keyword = f"/{Path(__file__).stem}"
-	zotero = Zotero().read
+	zotero = None
 	__doc__ = "\n".join([
 		f"The following functions are examples of available bot slash commands:",
 		f"`{keyword} hello_world`",
@@ -20,9 +21,11 @@ class command:
 		f"`{keyword} zotero`",
 		# etc
 	])
-	def __init__(self, ack:Ack, logger:logging.Logger, payload:dict, request:BoltRequest, response: BoltResponse):
+	def __init__(self, ack:Ack, context:BoltContext, logger:logging.Logger, payload:dict, request:BoltRequest, response: BoltResponse):
 		ack()
 		keyword = payload.get('text').split()[0]
+		self.zotero = Zotero(context.get('bot_user_id')).read
+
 		if hasattr(self, keyword):
 			event_handler = getattr(self, keyword)
 

@@ -17,7 +17,7 @@ class event:
 		"`zotero`",
 		# etc
 	])
-	zotero = Zotero().read
+	# zotero = Zotero().read
 	def __init__(self, ack:Ack, event:dict, client:WebClient, context:BoltContext, logger:logging.Logger, payload:dict, request:BoltRequest, response:BoltResponse):
 		text = get_bot_mention_text(context.get('bot_user_id'), payload.get('text'))
 		keyword = text.split()[0]
