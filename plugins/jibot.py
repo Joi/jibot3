@@ -11,7 +11,7 @@ import logging
 from pathlib import Path
 from slack_bolt import Ack, BoltRequest, BoltResponse, Respond
 from slack_bolt.kwargs_injection import build_required_kwargs
-from slack_sdk.web import WebClient
+from slack_sdk.web import WebClient, slack_response
 
 class command:
 	keyword = f"/{Path(__file__).stem}"
@@ -58,6 +58,9 @@ class command:
 class shortcut:
 	def __init__(self, ack:Ack, client:WebClient, shortcut:dict):
 		ack()
+		user_id = shortcut.get('user').get('id')
+		user_response:slack_response = client.users_info(user=user_id)
+		user = user_response.get('user') if user_response.get('ok') else None
 		view = {
 			"type": "modal",
 			"title": {
@@ -70,89 +73,93 @@ class shortcut:
 				"text": "Close",
 				"emoji": True
 			},
-			"blocks": [
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": "Get information and syntax help for installed plugins."
-					},
-					"accessory": {
-						"type": "button",
-						"text": {
-							"type": "plain_text",
-							"text": "Plugin Help",
-							"emoji": True
-						},
-						"action_id": "plugin_help",
-					}
-				},
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": "Zotero Configuration"
-					},
-					"accessory": {
-						"type": "button",
-						"text": {
-							"type": "plain_text",
-							"text": "Zotero Integration",
-							"emoji": True
-						},
-						"action_id": "zotero",
-					}
-				},
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": "View a list of links which have been shared."
-					},
-					"accessory": {
-						"type": "button",
-						"text": {
-							"type": "plain_text",
-							"text": "View Links",
-							"emoji": True
-						},
-						"action_id": "shared_links",
-					}
-				},
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": "Karma karma karma karma karma queryaaaah!"
-					},
-					"accessory": {
-						"type": "button",
-						"text": {
-							"type": "plain_text",
-							"text": "View Karma",
-							"emoji": True
-						},
-						"action_id": "karma",
-					}
-				},
-				{
-					"type": "section",
-					"text": {
-						"type": "mrkdwn",
-						"text": "The bot tries to learn, check out it's brain."
-					},
-					"accessory": {
-						"type": "button",
-						"text": {
-							"type": "plain_text",
-							"text": "View Brains",
-							"emoji": True
-						},
-						"action_id": "definition",
-					}
-				},
-			]
+			"blocks": []
 		}
+		view["blocks"].append(
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "Get information and syntax help for installed plugins."
+				},
+				"accessory": {
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Plugin Help",
+						"emoji": True
+					},
+					"action_id": "plugin_help",
+				}
+			}
+		)
+		view["blocks"].append({
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "View a list of links which have been shared."
+			},
+			"accessory": {
+				"type": "button",
+				"text": {
+					"type": "plain_text",
+					"text": "View Links",
+					"emoji": True
+				},
+				"action_id": "shared_links",
+			}
+		})
+		view["blocks"].append({
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Karma karma karma karma karma queryaaaah!"
+			},
+			"accessory": {
+				"type": "button",
+				"text": {
+					"type": "plain_text",
+					"text": "View Karma",
+					"emoji": True
+				},
+				"action_id": "karma",
+			}
+		})
+		view["blocks"].append({
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "The bot tries to learn, check out it's brain."
+			},
+			"accessory": {
+				"type": "button",
+				"text": {
+					"type": "plain_text",
+					"text": "View Brains",
+					"emoji": True
+				},
+				"action_id": "definition",
+			}
+		})
+
+		if user.get('is_admin'):
+			view["blocks"].append({
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "Zotero Configuration"
+				},
+				"accessory": {
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Zotero Integration",
+						"emoji": True
+					},
+					"action_id": "zotero",
+				}
+			})
+
 		client.views_open(
 			trigger_id=shortcut["trigger_id"],
 			view=json.dumps(view)
