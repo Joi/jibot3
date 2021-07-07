@@ -23,7 +23,6 @@ class event:
 		text = get_bot_mention_text(context.get('bot_user_id'), payload.get('text'))
 		keyword, sep, payload_text = text.partition(" ")
 		payload['text'] = payload_text
-		print(keyword)
 		if hasattr(self, keyword):
 			event_handler = getattr(self, keyword)
 			arg_names = inspect.getfullargspec(event_handler).args
