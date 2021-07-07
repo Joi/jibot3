@@ -1,5 +1,4 @@
 from slack_bolt import Say
-import os
 
 class message:
 	keyword:str = "hello world"
