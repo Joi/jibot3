@@ -81,7 +81,6 @@ class action(definition):
 			}
 		)
 
-
 class message(definition):
 	__doc__ = "The bot tries to learn about stuff, when you say a declarative statement, such as `[SOMETHING] is [SOMEATTRIBUTE]`, the bot will save that information."
 	spaces:str = "|".join([' ', '\xa0'])
