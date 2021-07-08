@@ -15,17 +15,14 @@ class SQLite():
 	cursor:Cursor = None
 	key_file:Path = Path(f"{os.getcwd()}{os.sep}jibot.key")
 	db_file:Path = Path(f"{os.getcwd()}{os.sep}sqlite.db")
-	cipher:Fernet = Fernet(open(key_file, "rb").read())
+	cipher:Fernet = Fernet(open(key_file, "rb").read()) if key_file.is_file() else None
 
 	def __init__(self):
 		if self.db_file.is_file():
 			logging.debug(f"Database file exists... {self.db_file}")
 		else:
 			logging.debug(f"Database file does not exist... creating {self.db_file}")
-			try:
-				os.mknod(self.db_file)
-			except:
-				with open(self.db_file, 'w'): pass
+			self.db_file.touch()
 
 		try:
 			self.connection = sqlite3.connect(self.db_file)
