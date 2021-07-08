@@ -15,7 +15,7 @@ class SQLite():
 	cursor:Cursor = None
 	key_file:Path = Path(f"{os.getcwd()}{os.sep}jibot.key")
 	db_file:Path = Path(f"{os.getcwd()}{os.sep}sqlite.db")
-	cipher:Fernet = Fernet(open(key_file, "rb").read()) if key_file.is_file() else None
+	cipher:Fernet
 
 	def __init__(self):
 		if self.db_file.is_file():
@@ -45,6 +45,7 @@ class SQLite():
 			key = base64.urlsafe_b64encode(kdf.derive(passphrase))
 			fernet:Fernet = Fernet(key).generate_key()
 			self.key_file.write_bytes(fernet)
+		self.cipher = Fernet(open(self.key_file, "rb").read())
 
 	def column_exists(self, table_name:str, column_name:str):
 		exists:bool = False
