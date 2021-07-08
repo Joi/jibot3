@@ -52,6 +52,7 @@ The setup instructions presume that we have a slack robot setup already. The sla
 	pip install stop_words
 	pip install wikipedia
 	pip install Pyzotero
+	pip install cryptography
 
 ## Environment Variables
 Replace [] values as shown below with the appropriate values from your slack bot configuration and import as appropriate to your local development environment. **BOT_TOKEN and SIGNING_SECRET are required. JIBOT_SLACK_APP_TOKEN is required to run in socket mode**
