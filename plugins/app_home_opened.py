@@ -13,7 +13,7 @@ class event:
 		ack()
 		view = event.get('view', None)
 		view_id = view.get('id') if view is not None else None
-		user_id = event["user"]
+		user_id = context.get('user_id')
 		user_response:SlackResponse = client.users_info(user=user_id)
 		user = user_response.get('user') if user_response.get('ok') else None
 		app_home_view = {

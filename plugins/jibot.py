@@ -38,27 +38,45 @@ class command:
 				this_func=event_handler,
 			))
 
+	def hello_world(self, ack: Ack, payload:dict, respond:Respond):
+		ack()
+		respond(f"HELLO <@{payload['user_id']}> :wave: !")
+
+	# def herald(self, ack: Ack, client:WebClient, context:BoltContext, payload:dict, request:BoltRequest, respond:Respond):
+	# 	# ack()
+	# 	keyword, sep, payload_text = payload.get('text').partition(" ")
+
+	# 	if keyword == "me":
+	# 		user_id = context.get('user_id')
+	# 		user_response:slack_response = client.users_info(user=user_id)
+	# 	else:
+	# 		# thing = keyword.replace("@","")
+	# 		# print(thing)
+	# 		user_response:slack_response = client.users_identity(name=keyword)
+	# 		user = user_response.get('user') if user_response.get('ok') else None
+	# 		print(user)
+	# 	# respond(f"HELLO <@{payload['user_id']}> :wave: !")
+
 	def wikipedia(self, ack: Ack, payload:dict, respond:Respond):
 		ack()
 		search_term = payload.get('text')
 		result = get_wikipedia_url(search_term)
 		respond(result)
 
-	def hello_world(self, ack: Ack, payload:dict, respond:Respond):
-		ack()
-		respond(f"HELLO <@{payload['user_id']}> :wave: !")
-
 	def zotero(self, ack: Ack, client:WebClient, command:dict, context:BoltContext, payload:dict, respond:Respond, say:Say):
 		ack()
 		search_term = payload.get('text')
 		zotero = Zotero(context.get('bot_user_id'))
 		results = zotero.read(search_term)
-		respond(blocks=zotero.blocks(results))
+		if len(results):
+			respond(blocks=zotero.blocks(results))
+		else:
+			respond(f"I did not find any zotero items matching `{search_term}`")
 
 class shortcut:
-	def __init__(self, ack:Ack, client:WebClient, shortcut:dict):
+	def __init__(self, ack:Ack, context:BoltContext, client:WebClient, shortcut:dict):
 		ack()
-		user_id = shortcut.get('user').get('id')
+		user_id = context.get('user_id')
 		user_response:slack_response = client.users_info(user=user_id)
 		user = user_response.get('user') if user_response.get('ok') else None
 		view = {
