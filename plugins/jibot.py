@@ -21,6 +21,7 @@ class command:
 		f"`{keyword} hello_world`",
 		f"`{keyword} wikipedia [SEARCH TERM OR PHRASE]`",
 		f"`{keyword} zotero [SEARCH TERM OR PHRASE]`",
+		f"`{keyword} herald [me|@user]`",
 		# etc
 	])
 

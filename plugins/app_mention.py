@@ -18,6 +18,7 @@ class event:
 		"The following functions are available when you @mention the bot:",
 		"`wikipedia [SEARCH TERM OR PHRASE]`",
 		"`zotero [SEARCH TERM OR PHRASE]`",
+		"`herald [me|@user]`",
 		# etc
 	])
 
