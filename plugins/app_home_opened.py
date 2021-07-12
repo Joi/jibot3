@@ -1,6 +1,11 @@
+import inspect
+import logging
+
+from slack_bolt.kwargs_injection.utils import build_required_kwargs
+from slack_bolt.request.request import BoltRequest
+from slack_bolt.response.response import BoltResponse
 from plugins.shared_links import shared_links
-from plugins.user_likes import user_likes
-from plugins.user_dislikes import user_dislikes
+from include.herald import herald
 
 from slack_bolt.context import BoltContext
 from slack_bolt.context.ack import Ack
@@ -9,48 +14,22 @@ from slack_sdk.web.slack_response import SlackResponse
 import json
 
 class event:
-	def __init__(self, ack:Ack, event:dict, client:WebClient, context: BoltContext):
+	def __init__(self, ack:Ack, context: BoltContext, client:WebClient, event:dict, logger:logging.Logger, payload:dict, request:BoltRequest, response:BoltResponse):
 		ack()
 		view = event.get('view', None)
 		view_id = view.get('id') if view is not None else None
-		user_id = context.get('user_id')
-		user_response:SlackResponse = client.users_info(user=user_id)
-		user = user_response.get('user') if user_response.get('ok') else None
+		herald_function = herald(**build_required_kwargs(
+			logger=logger,
+			request=request,
+			response=response,
+			required_arg_names=inspect.getfullargspec(herald).args,
+			this_func=herald,
+		))
 		app_home_view = {
 			"type": "home",
-			"blocks": [{
-				"type": "section",
-				"text": {
-					"type": "mrkdwn",
-					"text": f"*Hello <@{user_id}>!* :clap: :raised_hands: Welcome!"
-				}
-			}]
+			"blocks": herald_function.blocks()
 		}
-		if user.get('is_admin') or user.get('is_owner'):
-			if user.get('is_admin'):
-				app_home_view['blocks'].extend([
-					{
-						"type": "section",
-						"text": {
-							"type": "plain_text",
-							"text": ":wave: Hello operator!",
-							"emoji": True
-						}
-					},
-				])
-			if user.get('is_owner'):
-				app_home_view['blocks'].extend([
-					{
-						"type": "section",
-						"text": {
-							"type": "plain_text",
-							"text": ":wave: Hello owner!",
-							"emoji": True
-						}
-					},
-				])
-		app_home_view['blocks'].extend(user_likes().blocks(user_id))
-		app_home_view['blocks'].extend(user_dislikes().blocks(user_id))
+		app_home_view['blocks'].append({ "type": "divider" })
 		app_home_view['blocks'].extend(shared_links().blocks())
 		if view_id is None: client.views_publish(user_id=context.get('user_id'),view=json.dumps(app_home_view))
 		else: client.views_update(view_id=view.get('id'), view=json.dumps(app_home_view))

@@ -25,7 +25,7 @@ class user_dislikes:
 				"type": "header",
 				"text": {
 					"type": "plain_text",
-					"text": ":thumbsdown: You dislike:",
+					"text": ":thumbsdown: Dislikes:",
 					"emoji": True
 				}
 			})

@@ -1,6 +1,7 @@
-from re import search
 from slack_bolt.context.context import BoltContext
 from slack_bolt.context.say.say import Say
+
+from include.herald import herald
 from include.wikipedia import get_url as get_wikipedia_url
 from include.zotero import Zotero
 
@@ -15,7 +16,6 @@ from slack_sdk.web import WebClient, slack_response
 
 class command:
 	keyword = f"/{Path(__file__).stem}"
-
 	__doc__ = "\n".join([
 		f"The following functions are examples of available bot slash commands:",
 		f"`{keyword} hello_world`",
@@ -24,38 +24,28 @@ class command:
 		# etc
 	])
 
-	def __init__(self, ack:Ack, context:BoltContext, logger:logging.Logger, payload:dict, request:BoltRequest, response: BoltResponse):
+	def __init__(self, ack:Ack, context:BoltContext, logger:logging.Logger, payload:dict, request:BoltRequest, respond: Respond, response: BoltResponse):
+		self.herald = herald
 		keyword, sep, payload_text = payload.get('text').partition(" ")
 		payload['text'] =  payload_text
-		if hasattr(self, keyword):
-			event_handler = getattr(self, keyword)
-			arg_names = inspect.getfullargspec(event_handler).args
-			event_handler(**build_required_kwargs(
-				logger=logger,
-				request=request,
-				response=response,
-				required_arg_names=arg_names,
-				this_func=event_handler,
-			))
+		print(keyword)
+		if keyword:
+			if hasattr(self, keyword):
+				event_handler = getattr(self, keyword)
+				arg_names = inspect.getfullargspec(event_handler).args
+				event_handler(**build_required_kwargs(
+					logger=logger,
+					request=request,
+					response=response,
+					required_arg_names=arg_names,
+					this_func=event_handler,
+				))
+		else:
+			respond(self.__doc__)
 
 	def hello_world(self, ack: Ack, payload:dict, respond:Respond):
 		ack()
 		respond(f"HELLO <@{payload['user_id']}> :wave: !")
-
-	# def herald(self, ack: Ack, client:WebClient, context:BoltContext, payload:dict, request:BoltRequest, respond:Respond):
-	# 	# ack()
-	# 	keyword, sep, payload_text = payload.get('text').partition(" ")
-
-	# 	if keyword == "me":
-	# 		user_id = context.get('user_id')
-	# 		user_response:slack_response = client.users_info(user=user_id)
-	# 	else:
-	# 		# thing = keyword.replace("@","")
-	# 		# print(thing)
-	# 		user_response:slack_response = client.users_identity(name=keyword)
-	# 		user = user_response.get('user') if user_response.get('ok') else None
-	# 		print(user)
-	# 	# respond(f"HELLO <@{payload['user_id']}> :wave: !")
 
 	def wikipedia(self, ack: Ack, payload:dict, respond:Respond):
 		ack()

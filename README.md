@@ -9,7 +9,7 @@ The intent of this code is to create a "garage" where you can park code to be us
 	...
 
 # Slack Bot Creation
-Here is a good introdocution and instructions for creating and configuring a slack bot: https://api.slack.com/bot-users.
+Here is a good introduction and instructions for creating and configuring a slack bot: [Slack Bot User Overview](https://api.slack.com/bot-users).
 
 ## Recommended: Using [Socket Mode](https://app.slack.com/app-settings/T01LN1N5H60/A01LUFAPUFK/socket-mode)
 Socket Mode is convenient, and is likely to work to serve jibot's needs for a while. Socket Mode allows for slack events to be "listened for" on your local computer without requiring a stable and internet-reachable dns name or IP address endpoint. Without socket mode, you'll need
@@ -26,25 +26,26 @@ The bot is created to work with a slack shortcut with a callback ID called `jibo
 The slack bot and web api client use of tokens and scopes. The tokens and scopes required will vary depending on your desired bot listeners and interactivity needs, however here is a basic guide to setting up tokens and scopes for use with jibot:
 
 * To use Socket Mode, you must have an App-Level token with `connections:write` scope
-	* https://api.slack.com/apps/ Settings -> Basic Information
-* **Bot Token Scopes:** When an error is thrown, the missing scope will be specified in an error log. Start with the following, and add as you need: (https://api.slack.com/apps/ Settings -> OAuth & Permissions)
-	* app_mentions:read (@bot_name_mentions)
-	* channels:read (can get basic info about channel(s))
-	* groups:read (can get basic info about private channel(s) to which the bot has been added)
-	* im:read (can get basic info about direct message(s) to which the bot has been added)
-	* team:read (can get basic info about the current team)
-	* users:read (can get basic info about users(s))
-	* chat:write (can write in channels/direct messages )
-* **User Token Scopes** User token scopes allow access to api data and methods on behalf of the user which authorized/installed the slack application. At the moment, this has not been implemented, although if a user token is present and it is valid, it is used to establish the identity details of that user, for logging purposes.
+	* [Settings -> Basic Information](https://api.slack.com/apps/)
+
+* **Bot Token Scopes:** When an error is thrown, the missing scope will be specified in an error log. Start with the following, and add as you need: [Settings -> OAuth & Permissions](https://api.slack.com/apps/)
+	* [app_mentions:read](https://api.slack.com/scopes/app_mentions:read)
+	* [channels:read](https://api.slack.com/scopes/channels:read)
+	* [groups:read](https://api.slack.com/scopes/groups:read)
+	* [im:read](https://api.slack.com/scopes/im:read)
+	* [team:read](https://api.slack.com/scopes/team:read)
+	* [users:read](https://api.slack.com/scopes/users:read)
+	* [chat:write](https://api.slack.com/scopes/chat:write)
+
+* **User Token Scopes** User token scopes allow access to api data and methods on behalf of the user which authorized/installed the slack application.
+	* [identity.basic](https://api.slack.com/scopes/identity.basic)
+
 * **Event Subscriptions:**
-	* app_home_opened
-	* app_mention
-	* message.channels
-* **Incoming [Webhooks](https://api.slack.com/messaging/webhooks):**
-WEBHOOKS ARE COMING! Please see the webhook readme files for details as they emerge.
+	* [app_home_opened](https://api.slack.com/events/app_home_opened)
+	* [app_mention](https://api.slack.com/events/app_mention)
+	* [message.channels](https://api.slack.com/events/message.channels)
 
 # Project Setup
-The setup instructions presume that we have a slack robot setup already. The slack bot we have been using for the previous iteration of has permissions appropriate to this code. I will ammend these instructions with detailed information about slack bot setup and permissions once we determine where/how to move this code into existing jibot repo.
 
 ## Packages
 	pip install slack-bolt
@@ -88,8 +89,6 @@ I (pegnott) am using VS Code on  MacOS...  I set up a virtual environment, and a
 		source ./[venv_directory]/bin/activate
 
 * NOTE: The MS Python extension for VS Code will ask if you want to use this as a workspace -- doing so will mean that when you open a new terminal window, the virtual environment will be acticvated automatically, allowing you to skip this step next time.
-
-## Zotero Setup
 
 ## Run the bot
 	python ./app.py

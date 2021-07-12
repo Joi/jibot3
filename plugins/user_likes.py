@@ -27,7 +27,7 @@ class user_likes:
 				"type": "header",
 				"text": {
 					"type": "plain_text",
-					"text": ":+1: You like:",
+					"text": ":+1: Likes:",
 					"emoji": True
 				}
 			})

@@ -1,15 +1,17 @@
-import json
+
 from lib.slack import get_bot_mention_text
+from include.herald import herald
 from include.wikipedia import get_url as get_wikipedia_url
 from include.zotero import Zotero
 
 from slack_bolt import Ack, BoltRequest, BoltResponse, Respond, Say
 from slack_bolt.context import BoltContext
 from slack_bolt.kwargs_injection import build_required_kwargs
-from slack_sdk.web import WebClient
+from slack_sdk.web import WebClient, slack_response
 
 import inspect
 import logging
+import os
 
 class event:
 	__doc__ = "\n".join([
@@ -20,6 +22,7 @@ class event:
 	])
 
 	def __init__(self, ack:Ack, event:dict, client:WebClient, context:BoltContext, logger:logging.Logger, payload:dict, request:BoltRequest, response:BoltResponse):
+		self.herald = herald
 		text = get_bot_mention_text(context.get('bot_user_id'), payload.get('text'))
 		keyword, sep, payload_text = text.partition(" ")
 		payload['text'] = payload_text
