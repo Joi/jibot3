@@ -28,7 +28,6 @@ class command:
 		self.herald = herald
 		keyword, sep, payload_text = payload.get('text').partition(" ")
 		payload['text'] =  payload_text
-		print(keyword)
 		if keyword:
 			if hasattr(self, keyword):
 				event_handler = getattr(self, keyword)
@@ -41,7 +40,9 @@ class command:
 					this_func=event_handler,
 				))
 		else:
+			ack()
 			respond(self.__doc__)
+
 
 	def hello_world(self, ack: Ack, payload:dict, respond:Respond):
 		ack()
