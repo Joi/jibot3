@@ -56,9 +56,10 @@ class command:
 		respond(result)
 
 	def zotero(self, ack: Ack, client:WebClient, command:dict, context:BoltContext, payload:dict, respond:Respond, say:Say):
-		ack()
+		# ack()
+		user_id:str = context.get('user_id')
 		search_term = payload.get('text')
-		zotero = Zotero(context.get('user_id'))
+		zotero = Zotero(user_id)
 		results = zotero.read(search_term)
 		if len(results):
 			respond(blocks=zotero.blocks(results))

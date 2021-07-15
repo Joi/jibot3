@@ -22,22 +22,26 @@ class Zotero:
     def __init__(self, user_id:str = None):
         self.db = SQLite()
         if user_id is not None:
-            select = self.db.select_query(table_name, where=f"user_id = '{user_id}'")
+            self.user_id = user_id
+            select = self.db.select_query(table_name, where=f"user_id = '{self.user_id}'")
             config = self.db.cursor.execute(select).fetchone()
             if config is not None:
-                self.user_id = config[0]
                 self.zotero_library_type = config[1]
                 self.zotero_library_id = config[2]
                 self.zotero_api_key = self.db.cipher.decrypt(config[3]).decode('utf-8')
                 self.library = PyZotero.Zotero(self.zotero_library_id, self.zotero_library_type, self.zotero_api_key)
 
     def block(self, zotero_item):
-        zotero_data = zotero_item.get('data')
+        response_text:str = zotero_item
+        if type(zotero_item) != type(""):
+            zotero_data = zotero_item.get('data')
+            response_text = f"<{zotero_data.get('url')}|{zotero_data.get('title')}>"
+
         return {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": f"<{zotero_data.get('url')}|{zotero_data.get('title')}>"
+                "text": response_text
             },
         }
     def blocks(self, zotero_items):
@@ -46,7 +50,13 @@ class Zotero:
             blocks.append(self.block(zotero_item))
         return blocks
 
+    def no_integration(self):
+        return [f":warning:  <@{self.user_id}> You have not set up a zotero integration."]
+
     def read(self, search_term:str = None):
+        if self.library is None:
+            return self.no_integration()
+
         if not search_term:
             return self.library.items()
         else:
