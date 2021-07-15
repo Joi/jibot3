@@ -56,7 +56,7 @@ class command:
 		respond(result)
 
 	def zotero(self, ack: Ack, client:WebClient, command:dict, context:BoltContext, payload:dict, respond:Respond, say:Say):
-		# ack()
+		ack()
 		user_id:str = context.get('user_id')
 		search_term = payload.get('text')
 		zotero = Zotero(user_id)

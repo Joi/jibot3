@@ -19,9 +19,9 @@ class Zotero:
     zotero_api_key:bytes = None
     library:PyZotero.Zotero = None
 
-    def __init__(self, user_id:str = None):
+    def __init__(self, user_id:str):
         self.db = SQLite()
-        if user_id is not None:
+        if user_id:
             self.user_id = user_id
             select = self.db.select_query(table_name, where=f"user_id = '{self.user_id}'")
             config = self.db.cursor.execute(select).fetchone()
@@ -32,11 +32,12 @@ class Zotero:
                 self.library = PyZotero.Zotero(self.zotero_library_id, self.zotero_library_type, self.zotero_api_key)
 
     def block(self, zotero_item):
-        response_text:str = zotero_item
-        if type(zotero_item) != type(""):
+        response_text = None
+        if type(zotero_item) == type(""):
+            response_text = zotero_item
+        else:
             zotero_data = zotero_item.get('data')
             response_text = f"<{zotero_data.get('url')}|{zotero_data.get('title')}>"
-
         return {
             "type": "section",
             "text": {
@@ -44,6 +45,7 @@ class Zotero:
                 "text": response_text
             },
         }
+
     def blocks(self, zotero_items):
         blocks:list = []
         for zotero_item in zotero_items:

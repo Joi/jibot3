@@ -9,7 +9,7 @@ import logging
 
 class view(Zotero.Zotero):
     def __init__(self, ack:Ack, client:WebClient, context:BoltContext, logger:logging.Logger, request:BoltRequest, view:View):
-        super().__init__(context.get('user_id'))
+        super(context.get('user_id'))
         state:dict = view.get('state')
         form_fields:dict = state['values']
         sql_fields:dict = { 'user_id': context.get('user_id') }
@@ -45,7 +45,7 @@ class view(Zotero.Zotero):
 class action(Zotero.Zotero):
     zotero = None
     def __init__(self, ack:Ack, client:WebClient, context:BoltContext, logger:logging.Logger, payload:dict, request:BoltRequest):
-        super().__init__(context.get('user_id'))
+        super(context.get('user_id'))
         container = request.body.get('container', None)
         view:dict = request.body.get(container.get('type'))
         title:dict = view.get('title')
