@@ -8,14 +8,11 @@ import logging
 
 
 class view(Zotero.Zotero):
-    zotero: None
-
     def __init__(self, ack:Ack, client:WebClient, context:BoltContext, logger:logging.Logger, request:BoltRequest, view:View):
-        super().__init__()
-        self.zotero = Zotero.Zotero(context.get('bot_user_id'))
+        super().__init__(context.get('user_id'))
         state:dict = view.get('state')
         form_fields:dict = state['values']
-        sql_fields:dict = { 'user_id': context.get('bot_user_id') }
+        sql_fields:dict = { 'user_id': context.get('user_id') }
         for i in form_fields:
             form_field:dict = form_fields[i]
             for t in form_field:
@@ -26,8 +23,8 @@ class view(Zotero.Zotero):
                 if field_type == 'static_select':
                     field_value = field.get('selected_option').get('value')
 
-                if field_value is None and hasattr(self.zotero, field_name):
-                    field_value = getattr(self.zotero, field_name)
+                if field_value is None and hasattr(self, field_name):
+                    field_value = getattr(self, field_name)
 
                 if field_name == 'zotero_api_key':
                     field_value =  self.db.cipher.encrypt(field_value.encode('utf-8'))
@@ -48,21 +45,19 @@ class view(Zotero.Zotero):
 class action(Zotero.Zotero):
     zotero = None
     def __init__(self, ack:Ack, client:WebClient, context:BoltContext, logger:logging.Logger, payload:dict, request:BoltRequest):
-        super().__init__()
-        self.zotero = Zotero.Zotero(context.get('bot_user_id'))
+        super().__init__(context.get('user_id'))
         container = request.body.get('container', None)
         view:dict = request.body.get(container.get('type'))
         title:dict = view.get('title')
-        title.update(text="Slack-Wide Zotero")
+        title.update(text="Zotero Integration")
         close_button = view.get('close')
         close_button.update(text="Go Back")
         blocks:list = list()
-
         intro = {
             "type": "header",
             "text": {
                 "type": "plain_text",
-                "text": "The area is used to configur a a slack-wide zotero integration."
+                "text": "The area is used to configure your slack / zotero integration."
             }
         }
         link = {
@@ -79,7 +74,6 @@ class action(Zotero.Zotero):
                 "action_id": "zotero_library_id",
                 "placeholder": {
                     "type": "plain_text",
-                    "text": "Helpful placeholder text goes here",
                     "emoji": True
                 },
             },
@@ -128,12 +122,12 @@ class action(Zotero.Zotero):
             }
         }
 
-        if self.zotero.zotero_library_type is not None:
-            current_library_type = next((x for x in library_type_options if x.get('value') == self.zotero.zotero_library_type), library_type_options[0])
+        if self.zotero_library_type is not None:
+            current_library_type = next((x for x in library_type_options if x.get('value') == self.zotero_library_type), library_type_options[0])
             library_type['element']["initial_option"] = current_library_type
 
-        if self.zotero.zotero_library_id is not None:
-            library_id['element']["initial_value"] = self.zotero.zotero_library_id
+        if self.zotero_library_id is not None:
+            library_id['element']["initial_value"] = self.zotero_library_id
 
         api_key = {
             "type": "input",

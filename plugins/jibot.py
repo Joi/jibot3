@@ -58,7 +58,7 @@ class command:
 	def zotero(self, ack: Ack, client:WebClient, command:dict, context:BoltContext, payload:dict, respond:Respond, say:Say):
 		ack()
 		search_term = payload.get('text')
-		zotero = Zotero(context.get('bot_user_id'))
+		zotero = Zotero(context.get('user_id'))
 		results = zotero.read(search_term)
 		if len(results):
 			respond(blocks=zotero.blocks(results))
@@ -152,23 +152,22 @@ class shortcut:
 			}
 		})
 
-		if user.get('is_admin'):
-			view["blocks"].append({
-				"type": "section",
+		view["blocks"].append({
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Connect your Zotero Account to Slack"
+			},
+			"accessory": {
+				"type": "button",
 				"text": {
-					"type": "mrkdwn",
-					"text": "Zotero Configuration"
+					"type": "plain_text",
+					"text": "Zotero Config",
+					"emoji": True
 				},
-				"accessory": {
-					"type": "button",
-					"text": {
-						"type": "plain_text",
-						"text": "Zotero Integration",
-						"emoji": True
-					},
-					"action_id": "zotero",
-				}
-			})
+				"action_id": "zotero",
+			}
+		})
 
 		client.views_open(
 			trigger_id=shortcut["trigger_id"],
