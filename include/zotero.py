@@ -1,6 +1,7 @@
-import logging
+import inspect
 from slack_bolt.context.context import BoltContext
 from lib.database import SQLite
+from lib.logging import logger
 
 from pathlib import Path
 from pyzotero import zotero as PyZotero
@@ -25,6 +26,7 @@ class Zotero:
             self.user_id = user_id
             select = self.db.select_query(table_name, where=f"user_id = '{self.user_id}'")
             config = self.db.cursor.execute(select).fetchone()
+
             if config is not None:
                 self.zotero_library_type = config[1]
                 self.zotero_library_id = config[2]
@@ -53,6 +55,7 @@ class Zotero:
         return blocks
 
     def no_integration(self):
+        logger.info(f"{self.__class__.__name__} ({inspect.currentframe().f_code.co_name})")
         return [f":warning:  <@{self.user_id}> You have not set up a zotero integration."]
 
     def read(self, search_term:str = None):

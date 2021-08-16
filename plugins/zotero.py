@@ -4,12 +4,13 @@ from slack_bolt import Ack, BoltRequest, BoltResponse
 from slack_bolt.context import BoltContext
 from slack_sdk.models.views import View
 from slack_sdk.web import WebClient
-import logging
+from lib.logging import logger
 
 
 class view(Zotero.Zotero):
-    def __init__(self, ack:Ack, client:WebClient, context:BoltContext, logger:logging.Logger, request:BoltRequest, view:View):
-        super(context.get('user_id'))
+    def __init__(self, ack:Ack, client:WebClient, context:BoltContext, logger:logger, request:BoltRequest, view:View):
+        logger.info("Updating Zotero config...")
+        super().__init__(context.get('user_id'))
         state:dict = view.get('state')
         form_fields:dict = state['values']
         sql_fields:dict = { 'user_id': context.get('user_id') }
@@ -44,8 +45,9 @@ class view(Zotero.Zotero):
 
 class action(Zotero.Zotero):
     zotero = None
-    def __init__(self, ack:Ack, client:WebClient, context:BoltContext, logger:logging.Logger, payload:dict, request:BoltRequest):
-        super(context.get('user_id'))
+    def __init__(self, ack:Ack, client:WebClient, context:BoltContext, logger:logger, payload:dict, request:BoltRequest):
+        logger.info("Init Zotero UI...")
+        super().__init__(context.get('user_id'))
         container = request.body.get('container', None)
         view:dict = request.body.get(container.get('type'))
         title:dict = view.get('title')
@@ -72,10 +74,10 @@ class action(Zotero.Zotero):
             "element": {
                 "type": "plain_text_input",
                 "action_id": "zotero_library_id",
-                "placeholder": {
-                    "type": "plain_text",
-                    "emoji": True
-                },
+                # "placeholder": {
+                #     "type": "plain_text",
+                #     "emoji": True
+                # },
             },
             "label": {
                 "type": "plain_text",
