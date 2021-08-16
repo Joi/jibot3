@@ -61,11 +61,9 @@ Replace [] values as shown below with the appropriate values from your slack bot
 	JIBOT_SLACK_BOT_TOKEN=[xoxb-...]	# REQUIRED
 	JIBOT_SLACK_SIGNING_SECRET=[...]	# REQUIRED
 	JIBOT_SLACK_APP_TOKEN=[xapp-...]	# REQUIRED FOR SOCKET MODE
-
-	JIBOT_DO_SOCKET_MODE=[True]		# Enable/disable Socket Mode	(default True)
-	JIBOT_PORT=[3000]				# Port used for bot dev server	(default 3000)
-	JIBOT_SLACK_SLASH_COMMAND=[...]	# Slash command for bot use
-	JIBOT_SLACK_USER_TOKEN=[...]	# Currently Experimental
+	JIBOT_PORT=[3000]					# Port used for bot dev server	(default 3000)
+	JIBOT_SLACK_SLASH_COMMAND=[...]		# Slash command for bot use
+	JIBOT_SLACK_USER_TOKEN=[...]		# Currently Experimental
 	JIBOT_CRYPTO_PASS_PHRASE=[PASSPHRASE]	# Used to create key to encrypt/decript sensitive stuff in db
 
 ### Using virtual environment and adding your environment variables
