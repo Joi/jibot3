@@ -9,7 +9,7 @@ from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from sqlite3 import Connection, Cursor, Error
-
+from lib.logging import logger
 class SQLite():
 	connection:Connection = None
 	cursor:Cursor = None
@@ -18,23 +18,24 @@ class SQLite():
 	cipher:Fernet
 
 	def __init__(self):
+		# logger.info(f"{self.__class__.__name__} ({inspect.currentframe().f_code.co_name})")
 		if self.db_file.is_file():
-			logging.debug(f"Database file exists... {self.db_file}")
+			logger.debug(f"Database file exists... {self.db_file}")
 		else:
-			logging.debug(f"Database file does not exist... creating {self.db_file}")
+			logger.debug(f"Database file does not exist... creating {self.db_file}")
 			self.db_file.touch()
 
 		try:
 			self.connection = sqlite3.connect(self.db_file)
 			self.cursor = self.connection.cursor()
-			logging.debug(sqlite3.version)
+			logger.debug(sqlite3.version)
 		except Error as e:
-			logging.error(e)
+			logger.error(e)
 
 		if self.key_file.is_file():
-			logging.debug(f"Key file exists... {self.key_file}")
+			logger.debug(f"Key file exists... {self.key_file}")
 		else:
-			logging.debug(f"Key file does not exist... creating {self.key_file}")
+			logger.debug(f"Key file does not exist... creating {self.key_file}")
 			kdf = PBKDF2HMAC(
 				algorithm=hashes.SHA256(),
 				iterations=100000,

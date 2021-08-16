@@ -1,8 +1,2 @@
 import lib.slack as bolt
-import logging
-
-logging.basicConfig(
-	level=logging.INFO,
-	format='%(levelname)s:%(message)s'
-)
-bolt.app()
+bolt.jibot_slack_app()
